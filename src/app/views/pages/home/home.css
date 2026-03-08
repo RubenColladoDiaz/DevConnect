@@ -1,0 +1,9 @@
+.login-button-background {
+  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
+  color: #fff;
+  border: none;
+}
+.login-button-background:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
