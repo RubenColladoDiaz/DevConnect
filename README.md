@@ -1,59 +1,65 @@
 # DevConnect
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
+DevConnect is a social network for developers where users can share content, ask technical questions, showcase projects, and receive feedback. It combines features similar to LinkedIn and StackOverflow, with a strong focus on technical profiles and user interactions.
+
+## Features
+
+### User System
+- **Registration & Login:** JWT-based authentication with refresh tokens.
+- **Public Profile:** Avatar, biography, favorite technologies, and user level (junior, mid, senior).
+
+### Posts (LinkedIn-style)
+- Create text posts, share code, and GitHub links.
+- Add tags like `angular`, `node`, `python`.
+- Interactions: likes, comments, shares.
+
+### Questions & Answers (StackOverflow-style)
+- Ask questions, answer, vote, and mark solutions.
+- Demonstrates advanced business logic.
+
+### Technical User Profile
+- Show technologies used, projects, statistics, and reputation.
+- Example stats:
+  - Questions asked
+  - Accepted answers
+  - Likes received
+  - Reputation level
+
+### Follow System
+- Follow other users
+- Personalized feed
+- Demonstrates relationships between users
+
+## Architecture
+
+### Microservices
+- **Auth Service (Node.js):** handles registration, login, JWTs, and refresh tokens. Uses SQL database.
+- **User Service:** manages profiles, followers, and technologies. Uses SQL database.
+- **Post Service:** manages posts, comments, likes. Uses NoSQL (MongoDB).
+- **Question Service:** manages questions, answers, votes. Uses MongoDB.
+- **Notification Service:** manages likes, comments, new followers, and question responses. Uses MongoDB.
+
+### Databases
+- **SQL (PostgreSQL or MySQL):** structured data (users, followers, roles, auth)
+- **NoSQL (MongoDB):** dynamic content (posts, comments, questions, answers, notifications)
+
+## Frontend (Angular)
+- **Auth:** login, registration
+- **Feed:** view posts and interactions
+- **Questions:** list, detail, and answer questions
+- **Profile:** public profile and statistics
+- **Explorer:** search users and technologies
+
+## Testing
+- Unit tests for components, services, and pipes using [Vitest](https://vitest.dev/)
+- Examples:
+  - API service test
+  - Login component test
+  - Feed component test
 
 ## Development server
 
-To start a local development server, run:
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will reload automatically if you change any source files.
 
 ```bash
 ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
