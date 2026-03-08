@@ -17,6 +17,10 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "body-parser": "^2.2.2",
+    "bootstrap": "^5.3.8",
+    "express": "^5.2.1",
+    "mysql": "^2.18.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
