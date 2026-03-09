@@ -1,17 +1,79 @@
 const express = require('express');
-const cors = require('cors');
-const mysql = require('mysql2/promise');
-
 const app = express();
-const PORT = 3000;
+
+const mysql = require('mysql');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 app.use(cors());
-app.use(express.json());
 
-const db = mysql.createPool({
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
+
+app.listen(3000, function () {
+  console.log('Node app is running on port 3000')
+})
+module.exports = app;
+
+const dbConn = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'super3',
-  database: 'devconnect',
+  database: 'devconnectBD'
 });
 
+app.post('/login', function (req, res){
+  const username = req.body.username;
+  const password = req.body.password;
+
+  dbConn.query('SELECT * FROM users WHERE username = ?', [username], async function (error, results, fields){
+    if(error) return res.status(500).json({ message: 'Database error' });
+
+    if(results.length === 0)
+      return res.status(401).json({message: 'User not found'})
+
+    const user = results[0];
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if(!validPassword)
+      return res.status(401).json({message: 'Invalid credentials'});
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      "SECRET_KEY",
+      { expiresIn: "24h" }
+    );
+
+    return res.send({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+      }
+    })
+  })
+})
+
+app.post('/register', function (req, res) {
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+
+  dbConn.query('SELECT * FROM users WHERE email = ?', [email], function (error, results, fields){
+    if(error) return res.status(500).json({ message: 'Database error' });
+
+    if(results.length > 0)
+      return res.status(401).json({message: 'User not found'});
+
+    dbConn.query('INSERT INTO users set ?',
+      {username: username, email: email, password: password}, function (error, results, fields){
+        if(error) return res.status(500).json({ message: 'Database error' });
+
+        return res.send({})
+      })
+  })
+})

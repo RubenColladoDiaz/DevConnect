@@ -15,8 +15,8 @@
                   <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4>
                 </div>
 
-                <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-                  <p>Please login to your account</p>
+                <form>
+                  <p>Please create your account</p>
 
                   <div data-mdb-input-init class="form-outline mb-4">
                     <input
@@ -24,8 +24,18 @@
                       id="form2Example11"
                       class="form-control"
                       placeholder="Username"
-                      formControlName="username"
                       name="username"
+                      required
+                    />
+                  </div>
+
+                  <div data-mdb-input-init class="form-outline mb-4">
+                    <input
+                      type="email"
+                      id="form2Example11"
+                      class="form-control"
+                      placeholder="Email"
+                      name="email"
                       required
                     />
                   </div>
@@ -36,7 +46,6 @@
                       id="form2Example22"
                       class="form-control"
                       placeholder="Password"
-                      formControlName="password"
                       name="password"
                       required
                     />
@@ -49,22 +58,8 @@
                       class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3 w-100 login-button py-2"
                       type="submit"
                     >
-                      LOG IN</button
+                      REGISTER</button
                     ><br />
-                    <a class="text-muted" href="#!">Forgot password?</a>
-                  </div>
-
-                  <div class="d-flex align-items-center justify-content-center pb-4">
-                    <p class="mb-0 me-2">Don't have an account?</p>
-                    <a
-                      href="/register"
-                      type="button"
-                      data-mdb-button-init
-                      data-mdb-ripple-init
-                      class="btn btn-outline-danger"
-                    >
-                      Create new
-                    </a>
                   </div>
                 </form>
               </div>
