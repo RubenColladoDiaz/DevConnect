@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-login-page',
@@ -6,4 +7,12 @@ import { Component } from '@angular/core';
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
-export class LoginPage {}
+export class LoginPage {
+  username: string = "";
+  password: string = "";
+
+  login(f:NgForm) {
+    this.username = f.value.username;
+    this.password = f.value.password;
+  }
+}

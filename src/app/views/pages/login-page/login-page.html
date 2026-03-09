@@ -15,15 +15,18 @@
                   <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4>
                 </div>
 
-                <form>
+                <form (ngSubmit)="login(f)" #f="ngForm">
                   <p>Please login to your account</p>
 
                   <div data-mdb-input-init class="form-outline mb-4">
                     <input
-                      type="email"
+                      type="text"
                       id="form2Example11"
                       class="form-control"
                       placeholder="Username"
+                      [(ngModel)]="username"
+                      name="username"
+                      required
                     />
                   </div>
 
@@ -33,6 +36,9 @@
                       id="form2Example22"
                       class="form-control"
                       placeholder="Password"
+                      [(ngModel)]="password"
+                      name="password"
+                      required
                     />
                   </div>
 
@@ -41,7 +47,7 @@
                       data-mdb-button-init
                       data-mdb-ripple-init
                       class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3 w-100 login-button py-2"
-                      type="button"
+                      type="submit"
                     >
                       LOG IN</button
                     ><br />
