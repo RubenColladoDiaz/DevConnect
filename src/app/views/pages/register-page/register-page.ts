@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-register-page',
@@ -9,18 +9,24 @@ import {HttpClient} from '@angular/common/http';
   styleUrl: './register-page.css',
 })
 export class RegisterPage {
+  registerForm: FormGroup;
 
-  registerForm:FormGroup;
-
-  constructor(private fb:FormBuilder, private http:HttpClient) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+  ) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', Validators.required],
-      password: ['', Validators.required]
-    })
+      password: ['', Validators.required],
+    });
   }
 
-  onRegister(){
-    if(this.registerForm.invalid) return;
+  onRegister() {
+    if (this.registerForm.invalid) return;
+
+    this.http.post('http://localhost:3000/register', this.registerForm.value).subscribe((res: any) => {
+      localStorage.setItem('user', JSON.stringify(res.user));
+    });
   }
 }
