@@ -60,6 +60,9 @@
                       REGISTER</button
                     ><br />
                     <a href="/login" style="text-decoration: none">I have an account</a>
+                    @if (message.length > 0) {
+                      <div class="error mt-3">{{ message }}</div>
+                    }
                   </div>
                 </form>
               </div>

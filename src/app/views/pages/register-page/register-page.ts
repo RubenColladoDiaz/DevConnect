@@ -12,6 +12,8 @@ import { Router } from '@angular/router';
 export class RegisterPage {
   registerForm: FormGroup;
 
+  message: string = '';
+
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -30,10 +32,10 @@ export class RegisterPage {
     this.http.post('http://localhost:3000/register', this.registerForm.value).subscribe({
       next: (res: any) => {
         localStorage.setItem('user', JSON.stringify(res.user));
-        this.router.navigate(['/login']);
+        this.router.navigate(['/']);
       },
-      error: () => {
-        alert('No se pudo registrar. Revisa los datos o si el backend esta corriendo.');
+      error: (res: any) => {
+        this.message = res.error?.message ?? 'Unexpected error';
       },
     });
   }
