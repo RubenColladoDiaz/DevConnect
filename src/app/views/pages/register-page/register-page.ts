@@ -35,7 +35,7 @@ export class RegisterPage {
         this.router.navigate(['/']);
       },
       error: (res: any) => {
-        this.message = res.error?.message ?? 'Unexpected error';
+        this.message = res.error.message ?? 'Unexpected error';
       },
     });
   }
