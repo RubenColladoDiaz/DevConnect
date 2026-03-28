@@ -1,3 +1,9 @@
 li {
   cursor: pointer;
 }
+
+.welcome-message {
+  width: 10%;
+  color: #df1888;
+  font-size: 130%;
+}
