@@ -8,4 +8,7 @@ import { Component, signal } from '@angular/core';
 })
 export class App {
   protected readonly title = signal('DevConnect');
+
+  user = JSON.parse(localStorage.getItem('user') || '{}');
+  username = this.user.username;
 }

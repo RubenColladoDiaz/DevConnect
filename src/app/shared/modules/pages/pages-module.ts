@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Home } from '../../../views/pages/home/home';
 import { ComponentsModule } from '../components/components-module';
 import { LoginPage } from '../../../views/pages/login-page/login-page';
@@ -8,7 +9,14 @@ import { RegisterPage } from '../../../views/pages/register-page/register-page';
 
 @NgModule({
   declarations: [Home, LoginPage, RegisterPage],
-  imports: [CommonModule, ComponentsModule, FormsModule, NgOptimizedImage, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ComponentsModule,
+    FormsModule,
+    NgOptimizedImage,
+    ReactiveFormsModule,
+    RouterModule,
+  ],
   exports: [Home, LoginPage, RegisterPage],
 })
 export class PagesModule {}

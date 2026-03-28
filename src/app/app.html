@@ -1,7 +1,12 @@
-<ul
-  class="d-flex align-items-center list-unstyled justify-content-center gap-5 bg-black text-white m-0 p-1"
->
-  <li routerLink="/">Home</li>
-  <li routerLink="/login">Login</li>
-</ul>
+<div class="d-flex justify-content-center flex-column align-items-center">
+  <ul
+    class="d-flex align-items-center list-unstyled justify-content-center gap-5 bg-black text-white m-0 p-1 w-100"
+  >
+    <li routerLink="/">Home</li>
+    <li routerLink="/login">Login</li>
+  </ul>
+  @if (username) {
+    <p class="text-center bg-black text-white p-1" style="width: 10%">Welcome, {{ username }}</p>
+  }
+</div>
 <router-outlet />
