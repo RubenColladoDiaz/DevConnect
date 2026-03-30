@@ -1,3 +1,8 @@
+section{
+  margin: 0 435px;
+  margin-top: 50px;
+}
+
 .login-button-background {
   background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
   color: #fff;
@@ -6,4 +11,32 @@
 .login-button-background:hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
+}
+
+.user-target {
+  background-color: rgb(243, 241, 238);
+  width: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.user-target:hover{
+  cursor: pointer;
+}
+
+.user-target img {
+  width: 35px;
+  height: 35px;
+  margin-right: 10px;
+  border-radius: 120px;
+}
+
+a{
+  text-decoration: none;
+  color: black;
+  display: inline-block;
+  width: fit-content;
 }

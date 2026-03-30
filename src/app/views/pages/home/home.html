@@ -1,7 +1,26 @@
 <app-header />
-<button
-  class="m-auto d-flex rounded-4 px-4 py-1 fs-5 login-button-background border-0"
-  routerLink="/login"
->
-  Login
-</button>
+@if (!username) {
+  <button
+    class="m-auto d-flex rounded-4 px-4 py-1 fs-5 login-button-background border-0"
+    routerLink="/login"
+  >
+    Login
+  </button>
+}
+<section class="vh-100">
+  @if (username) {
+    <a href="">
+      <div class="user-target">
+        <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="" />
+        Welcome, {{ username }}
+      </div>
+    </a>
+  } @else {
+    <a href="/login">
+      <div class="user-target">
+        <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="" />
+        Welcome, Unknown
+      </div>
+    </a>
+  }
+</section>

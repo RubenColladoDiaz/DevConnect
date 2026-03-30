@@ -6,6 +6,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const { MongoClient } = require('mongodb');
 
 app.use(cors());
 
@@ -27,6 +28,12 @@ const dbConn = mysql.createConnection({
   password: 'super3',
   database: 'devconnectBD',
 });
+
+const mongoClient = new MongoClient('mongodb://localhost:27017');
+mongoClient.connect();
+const dbConnMongo = mongoClient.db('devconnect');
+
+// USERS SERVICE
 
 app.post('/login', function (req, res) {
   const username = req.body.username;
@@ -65,26 +72,79 @@ app.post('/register', function (req, res) {
   const email = req.body.email;
   const password = req.body.password;
 
-  dbConn.query('SELECT * FROM users WHERE email = ? OR username = ?', [email, username], async function (error, results, fields) {
-    if (error) return res.status(500).json({ message: 'Database error' });
+  dbConn.query(
+    'SELECT * FROM users WHERE email = ? OR username = ?',
+    [email, username],
+    async function (error, results, fields) {
+      if (error) return res.status(500).json({ message: 'Database error' });
 
-    if (results.length > 0) return res.status(409).json({ message: 'User already exists' });
+      if (results.length > 0) return res.status(409).json({ message: 'User already exists' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    dbConn.query(
-      'INSERT INTO users set ?',
-      { username: username, email: email, password: hashedPassword },
-      function (error, results, fields) {
+      dbConn.query(
+        'INSERT INTO users set ?',
+        { username: username, email: email, password: hashedPassword },
+        function (error, results, fields) {
+          if (error) return res.status(500).json({ message: 'Database error' });
+
+          const newUser = {
+            id: results.insertId,
+            username,
+            email,
+          };
+          return res.send({ user: newUser });
+        },
+      );
+    },
+  );
+});
+
+// POSTS SERVICE
+
+app.post('/createPost', function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+
+    const decoded = jwt.verify(token, 'SECRET_KEY');
+    const userId = decoded.id;
+    const content = req.body.content;
+    const tags = req.body.tags;
+    const createdAt = req.body.createdAt;
+    const likes = 0;
+    const comments = [];
+
+    dbConnMongo.collection('posts').insertOne(
+      {
+        userId,
+        content,
+        tags,
+        createdAt,
+        likes,
+        comments,
+      },
+      function (error, result) {
         if (error) return res.status(500).json({ message: 'Database error' });
-
-        const newUser = {
-          id: results.insertId,
-          username,
-          email,
-        };
-        return res.send({ user: newUser });
+        return res.send({
+          post: {
+            _id: result.insertedId,
+            userId,
+            content,
+            tags,
+            createdAt,
+            likes,
+            comments,
+          },
+        });
       },
     );
-  });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
 });
+
+function getDecodedToken(req) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) throw new Error('No token provided');
+  return token;
+}
