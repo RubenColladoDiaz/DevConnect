@@ -1,8 +1,10 @@
 export type Post = {
-    userId:number,
-    content:string,
-    tags:string[],
-    createdAt:Date,
-    likes:number,
-    comments:string[]
-}
+  username: string;
+  content: string;
+  reposts: number;
+  views: number;
+  tags: string[];
+  createdAt: Date;
+  likes: number;
+  comments: string[];
+};

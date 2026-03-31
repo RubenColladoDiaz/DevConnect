@@ -89,7 +89,7 @@ app.post('/register', function (req, res) {
           if (error) return res.status(500).json({ message: 'Database error' });
 
           const newUser = {
-            id: results.insertId,
+            userId: results.insertId,
             username,
             email,
           };
@@ -100,11 +100,23 @@ app.post('/register', function (req, res) {
   );
 });
 
+function getUserByID(id, req, res) {
+  dbConn.query(
+    'SELECT userId, username, email FROM users WHERE id = ?', [id],
+    function (error, results, fields) {
+      if (error) return res.status(500).json({ message: 'Database error' });
+      if (results.length === 0) return res.status(404).json({ message: 'User not found' });
+
+      return res.send({ user: results[0] });
+    },
+  );
+}
+
 // POSTS SERVICE
 
-app.get('/getAllPosts', function (req, res) {
+app.get('/getAllPosts', async function (req, res) {
   try {
-    const posts = dbConnMongo.collection('posts').find().sort({ createdAt: 1 }).toArray();
+    const posts = await dbConnMongo.collection('posts').find().sort({ createdAt: 1 }).toArray();
     return res.send({ posts: posts });
   } catch (error) {
     return res.status(401).json({ message: error.message });
@@ -114,21 +126,25 @@ app.get('/getAllPosts', function (req, res) {
 app.post('/createPost', function (req, res) {
   try {
     const token = getDecodedToken(req);
-
     const decoded = jwt.verify(token, 'SECRET_KEY');
-    const userId = decoded.id;
+
+    const username = decoded.username;
     const content = req.body.content;
     const tags = req.body.tags;
     const createdAt = new Date().toLocaleString();
+    const reposts = 0;
+    const views = 0;
     const likes = 0;
     const comments = [];
 
     dbConnMongo.collection('posts').insertOne(
       {
-        userId,
+        username: username,
         content,
         tags,
         createdAt,
+        reposts,
+        views,
         likes,
         comments,
       },
@@ -137,12 +153,14 @@ app.post('/createPost', function (req, res) {
         return res.send({
           post: {
             _id: result.insertedId,
-            userId,
+            username: username,
             content,
             tags,
             createdAt,
+            reposts,
+            views,
             likes,
-            comments,
+            comments
           },
         });
       },

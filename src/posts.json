@@ -1,0 +1,82 @@
+[
+  {
+    "username": "ruben",
+    "content": "He terminado la estructura base de DevConnect y ya podemos empezar a publicar avances del proyecto aqui.",
+    "tags": ["angular", "node", "mongodb"],
+    "createdAt": "31/03/2026, 09:15:00",
+    "reposts": 2,
+    "views": 18,
+    "likes": 7,
+    "comments": ["Buen arranque", "Tiene muy buena pinta"]
+  },
+  {
+    "username": "laura_dev",
+    "content": "Hoy he conectado el frontend con el backend usando HttpClient y ya se muestran los posts en la home.",
+    "tags": ["frontend", "api", "angular"],
+    "createdAt": "31/03/2026, 09:42:00",
+    "reposts": 1,
+    "views": 12,
+    "likes": 5,
+    "comments": ["Genial", "Eso ya da vida a la app"]
+  },
+  {
+    "username": "sergio_js",
+    "content": "La autenticacion con JWT ya responde bien en login y register. Siguiente paso: proteger mejor las rutas.",
+    "tags": ["jwt", "auth", "express"],
+    "createdAt": "31/03/2026, 10:05:00",
+    "reposts": 3,
+    "views": 26,
+    "likes": 9,
+    "comments": ["Muy necesario", "Luego hacemos el guard en Angular"]
+  },
+  {
+    "username": "marta_ui",
+    "content": "He ajustado la vista principal para que los posts queden mas limpios y faciles de leer desde movil.",
+    "tags": ["ui", "css", "responsive"],
+    "createdAt": "31/03/2026, 10:28:00",
+    "reposts": 0,
+    "views": 14,
+    "likes": 6,
+    "comments": ["Se nota bastante", "Quedo mucho mejor"]
+  },
+  {
+    "username": "dani_code",
+    "content": "MongoDB Compass me viene genial para cargar datos de prueba rapido mientras seguimos con el desarrollo.",
+    "tags": ["mongodb", "compass", "seed"],
+    "createdAt": "31/03/2026, 11:00:00",
+    "reposts": 1,
+    "views": 20,
+    "likes": 8,
+    "comments": ["Yo tambien lo uso", "Ahorra mucho tiempo"]
+  },
+  {
+    "username": "nerea_db",
+    "content": "La tabla users en MySQL ya esta lista. Ahora el objetivo es que los posts vivan en Mongo sin mezclar responsabilidades.",
+    "tags": ["mysql", "mongodb", "backend"],
+    "createdAt": "31/03/2026, 11:26:00",
+    "reposts": 2,
+    "views": 21,
+    "likes": 10,
+    "comments": ["Buena separacion", "Tiene sentido para este caso"]
+  },
+  {
+    "username": "alex_fullstack",
+    "content": "He probado varios posts con tags para luego poder filtrar por tecnologia o por tipo de contenido.",
+    "tags": ["fullstack", "tags", "feature"],
+    "createdAt": "31/03/2026, 12:03:00",
+    "reposts": 0,
+    "views": 11,
+    "likes": 4,
+    "comments": ["Ese filtro va a quedar muy bien"]
+  },
+  {
+    "username": "clara_net",
+    "content": "Queda pendiente mejorar el orden por fecha, pero para poblar la coleccion de prueba este JSON ya nos sirve perfecto.",
+    "tags": ["testing", "posts", "devconnect"],
+    "createdAt": "31/03/2026, 12:40:00",
+    "reposts": 1,
+    "views": 16,
+    "likes": 5,
+    "comments": []
+  }
+]
