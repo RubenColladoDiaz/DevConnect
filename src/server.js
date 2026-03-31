@@ -102,6 +102,15 @@ app.post('/register', function (req, res) {
 
 // POSTS SERVICE
 
+app.get('/getAllPosts', function (req, res) {
+  try {
+    const posts = dbConnMongo.collection('posts').find().sort({ createdAt: 1 }).toArray();
+    return res.send({ posts: posts });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/createPost', function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -110,7 +119,7 @@ app.post('/createPost', function (req, res) {
     const userId = decoded.id;
     const content = req.body.content;
     const tags = req.body.tags;
-    const createdAt = req.body.createdAt;
+    const createdAt = new Date().toLocaleString();
     const likes = 0;
     const comments = [];
 

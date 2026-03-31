@@ -1,6 +1,13 @@
-section{
+main {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 40px;
   margin: 0 435px;
   margin-top: 50px;
+}
+
+section {
+  margin: 0;
 }
 
 .login-button-background {
@@ -23,7 +30,7 @@ section{
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
-.user-target:hover{
+.user-target:hover {
   cursor: pointer;
 }
 
@@ -34,9 +41,42 @@ section{
   border-radius: 120px;
 }
 
-a{
+a {
   text-decoration: none;
   color: black;
   display: inline-block;
   width: fit-content;
+}
+
+.post-target {
+  border: none;
+  border-radius: 12px;
+  max-width: 500px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+.post-target p {
+  padding: 17px;
+}
+
+.post-target .user-bar {
+  height: 50px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.post-target .user-bar img {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  object-fit: cover;
 }
