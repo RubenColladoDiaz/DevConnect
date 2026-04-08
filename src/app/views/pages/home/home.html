@@ -1,0 +1,96 @@
+<app-header />
+@if (!user.username) {
+  <button
+    class="m-auto d-flex rounded-4 px-4 py-1 fs-5 login-button-background border-0"
+    routerLink="/login"
+  >
+    Login
+  </button>
+}
+<main>
+  <section>
+    @if (user.username) {
+      <a href="">
+        <div class="user-target">
+          <img
+            src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+            alt="User logo"
+          />
+          Welcome, {{ user.username }}
+        </div>
+      </a>
+    } @else {
+      <a href="/login">
+        <div class="user-target">
+          <img
+            src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+            alt="User logo"
+          />
+          Welcome, Unknown
+        </div>
+      </a>
+    }
+  </section>
+
+  <section>
+    @if (posts.length > 0) {
+      @for (post of posts; track post) {
+        <div class="post-target">
+          <div class="bg-black text-white user-bar">
+            <div class="d-flex align-items-center gap-3">
+              <img
+                src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+                alt="User logo"
+              />
+              <p class="m-0 p-0">{{ post.username }}</p>
+            </div>
+            <p class="m-0 p-0">{{ post.createdAt | date:'dd/MM' }}</p>
+          </div>
+          <div>
+            <p>{{ post.content }}</p>
+          </div>
+          <hr />
+          <div class="d-flex align-items-center justify-content-center gap-3 pb-3">
+            <p><i class="fa-regular fa-comment"></i> {{ post.comments.length }}</p>
+            <p><i class="fa-solid fa-retweet"></i> {{ post.reposts }}</p>
+            <p><i class="fa-regular fa-heart"></i> {{ post.likes }}</p>
+            <p><i class="fa-regular fa-eye"></i> {{ post.views }}</p>
+            <p><i class="fa-regular fa-bookmark"></i></p>
+            <p><i class="fa-solid fa-share"></i></p>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="post-target">
+        <div class="bg-black text-white user-bar">
+          <div class="d-flex align-items-center gap-3">
+            <img
+              src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+              alt="User logo"
+            />
+            <p class="m-0 p-0">Unknown</p>
+          </div>
+          <p class="m-0 p-0">31/03</p>
+        </div>
+        <div>
+          <p>
+            Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.
+            Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,
+            cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una
+            galería de textos y los mezcló de tal manera que logró hacer un libro de textos
+            especimen.
+          </p>
+        </div>
+        <hr />
+        <div class="d-flex align-items-center justify-content-center gap-3 pb-3">
+          <p><i class="fa-regular fa-comment"></i> 0</p>
+          <p><i class="fa-solid fa-retweet"></i> 0</p>
+          <p><i class="fa-regular fa-heart"></i> 0</p>
+          <p><i class="fa-regular fa-eye"></i> 0</p>
+          <p><i class="fa-regular fa-bookmark"></i></p>
+          <p><i class="fa-solid fa-share"></i></p>
+        </div>
+      </div>
+    }
+  </section>
+</main>

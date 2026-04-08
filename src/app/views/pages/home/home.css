@@ -1,0 +1,87 @@
+main {
+  display: grid;
+  grid-template-columns: 210px minmax(320px, 500px);
+  justify-content: center;
+  gap: 40px;
+  margin: 50px auto 0;
+  width: min(1100px, calc(100% - 32px));
+}
+
+section {
+  margin: 0;
+}
+
+.login-button-background {
+  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
+  color: #fff;
+  border: none;
+}
+.login-button-background:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.user-target {
+  background-color: rgb(243, 241, 238);
+  width: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.user-target:hover {
+  cursor: pointer;
+}
+
+.user-target img {
+  width: 35px;
+  height: 35px;
+  margin-right: 10px;
+  border-radius: 120px;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  display: inline-block;
+  width: fit-content;
+}
+
+.post-target {
+  border: none;
+  border-radius: 12px;
+  max-width: 500px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+.post-target p {
+  padding: 17px;
+}
+
+.post-target .user-bar {
+  height: 50px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 312px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.post-target .user-bar img {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+i:hover {
+  cursor: pointer;
+}
