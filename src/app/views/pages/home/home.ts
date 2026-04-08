@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { User } from '../../../shared/types/User';
 
@@ -9,12 +9,17 @@ import { User } from '../../../shared/types/User';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
+export class Home implements OnInit {
   user: User = JSON.parse(localStorage.getItem('user') || '{}');
   posts: Post[] = [];
   message: string = '';
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
     this.getAllPosts();
   }
 
@@ -31,9 +36,11 @@ export class Home {
       .subscribe({
         next: (res: any) => {
           this.posts = res.posts;
+          this.cdr.detectChanges();
         },
         error: (res: any) => {
-          this.message = res.error.message;
+          console.error('getAllPosts ERROR:', res);
+          this.message = res.error?.message;
         },
       });
   }
