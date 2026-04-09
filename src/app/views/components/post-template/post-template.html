@@ -1,0 +1,24 @@
+<div class="post-target">
+  <div class="bg-black text-white user-bar">
+    <div class="d-flex align-items-center gap-3">
+      <img
+        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+        alt="User logo"
+      />
+      <p class="m-0 p-0">{{ post()?.username }}</p>
+    </div>
+    <p class="m-0 p-0">{{ post()?.createdAt | date: 'dd/MM' }}</p>
+  </div>
+  <div>
+    <p>{{ post()?.content }}</p>
+  </div>
+  <hr />
+  <div class="d-flex align-items-center justify-content-center gap-3 pb-3">
+    <p><i class="fa-regular fa-comment"></i> {{ post()?.comments?.length }}</p>
+    <p><i class="fa-solid fa-retweet"></i> {{ post()?.reposts }}</p>
+    <p><i class="fa-regular fa-heart"></i> {{ post()?.likes }}</p>
+    <p><i class="fa-regular fa-eye"></i> {{ post()?.views }}</p>
+    <p><i class="fa-regular fa-bookmark"></i></p>
+    <p><i class="fa-solid fa-share"></i></p>
+  </div>
+</div>

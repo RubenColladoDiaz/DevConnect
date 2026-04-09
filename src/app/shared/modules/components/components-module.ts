@@ -1,11 +1,15 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Header } from '../../../views/components/header/header';
-import { NewPostComponent } from '../../../views/components/new-post-component/new-post-component';
+import { NewPostButton } from '../../../views/components/new-post-button/new-post-button';
+import { OfflinePost } from '../../../views/components/offline-post/offline-post';
+import { PostTemplate } from '../../../views/components/post-template/post-template';
+import { NewPostTemplate } from '../../../views/components/new-post-template/new-post-template';
 
 @NgModule({
-  declarations: [Header, NewPostComponent],
+  declarations: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate],
   imports: [CommonModule],
-  exports: [Header, NewPostComponent],
+  exports: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate],
+  providers: [DatePipe],
 })
 export class ComponentsModule {}

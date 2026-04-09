@@ -18,13 +18,13 @@ export class Home implements OnInit {
    * @type {User}
    * @default {}
    */
-  user: User = JSON.parse(localStorage.getItem('user') || '{}');
+  user: WritableSignal<User> = signal<User>(JSON.parse(localStorage.getItem('user') || '{}'));
   /**
    * List variable where we save all gotten post from getAllPosts.
    * @type {Post}
    * @default {[]}
    */
-  posts: Post[] = [];
+  posts: WritableSignal<Post>[] = [];
   /**
    * Text message where we show possible errors.
    * @type {string}

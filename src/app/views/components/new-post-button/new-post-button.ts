@@ -2,12 +2,12 @@ import { Component, model, ModelSignal } from '@angular/core';
 import { User } from '../../../shared/types/User';
 
 @Component({
-  selector: 'app-new-post-component',
+  selector: 'app-new-post-button',
   standalone: false,
-  templateUrl: './new-post-component.html',
-  styleUrl: './new-post-component.css',
+  templateUrl: './new-post-button.html',
+  styleUrl: './new-post-button.css',
 })
-export class NewPostComponent {
+export class NewPostButton {
   creating: ModelSignal<boolean> = model<boolean>(false);
   user: User = JSON.parse(localStorage.getItem('user') || '{}');
 
