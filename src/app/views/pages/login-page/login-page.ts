@@ -3,6 +3,9 @@ import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+/**
+ * Login component where the user will be able to login in a SQL Database.
+ */
 @Component({
   selector: 'app-login-page',
   standalone: false,
@@ -10,10 +13,25 @@ import { Router } from '@angular/router';
   styleUrl: './login-page.css',
 })
 export class LoginPage {
+  /**
+   * Form group where we will modify username and password.
+   * @type {FormGroup}
+   */
   loginForm: FormGroup;
 
+  /**
+   * Text message where we show possible errors.
+   * @type {string}
+   * @default {''}
+   */
   message: string = '';
 
+  /**
+   * Constructor where we create essencial params for different methods and we validate inputs from the form.
+   * @param {FormBuilder} fb Builder for create the FormGroup.
+   * @param {HttpClient} http Property that is used to make API calls.
+   * @param {Router} router Property that is used to navigate within different web routes.
+   */
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -25,7 +43,12 @@ export class LoginPage {
     });
   }
 
-  onLogin() {
+  /**
+   * This POST method log in the user into the paltform saving the user object in localStorage.
+   * @type {void}
+   * @returns This method does not return any data.
+   */
+  onLogin(): void {
     if (this.loginForm.invalid) return;
 
     this.http.post('http://localhost:3000/login', this.loginForm.value).subscribe({

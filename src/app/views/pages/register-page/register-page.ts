@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+/**
+ * Register component where the user will be able to register his data in the platform.
+ */
 @Component({
   selector: 'app-register-page',
   standalone: false,
@@ -10,10 +13,25 @@ import { Router } from '@angular/router';
   styleUrl: './register-page.css',
 })
 export class RegisterPage {
+  /**
+   * Form group where we will modify username and password.
+   * @type {FormGroup}
+   */
   registerForm: FormGroup;
 
+  /**
+   * Text message where we show possible errors.
+   * @type {string}
+   * @default {''}
+   */
   message: string = '';
 
+  /**
+   * Constructor where we create essencial params for different methods and we validate inputs from the form.
+   * @param {FormBuilder} fb Builder for create the FormGroup.
+   * @param {HttpClient} http Property that is used to make API calls.
+   * @param {Router} router Property that is used to navigate within different web routes.
+   */
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -26,7 +44,12 @@ export class RegisterPage {
     });
   }
 
-  onRegister() {
+  /**
+   * This POST method register the user into the paltform saving the user object in localStorage.
+   * @type {void}
+   * @returns This method does not return any data.
+   */
+  onRegister(): void {
     if (this.registerForm.invalid) return;
 
     this.http.post('http://localhost:3000/register', this.registerForm.value).subscribe({

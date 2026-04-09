@@ -3,6 +3,9 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { User } from '../../../shared/types/User';
 
+/**
+ * Home component where the user will be able to see all posts and user configuration.
+ */
 @Component({
   selector: 'app-home',
   standalone: false,
@@ -10,38 +13,59 @@ import { User } from '../../../shared/types/User';
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
+  /**
+   * We call the logged user object saved in localStorage and we save it in JSON data. In case the user is not logged, we save an empty JSON.
+   * @type {User}
+   * @default {}
+   */
   user: User = JSON.parse(localStorage.getItem('user') || '{}');
+  /**
+   * List variable where we save all gotten post from getAllPosts.
+   * @type {Post}
+   * @default {[]}
+   */
   posts: Post[] = [];
+  /**
+   * Text message where we show possible errors.
+   * @type {string}
+   * @default {''}
+   */
   message: string = '';
 
+  /**
+   * Constructor where we create essencial params for different methods.
+   * @param {HttpClient} http Property that is used to make API calls.
+   * @param {ChangeDetectorRef} cdr Property that is used to detect changes in the view. We use it to detect when the posts are loaded.
+   */
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
   ) {}
 
+  /**
+   * This method is called in the first load of the view.
+   * @type {void}
+   * @returns This method does not return any data.
+   */
   ngOnInit(): void {
     this.getAllPosts();
   }
 
-  getAllPosts() {
-    const token = localStorage.getItem('token');
-
-    this.http
-      .get('http://localhost:3000/getAllPosts', {
-        // We send to backend the token with a header element called Authorization
-        headers: {
-          Authorization: `Bearer ${token ?? ''}`,
-        },
-      })
-      .subscribe({
-        next: (res: any) => {
-          this.posts = res.posts;
-          this.cdr.detectChanges();
-        },
-        error: (res: any) => {
-          console.error('getAllPosts ERROR:', res);
-          this.message = res.error?.message;
-        },
-      });
+  /**
+   * This GET method calls all posts from the mongo server and save them in posts variable.
+   * @type {void}
+   * @returns This method does not return any data.
+   */
+  getAllPosts(): void {
+    this.http.get('http://localhost:3000/getAllPosts').subscribe({
+      next: (res: any) => {
+        this.posts = res.posts;
+        this.cdr.detectChanges();
+      },
+      error: (res: any) => {
+        console.error('getAllPosts ERROR:', res);
+        this.message = res.error?.message;
+      },
+    });
   }
 }
