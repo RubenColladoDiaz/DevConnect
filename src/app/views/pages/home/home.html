@@ -33,6 +33,37 @@
   </section>
 
   <section>
+    @if (creating() && user.username) {
+      <div class="post-target">
+        <div class="bg-black text-white user-bar">
+          <div class="d-flex align-items-center gap-3">
+            <img
+              src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+              alt="User logo"
+            />
+            <p class="m-0 p-0">{{ user.username }}</p>
+          </div>
+        </div>
+        <div>
+          <p>
+            Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.
+            Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,
+            cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una
+            galería de textos y los mezcló de tal manera que logró hacer un libro de textos
+            especimen.
+          </p>
+        </div>
+        <hr />
+        <div class="d-flex align-items-center justify-content-center gap-3 pb-3">
+          <p><i class="fa-regular fa-comment"></i> 0</p>
+          <p><i class="fa-solid fa-retweet"></i> 0</p>
+          <p><i class="fa-regular fa-heart"></i> 0</p>
+          <p><i class="fa-regular fa-eye"></i> 0</p>
+          <p><i class="fa-regular fa-bookmark"></i></p>
+          <p><i class="fa-solid fa-share"></i></p>
+        </div>
+      </div>
+    }
     @if (posts.length > 0) {
       @for (post of posts; track post) {
         <div class="post-target">
@@ -93,4 +124,5 @@
       </div>
     }
   </section>
+  <app-new-post-component [(creating)]="creating" />
 </main>

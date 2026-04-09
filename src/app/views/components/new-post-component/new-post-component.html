@@ -1,0 +1,9 @@
+@if (creating()) {
+  @if (user.username) {
+    <p>Creating Post</p>
+  } @else {
+    <p>You need to be logged</p>
+  }
+} @else {
+  <button class="user-target" (click)="toggleCreating()" type="submit">+ New Post</button>
+}

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { User } from '../../../shared/types/User';
 
@@ -31,6 +31,8 @@ export class Home implements OnInit {
    * @default {''}
    */
   message: string = '';
+
+  creating: WritableSignal<boolean> = signal(false);
 
   /**
    * Constructor where we create essencial params for different methods.

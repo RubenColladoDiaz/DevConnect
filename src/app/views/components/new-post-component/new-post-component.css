@@ -1,0 +1,15 @@
+.user-target {
+  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
+  color: white;
+  width: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: large;
+}
+.user-target:hover {
+  cursor: pointer;
+}
