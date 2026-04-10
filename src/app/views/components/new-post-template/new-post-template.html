@@ -5,15 +5,15 @@
         src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
         alt="User logo"
       />
-      <p class="m-0 p-0">{{ user()?.username }}</p>
+      <p class="m-0 p-0">{{ user.username }}</p>
     </div>
   </div>
   <div>
-    <textarea name="" id=""></textarea>
+    <textarea [(ngModel)]="content"></textarea>
   </div>
   <hr />
   <div>
-    <button>Publish</button>
-    <button>Cancel</button>
+    <button (click)="createPost()">Publish</button>
+    <button (click)="toggleCreating()">Cancel</button>
   </div>
 </div>

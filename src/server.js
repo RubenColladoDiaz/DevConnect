@@ -100,7 +100,7 @@ app.post('/register', function (req, res) {
 
 app.get('/getAllPosts', async function (req, res) {
   try {
-    const posts = await dbConnMongo.collection('posts').find().sort({ createdAt: 1 }).toArray();
+    const posts = await dbConnMongo.collection('posts').find().sort({ _id: -1 }).toArray();
     return res.send({ posts: posts });
   } catch (error) {
     return res.status(401).json({ message: error.message });

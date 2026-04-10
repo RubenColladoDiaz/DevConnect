@@ -3,7 +3,11 @@
     class="d-flex align-items-center list-unstyled justify-content-center gap-5 m-0 p-1 w-100 fs-5"
   >
     <li routerLink="/">Home</li>
-    <li routerLink="/login">Login</li>
+    @if (user.username) {
+      <li (click)="logout()" routerLink="/">Log out</li>
+    } @else {
+      <li routerLink="/login">Login</li>
+    }
   </ul>
   @if (username) {
     <p class="text-center welcome-message mt-3">Welcome, {{ username }}</p>

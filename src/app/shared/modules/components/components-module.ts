@@ -5,10 +5,11 @@ import { NewPostButton } from '../../../views/components/new-post-button/new-pos
 import { OfflinePost } from '../../../views/components/offline-post/offline-post';
 import { PostTemplate } from '../../../views/components/post-template/post-template';
 import { NewPostTemplate } from '../../../views/components/new-post-template/new-post-template';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate],
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   exports: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate],
   providers: [DatePipe],
 })

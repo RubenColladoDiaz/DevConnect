@@ -34,7 +34,7 @@
 
   <section>
     @if (creating() && user().username) {
-      <app-new-post-template [user]="user()" />
+      <app-new-post-template [(creating)]="creating" />
     }
     @if (posts.length > 0) {
       @for (post of posts; track post) {
