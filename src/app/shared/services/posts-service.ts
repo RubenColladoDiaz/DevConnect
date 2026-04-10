@@ -17,8 +17,17 @@ export class PostsService {
       content,
       tags,
     };
-
     return this.http.post(this.nodeURL + '/createPost', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  getAllPosts(): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    return this.http.get(this.nodeURL + '/getAllPosts', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

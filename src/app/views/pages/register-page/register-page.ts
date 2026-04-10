@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { UsersService } from '../../../shared/services/users-service';
 
 /**
  * Register component where the user will be able to register his data in the platform.
@@ -34,7 +35,7 @@ export class RegisterPage {
    */
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private userService: UsersService,
     private router: Router,
   ) {
     this.registerForm = this.fb.group({
@@ -49,10 +50,12 @@ export class RegisterPage {
    * @type {void}
    * @returns This method does not return any data.
    */
-  onRegister(): void {
+  Register(): void {
     if (this.registerForm.invalid) return;
 
-    this.http.post('http://localhost:3000/register', this.registerForm.value).subscribe({
+    const { username, email, password } = this.registerForm.value;
+
+    this.userService.Register(username, email, password).subscribe({
       next: (res: any) => {
         localStorage.setItem('user', JSON.stringify(res.user));
         this.router.navigate(['/']);

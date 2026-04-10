@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { UsersService } from '../../../shared/services/users-service';
 
 /**
  * Login component where the user will be able to login in a SQL Database.
@@ -34,7 +35,7 @@ export class LoginPage {
    */
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private userService: UsersService,
     private router: Router,
   ) {
     this.loginForm = this.fb.group({
@@ -48,10 +49,12 @@ export class LoginPage {
    * @type {void}
    * @returns This method does not return any data.
    */
-  onLogin(): void {
+  Login(): void {
     if (this.loginForm.invalid) return;
 
-    this.http.post('http://localhost:3000/login', this.loginForm.value).subscribe({
+    const { username, password } = this.loginForm.value;
+
+    this.userService.Login(username, password).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));

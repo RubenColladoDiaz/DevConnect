@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { User } from '../../../shared/types/User';
+import { PostsService } from '../../../shared/services/posts-service';
 
 /**
  * Home component where the user will be able to see all posts and user configuration.
@@ -40,8 +41,8 @@ export class Home implements OnInit {
    * @param {ChangeDetectorRef} cdr Property that is used to detect changes in the view. We use it to detect when the posts are loaded.
    */
   constructor(
-    private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private postsService: PostsService,
   ) {}
 
   /**
@@ -59,15 +60,12 @@ export class Home implements OnInit {
    * @returns This method does not return any data.
    */
   getAllPosts(): void {
-    this.http.get('http://localhost:3000/getAllPosts').subscribe({
+    this.postsService.getAllPosts().subscribe({
       next: (res: any) => {
         this.posts = res.posts;
         this.cdr.detectChanges();
       },
-      error: (res: any) => {
-        console.error('getAllPosts ERROR:', res);
-        this.message = res.error?.message;
-      },
+      error: (err) => console.error('Error:', err),
     });
   }
 }
