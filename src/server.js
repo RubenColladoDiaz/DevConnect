@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 const mysql = require('mysql');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-require('dotenv').config()
+require('dotenv').config();
 
 // Mongo config
 const mongoURL = process.env.MONGO_URL;
@@ -107,6 +107,15 @@ app.get('/getAllPosts', async function (req, res) {
   }
 });
 
+app.post('addLike', async function (req, res) {
+  try {
+    const postId = req.body.postId;
+    const post = await dbConnMongo.collection('posts').findOne({ _id: postId });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/createPost', function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -144,7 +153,7 @@ app.post('/createPost', function (req, res) {
             reposts,
             views,
             likes,
-            comments
+            comments,
           },
         });
       },
@@ -166,15 +175,15 @@ async function mongoConnection() {
       version: ServerApiVersion.v1,
       strict: true,
       deprecationErrors: true,
-    }
+    },
   });
 
   try {
     await client.connect();
-    console.log("You successfully connected to MongoDB!");
-    return client.db('devconnect')
+    console.log('You successfully connected to MongoDB!');
+    return client.db('devconnect');
   } catch (error) {
-    console.error("MongoDB connection error:", error);
+    console.error('MongoDB connection error:', error);
   }
 }
 
@@ -192,9 +201,9 @@ function SQLConnection() {
 async function startServer() {
   dbConnMongo = await mongoConnection();
   if (!dbConnMongo) {
-    console.error("Mongo no conectado. No arrancando server");
+    console.error('Mongo no conectado. No arrancando server');
     return;
   }
   app.listen(3000, () => console.log('Node app is running on port 3000'));
 }
-startServer()
+startServer();

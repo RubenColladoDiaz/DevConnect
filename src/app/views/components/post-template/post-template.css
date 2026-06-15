@@ -30,3 +30,12 @@
   border-radius: 50%;
   object-fit: cover;
 }
+
+.post-target .d-flex p {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+}
