@@ -33,4 +33,18 @@ export class PostsService {
       },
     });
   }
+
+  updateLikes(id: string): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    const body = {
+      postId: id,
+    };
+
+    return this.http.post(this.nodeURL + '/updateLikes', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 }

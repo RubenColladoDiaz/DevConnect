@@ -5,3 +5,6 @@ html,
 body {
   font-family: Arial, sans-serif;
 }
+.cursor-pointer {
+  cursor: pointer;
+}

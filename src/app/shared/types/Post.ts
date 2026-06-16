@@ -1,4 +1,5 @@
 export type Post = {
+  _id: string;
   username: string;
   content: string;
   reposts: number;

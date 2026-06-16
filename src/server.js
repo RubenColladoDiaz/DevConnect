@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const mysql = require('mysql');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 require('dotenv').config();
 
@@ -39,7 +39,7 @@ app.post('/login', function (req, res) {
     'SELECT * FROM users WHERE username = ?',
     [username],
     async function (error, results, fields) {
-      if (error) return res.status(500).json({ message: 'Database error' });
+      if (error) return res.status(500).json({ message: 'Database error: ' + error });
 
       if (results.length === 0) return res.status(401).json({ message: 'User not found' });
 
@@ -72,7 +72,7 @@ app.post('/register', function (req, res) {
     'SELECT * FROM users WHERE email = ? OR username = ?',
     [email, username],
     async function (error, results, fields) {
-      if (error) return res.status(500).json({ message: 'Database error' });
+      if (error) return res.status(500).json({ message: 'Database error: ' + error });
 
       if (results.length > 0) return res.status(409).json({ message: 'User already exists' });
 
@@ -82,7 +82,7 @@ app.post('/register', function (req, res) {
         'INSERT INTO users set ?',
         { username: username, email: email, password: hashedPassword },
         function (error, results, fields) {
-          if (error) return res.status(500).json({ message: 'Database error' });
+          if (error) return res.status(500).json({ message: 'Database error: ' + error });
 
           const newUser = {
             userId: results.insertId,
@@ -107,10 +107,12 @@ app.get('/getAllPosts', async function (req, res) {
   }
 });
 
-app.post('addLike', async function (req, res) {
+app.post('/updateLikes', async function (req, res) {
   try {
-    const postId = req.body.postId;
+    const postId = new ObjectId(req.body.postId); // En MongoDB el id no es ni numero ni string
+    await dbConnMongo.collection('posts').updateOne({ _id: postId }, { $inc: { likes: 1 } });
     const post = await dbConnMongo.collection('posts').findOne({ _id: postId });
+    return res.send({ likes: post.likes });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
@@ -142,7 +144,7 @@ app.post('/createPost', function (req, res) {
         comments,
       },
       function (error, result) {
-        if (error) return res.status(500).json({ message: 'Database error' });
+        if (error) return res.status(500).json({ message: 'Database error: ' + error });
         return res.send({
           post: {
             _id: result.insertedId,
