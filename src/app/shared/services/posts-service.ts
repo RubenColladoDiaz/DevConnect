@@ -27,6 +27,10 @@ export class PostsService {
   getAllPosts(): Observable<any> {
     const token = localStorage.getItem('token');
 
+    if (!token) {
+      return this.http.get(this.nodeURL + '/getAllPosts');
+    }
+
     return this.http.get(this.nodeURL + '/getAllPosts', {
       headers: {
         Authorization: `Bearer ${token}`,

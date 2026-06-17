@@ -7,5 +7,6 @@ export type Post = {
   tags: string[];
   createdAt: Date;
   likes: number;
+  liked?: boolean;
   comments: string[];
 };

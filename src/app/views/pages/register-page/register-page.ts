@@ -57,6 +57,7 @@ export class RegisterPage {
 
     this.userService.Register(username, email, password).subscribe({
       next: (res: any) => {
+        localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
         this.router.navigate(['/']);
       },

@@ -15,5 +15,9 @@ export class App {
 
   logout() {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    this.user = {} as User;
+    this.username = '';
+    window.location.reload();
   }
 }

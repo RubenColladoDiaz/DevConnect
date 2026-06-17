@@ -48,14 +48,14 @@ app.post('/login', function (req, res) {
 
       if (!validPassword) return res.status(401).json({ message: 'Invalid credentials' });
 
-      const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
+      const token = jwt.sign({ userId: user.userId, username: user.username }, JWT_SECRET, {
         expiresIn: '24h',
       });
 
       return res.send({
         token,
         user: {
-          id: user.id,
+          userId: user.userId,
           username: user.username,
         },
       });
@@ -89,7 +89,16 @@ app.post('/register', function (req, res) {
             username,
             email,
           };
-          return res.send({ user: newUser });
+
+          const token = jwt.sign(
+            { userId: newUser.userId, username: newUser.username },
+            JWT_SECRET,
+            {
+              expiresIn: '24h',
+            },
+          );
+
+          return res.send({ token, user: newUser });
         },
       );
     },
@@ -100,8 +109,28 @@ app.post('/register', function (req, res) {
 
 app.get('/getAllPosts', async function (req, res) {
   try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    const hasValidToken = token && token !== 'null' && token !== 'undefined';
+
+    let userId = null;
+
+    if (hasValidToken) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        userId = decoded.userId;
+      } catch (error) {
+        userId = null;
+      }
+    }
+
     const posts = await dbConnMongo.collection('posts').find().sort({ _id: -1 }).toArray();
-    return res.send({ posts: posts });
+    const postsWithLiked = posts.map((post) => ({
+      ...post,
+      liked: (post.likedByUserIds || []).includes(userId),
+    }));
+
+    return res.send({ posts: postsWithLiked });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
@@ -110,9 +139,36 @@ app.get('/getAllPosts', async function (req, res) {
 app.post('/updateLikes', async function (req, res) {
   try {
     const postId = new ObjectId(req.body.postId); // En MongoDB el id no es ni numero ni string
-    await dbConnMongo.collection('posts').updateOne({ _id: postId }, { $inc: { likes: 1 } });
-    const post = await dbConnMongo.collection('posts').findOne({ _id: postId });
-    return res.send({ likes: post.likes });
+
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+    let post = await dbConnMongo.collection('posts').findOne({ _id: postId });
+
+    let liked = false;
+
+    const result = await dbConnMongo
+      .collection('posts')
+      .updateOne(
+        { _id: postId, likedByUserIds: { $ne: userId } },
+        { $addToSet: { likedByUserIds: userId }, $inc: { likes: 1 } },
+      );
+
+    if (result.modifiedCount === 1) {
+      liked = true;
+    } else {
+      await dbConnMongo
+        .collection('posts')
+        .updateOne(
+          { _id: postId, likedByUserIds: userId },
+          { $pull: { likedByUserIds: userId }, $inc: { likes: -1 } },
+        );
+      liked = false;
+    }
+    // Vuelvo a buscar el post para no devolver la cantidad de likes desactualizada
+    post = await dbConnMongo.collection('posts').findOne({ _id: postId });
+
+    return res.send({ likes: post.likes, liked: liked });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
@@ -142,6 +198,7 @@ app.post('/createPost', function (req, res) {
         views,
         likes,
         comments,
+        likedByUserIds: [],
       },
       function (error, result) {
         if (error) return res.status(500).json({ message: 'Database error: ' + error });

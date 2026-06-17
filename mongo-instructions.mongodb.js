@@ -1,3 +1,102 @@
 use('devconnect');
 
-db.getCollection('posts').deleteMany({"likes": 0})
+db.getCollection('posts').deleteMany({});
+
+db.getCollection('posts').insertMany([
+  {
+    username: 'ruben',
+    content:
+      'He terminado la estructura base de DevConnect y ya podemos empezar a publicar avances del proyecto aqui.',
+    tags: ['angular', 'node', 'mongodb'],
+    createdAt: new Date('2026-03-31T09:15:00.000Z'),
+    reposts: 2,
+    views: 18,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Buen arranque', 'Tiene muy buena pinta'],
+  },
+  {
+    username: 'laura_dev',
+    content:
+      'Hoy he conectado el frontend con el backend usando HttpClient y ya se muestran los posts en la home.',
+    tags: ['frontend', 'api', 'angular'],
+    createdAt: new Date('2026-03-31T09:42:00.000Z'),
+    reposts: 1,
+    views: 12,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Genial', 'Eso ya da vida a la app'],
+  },
+  {
+    username: 'sergio_js',
+    content:
+      'La autenticacion con JWT ya responde bien en login y register. Siguiente paso: proteger mejor las rutas.',
+    tags: ['jwt', 'auth', 'express'],
+    createdAt: new Date('2026-03-31T10:05:00.000Z'),
+    reposts: 3,
+    views: 26,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Muy necesario', 'Luego hacemos el guard en Angular'],
+  },
+  {
+    username: 'marta_ui',
+    content:
+      'He ajustado la vista principal para que los posts queden mas limpios y faciles de leer desde movil.',
+    tags: ['ui', 'css', 'responsive'],
+    createdAt: new Date('2026-03-31T10:28:00.000Z'),
+    reposts: 0,
+    views: 14,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Se nota bastante', 'Quedo mucho mejor'],
+  },
+  {
+    username: 'dani_code',
+    content:
+      'MongoDB Compass me viene genial para cargar datos de prueba rapido mientras seguimos con el desarrollo.',
+    tags: ['mongodb', 'compass', 'seed'],
+    createdAt: new Date('2026-03-31T11:00:00.000Z'),
+    reposts: 1,
+    views: 20,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Yo tambien lo uso', 'Ahorra mucho tiempo'],
+  },
+  {
+    username: 'nerea_db',
+    content:
+      'La tabla users en MySQL ya esta lista. Ahora el objetivo es que los posts vivan en Mongo sin mezclar responsabilidades.',
+    tags: ['mysql', 'mongodb', 'backend'],
+    createdAt: new Date('2026-03-31T11:26:00.000Z'),
+    reposts: 2,
+    views: 21,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Buena separacion', 'Tiene sentido para este caso'],
+  },
+  {
+    username: 'alex_fullstack',
+    content:
+      'He probado varios posts con tags para luego poder filtrar por tecnologia o por tipo de contenido.',
+    tags: ['fullstack', 'tags', 'feature'],
+    createdAt: new Date('2026-03-31T12:03:00.000Z'),
+    reposts: 0,
+    views: 11,
+    likes: 0,
+    likedByUserIds: [],
+    comments: ['Ese filtro va a quedar muy bien'],
+  },
+  {
+    username: 'clara_net',
+    content:
+      'Queda pendiente mejorar el orden por fecha, pero para poblar la coleccion de prueba este JSON ya nos sirve perfecto.',
+    tags: ['testing', 'posts', 'devconnect'],
+    createdAt: new Date('2026-03-31T12:40:00.000Z'),
+    reposts: 1,
+    views: 16,
+    likes: 0,
+    likedByUserIds: [],
+    comments: [],
+  },
+]);
