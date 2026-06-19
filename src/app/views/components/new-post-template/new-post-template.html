@@ -1,19 +1,44 @@
-<div class="post-target">
-  <div class="bg-black text-white user-bar">
-    <div class="d-flex align-items-center gap-3">
+<article class="post-composer">
+  <header class="composer-header">
+    <div class="author">
       <img
         src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
         alt="User logo"
       />
-      <p class="m-0 p-0">{{ user.username }}</p>
+      <div>
+        <p class="author-name">{{ user.username }}</p>
+        <span>Creating a new post</span>
+      </div>
+    </div>
+    <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+  </header>
+
+  <div class="composer-body">
+    <label for="post-content">What do you want to share?</label>
+    <textarea
+      id="post-content"
+      [(ngModel)]="content"
+      maxlength="500"
+      placeholder="Share an idea, a project update or something you have learned..."
+      autofocus
+    ></textarea>
+
+    <div class="composer-meta">
+      <span><i class="fa-solid fa-code" aria-hidden="true"></i> DevConnect community</span>
+      <span>{{ content.length }}/500</span>
     </div>
   </div>
-  <div>
-    <textarea [(ngModel)]="content"></textarea>
-  </div>
-  <hr />
-  <div>
-    <button (click)="createPost()">Publish</button>
-    <button (click)="toggleCreating()">Cancel</button>
-  </div>
-</div>
+
+  <footer class="composer-actions">
+    <button class="cancel-button" type="button" (click)="toggleCreating()">Cancel</button>
+    <button
+      class="publish-button"
+      type="button"
+      (click)="createPost()"
+      [disabled]="!content.trim()"
+    >
+      <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+      Publish
+    </button>
+  </footer>
+</article>

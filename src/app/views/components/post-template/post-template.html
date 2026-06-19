@@ -1,23 +1,71 @@
-<div class="post-target">
-  <div class="bg-black text-white user-bar">
-    <div class="d-flex align-items-center gap-3">
-      <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User logo" />
-      <p class="m-0 p-0">{{ post()?.username }}</p>
+<article class="post-card">
+  <header class="post-header">
+    <div class="post-author">
+      <img
+        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+        alt="User logo"
+      />
+      <div class="author-info">
+        <p>{{ post()?.username }}</p>
+        <span>Community post</span>
+      </div>
     </div>
-    <p class="m-0 p-0">{{ post()?.createdAt | date: 'dd/MM' }}</p>
+
+    <time class="post-date" [attr.datetime]="post()?.createdAt">
+      <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+      {{ post()?.createdAt | date: 'dd MMM yyyy' }}
+    </time>
+  </header>
+
+  <div class="post-body">
+    <p class="post-content">{{ post()?.content }}</p>
+
+    @if (post()?.tags?.length) {
+      <div class="post-tags" aria-label="Post tags">
+        @for (tag of post()?.tags ?? []; track tag) {
+          <span>#{{ tag }}</span>
+        }
+      </div>
+    }
   </div>
-  <div>
-    <p>{{ post()?.content }}</p>
-  </div>
-  <hr />
-  <div class="d-flex align-items-center justify-content-center gap-3 pb-3">
-    <p><i class="fa-regular fa-comment"></i> {{ post()?.comments?.length }}</p>
-    <p><i class="fa-solid fa-retweet"></i> {{ post()?.reposts }}</p>
-    <p><i class="fa-heart cursor-pointer" (click)="updateLikes()" [class.fa-regular]="post()?.liked !== true"
-        [class.fa-solid]="post()?.liked === true" id="likes"></i>
-      {{ post()?.likes }}</p>
-    <p><i class="fa-regular fa-eye"></i> {{ post()?.views }}</p>
-    <p><i class="fa-regular fa-bookmark"></i></p>
-    <p><i class="fa-solid fa-share"></i></p>
-  </div>
-</div>
+
+  <footer class="post-footer">
+    <div class="post-metrics">
+      <span class="metric" title="Comments">
+        <i class="fa-regular fa-comment" aria-hidden="true"></i>
+        {{ post()?.comments?.length ?? 0 }}
+      </span>
+
+      <span class="metric" title="Reposts">
+        <i class="fa-solid fa-retweet" aria-hidden="true"></i>
+        {{ post()?.reposts ?? 0 }}
+      </span>
+
+      <button
+        class="metric like-button"
+        type="button"
+        (click)="updateLikes()"
+        [class.is-liked]="post()?.liked === true"
+        [attr.aria-label]="post()?.liked ? 'Remove like' : 'Like post'"
+      >
+        <i
+          class="fa-heart"
+          aria-hidden="true"
+          [class.fa-regular]="post()?.liked !== true"
+          [class.fa-solid]="post()?.liked === true"
+        ></i>
+        {{ post()?.likes ?? 0 }}
+      </button>
+
+      <span class="metric" title="Views">
+        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+        {{ post()?.views ?? 0 }}
+      </span>
+    </div>
+
+    <div class="post-tools" aria-label="Post tools">
+      <span title="Bookmark"><i class="fa-regular fa-bookmark" aria-hidden="true"></i></span>
+      <span title="Share"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></span>
+    </div>
+  </footer>
+</article>

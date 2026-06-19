@@ -1,16 +1,46 @@
-<div class="d-flex justify-content-center flex-column align-items-center">
-  <ul
-    class="d-flex align-items-center list-unstyled justify-content-center gap-5 m-0 p-1 w-100 fs-5"
-  >
-    <li routerLink="/">Home</li>
+<header class="app-header">
+  <nav class="app-nav" aria-label="Main navigation">
+    <a class="brand" routerLink="/" aria-label="DevConnect home">
+      <span class="brand-mark"><i class="fa-solid fa-code" aria-hidden="true"></i></span>
+      <span class="brand-name">Dev<span>Connect</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+          <i class="fa-solid fa-house" aria-hidden="true"></i>
+          <span>Home</span>
+        </a>
+      </li>
+
+      @if (user.username) {
+        <li>
+          <button type="button" (click)="logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+            <span>Log out</span>
+          </button>
+        </li>
+      } @else {
+        <li>
+          <a routerLink="/login" routerLinkActive="is-active">
+            <i class="fa-regular fa-user" aria-hidden="true"></i>
+            <span>Login</span>
+          </a>
+        </li>
+      }
+    </ul>
+
     @if (user.username) {
-      <li (click)="logout()" routerLink="/">Log out</li>
-    } @else {
-      <li routerLink="/login">Login</li>
+      <div class="welcome-pill">
+        <span class="welcome-avatar">{{ username.charAt(0).toUpperCase() }}</span>
+        <span class="welcome-copy">
+          <small>Welcome back</small>
+          <strong>{{ username }}</strong>
+        </span>
+        <span class="status-dot" title="Online"></span>
+      </div>
     }
-  </ul>
-  @if (username) {
-    <p class="text-center welcome-message mt-3">Welcome, {{ username }}</p>
-  }
-</div>
+  </nav>
+</header>
+
 <router-outlet />

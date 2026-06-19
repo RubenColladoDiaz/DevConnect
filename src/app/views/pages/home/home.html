@@ -1,39 +1,57 @@
 <app-header />
-@if (!user().username) {
-<button class="m-auto d-flex rounded-4 px-4 py-1 fs-5 login-button-background border-0" routerLink="/login">
-  Login
-</button>
-}
+
 <main>
-  <section>
+  <section class="profile-column">
     @if (user().username) {
-    <a href="">
-      <div class="user-target">
-        <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User logo" />
-        Welcome, {{ user().username }}
+      <div class="profile-card">
+        <div class="profile-avatar">
+          <img
+            src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+            alt="User logo"
+          />
+          <span class="profile-online" title="Online"></span>
+        </div>
+
+        <div class="profile-copy">
+          <span class="profile-eyebrow">Signed in as</span>
+          <strong>{{ user().username }}</strong>
+          <span class="profile-status"
+            ><i class="fa-solid fa-circle-check"></i> Ready to connect</span
+          >
+        </div>
       </div>
-    </a>
     } @else {
-    <a href="/login">
-      <div class="user-target">
-        <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User logo" />
-        Welcome, Unknown
-      </div>
-    </a>
+      <a class="profile-card profile-card--guest" routerLink="/login">
+        <div class="profile-avatar">
+          <img
+            src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+            alt="User logo"
+          />
+        </div>
+
+        <div class="profile-copy">
+          <span class="profile-eyebrow">Guest session</span>
+          <strong>Welcome</strong>
+          <span class="profile-status"
+            ><i class="fa-solid fa-arrow-right-to-bracket"></i> Log in to join</span
+          >
+        </div>
+      </a>
     }
   </section>
 
-  <section>
+  <section class="feed-column">
     @if (creating() && user().username) {
-    <app-new-post-template [(creating)]="creating" (postCreated)="getAllPosts()" />
+      <app-new-post-template [(creating)]="creating" (postCreated)="getAllPosts()" />
     }
     @if (posts.length > 0) {
-    @for (post of posts; track post) {
-    <app-post-template [(post)]="post" />
-    }
+      @for (post of posts; track post) {
+        <app-post-template [(post)]="post" />
+      }
     } @else {
-    <app-offline-post />
+      <app-offline-post />
     }
   </section>
+
   <app-new-post-button [(creating)]="creating" />
 </main>

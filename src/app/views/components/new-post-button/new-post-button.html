@@ -1,9 +1,20 @@
 @if (creating()) {
   @if (user.username) {
-    <p>Creating Post</p>
+    <div class="new-post-state new-post-state--active">
+      <span class="state-icon"><i class="fa-solid fa-pen" aria-hidden="true"></i></span>
+      <p>Creating Post</p>
+      <span class="state-pulse" aria-hidden="true"></span>
+    </div>
   } @else {
-    <p>You need to be logged</p>
+    <div class="new-post-state new-post-state--locked">
+      <span class="state-icon"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
+      <p>You need to be logged</p>
+    </div>
   }
 } @else {
-  <button class="user-target" (click)="toggleCreating()" type="submit">+ New Post</button>
+  <button class="new-post-button" (click)="toggleCreating()" type="button">
+    <span class="button-icon"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+    <span>New Post</span>
+    <i class="fa-solid fa-arrow-right button-arrow" aria-hidden="true"></i>
+  </button>
 }
