@@ -174,7 +174,7 @@ app.post('/updateLikes', async function (req, res) {
   }
 });
 
-app.post('/createPost', function (req, res) {
+app.post('/createPost', async function (req, res) {
   try {
     const token = getDecodedToken(req);
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -188,9 +188,22 @@ app.post('/createPost', function (req, res) {
     const likes = 0;
     const comments = [];
 
-    dbConnMongo.collection('posts').insertOne(
-      {
-        username: username,
+    const result = await dbConnMongo.collection('posts').insertOne({
+      username,
+      content,
+      tags,
+      createdAt,
+      reposts,
+      views,
+      likes,
+      comments,
+      likedByUserIds: [],
+    });
+
+    return res.send({
+      post: {
+        _id: result.insertedId,
+        username,
         content,
         tags,
         createdAt,
@@ -198,27 +211,12 @@ app.post('/createPost', function (req, res) {
         views,
         likes,
         comments,
-        likedByUserIds: [],
       },
-      function (error, result) {
-        if (error) return res.status(500).json({ message: 'Database error: ' + error });
-        return res.send({
-          post: {
-            _id: result.insertedId,
-            username: username,
-            content,
-            tags,
-            createdAt,
-            reposts,
-            views,
-            likes,
-            comments,
-          },
-        });
-      },
-    );
+    });
   } catch (error) {
-    return res.status(401).json({ message: error.message || 'Invalid token' });
+    return res.status(401).json({
+      message: error.message || 'Invalid token',
+    });
   }
 });
 

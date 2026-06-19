@@ -25,7 +25,7 @@
 
   <section>
     @if (creating() && user().username) {
-    <app-new-post-template [(creating)]="creating" [(getAllPosts)]="getAllPosts" />
+    <app-new-post-template [(creating)]="creating" (postCreated)="getAllPosts()" />
     }
     @if (posts.length > 0) {
     @for (post of posts; track post) {

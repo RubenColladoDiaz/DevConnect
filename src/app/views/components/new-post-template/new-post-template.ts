@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, model, ModelSignal } from '@angular/core';
+import { Component, model, ModelSignal, output } from '@angular/core';
 import { User } from '../../../shared/types/User';
 import { PostsService } from '../../../shared/services/posts-service';
 
@@ -12,14 +12,11 @@ export class NewPostTemplate {
   user: User = JSON.parse(localStorage.getItem('user') || '{}');
 
   creating: ModelSignal<boolean> = model<boolean>(false);
-  getAllPosts = model<() => void>();
+  postCreated = output<void>();
 
   content: string = '';
 
-  constructor(
-    private postsService: PostsService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  constructor(private postsService: PostsService) {}
 
   toggleCreating(): void {
     this.creating.update((creating) => !creating);
@@ -28,9 +25,8 @@ export class NewPostTemplate {
   createPost(): void {
     this.postsService.createPost(this.content, []).subscribe({
       next: (res) => {
+        this.postCreated.emit();
         this.toggleCreating();
-        this.getAllPosts();
-        this.cdr.detectChanges();
       },
       error: (err) => console.error('Error:', err),
     });
