@@ -1,0 +1,147 @@
+:host {
+  display: block;
+}
+
+.comment-card {
+  position: relative;
+  margin: 12px 16px 0;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+}
+
+:host:last-child .comment-card {
+  margin-bottom: 16px;
+}
+
+.comment-rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.comment-rail::after {
+  position: absolute;
+  top: 36px;
+  bottom: -14px;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(86, 49, 149, 0.18), transparent);
+  content: '';
+  transform: translateX(-50%);
+}
+
+:host:last-child .comment-rail::after {
+  display: none;
+}
+
+.comment-avatar {
+  position: relative;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #00a8de, #563195 55%, #e91388);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 1px rgba(86, 49, 149, 0.12);
+}
+
+.comment-bubble {
+  min-width: 0;
+  padding: 11px 13px 12px;
+  border: 1px solid #e8eaf0;
+  border-radius: 4px 12px 12px 12px;
+  background: #f8f9fc;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.comment-bubble:hover {
+  transform: translateY(-1px);
+  border-color: rgba(86, 49, 149, 0.18);
+  background: #fff;
+}
+
+.comment-header {
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.comment-header > p {
+  max-width: 230px;
+  margin: 0;
+  overflow: hidden;
+  color: #343647;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment-label {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #9599a8;
+  font-size: 0.64rem;
+  font-weight: 600;
+}
+
+.comment-label i {
+  color: #6b3aa0;
+}
+
+.comment-content {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #5f6372;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 520px) {
+  .comment-card {
+    margin-right: 12px;
+    margin-left: 12px;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .comment-avatar {
+    width: 29px;
+    height: 29px;
+    flex-basis: 29px;
+    border-radius: 9px;
+  }
+
+  .comment-rail::after {
+    top: 33px;
+  }
+
+  .comment-bubble {
+    padding: 10px 11px;
+  }
+
+  .comment-label {
+    font-size: 0;
+  }
+
+  .comment-label i {
+    font-size: 0.7rem;
+  }
+}

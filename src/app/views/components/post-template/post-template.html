@@ -1,10 +1,7 @@
 <article class="post-card">
   <header class="post-header">
     <div class="post-author">
-      <img
-        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
-        alt="User logo"
-      />
+      <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User logo" />
       <div class="author-info">
         <p>{{ post()?.username }}</p>
         <span>Community post</span>
@@ -21,39 +18,30 @@
     <p class="post-content">{{ post()?.content }}</p>
 
     @if (post()?.tags?.length) {
-      <div class="post-tags" aria-label="Post tags">
-        @for (tag of post()?.tags ?? []; track tag) {
-          <span>#{{ tag }}</span>
-        }
-      </div>
+    <div class="post-tags" aria-label="Post tags">
+      @for (tag of post()?.tags ?? []; track tag) {
+      <span>#{{ tag }}</span>
+      }
+    </div>
     }
   </div>
 
   <footer class="post-footer">
     <div class="post-metrics">
-      <span class="metric" title="Comments">
+      <button class="metric comments-button" type="button" (click)="updateComments()">
         <i class="fa-regular fa-comment" aria-hidden="true"></i>
         {{ post()?.comments?.length ?? 0 }}
-      </span>
+      </button>
 
       <span class="metric" title="Reposts">
         <i class="fa-solid fa-retweet" aria-hidden="true"></i>
         {{ post()?.reposts ?? 0 }}
       </span>
 
-      <button
-        class="metric like-button"
-        type="button"
-        (click)="updateLikes()"
-        [class.is-liked]="post()?.liked === true"
-        [attr.aria-label]="post()?.liked ? 'Remove like' : 'Like post'"
-      >
-        <i
-          class="fa-heart"
-          aria-hidden="true"
-          [class.fa-regular]="post()?.liked !== true"
-          [class.fa-solid]="post()?.liked === true"
-        ></i>
+      <button class="metric like-button" type="button" (click)="updateLikes()" [class.is-liked]="post()?.liked === true"
+        [attr.aria-label]="post()?.liked ? 'Remove like' : 'Like post'">
+        <i class="fa-heart" aria-hidden="true" [class.fa-regular]="post()?.liked !== true"
+          [class.fa-solid]="post()?.liked === true"></i>
         {{ post()?.likes ?? 0 }}
       </button>
 
@@ -68,4 +56,10 @@
       <span title="Share"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></span>
     </div>
   </footer>
+
+  @if ((post()?.comments?.length ?? 0) > 0) {
+  @for (comment of post()?.comments ?? []; track comment){
+  <app-comment-template [comment]="comment"></app-comment-template>
+  }
+  }
 </article>

@@ -38,4 +38,6 @@ export class PostTemplate {
       error: (err) => console.error('Error:', err),
     });
   }
+
+  updateComments(): void {}
 }

@@ -1,0 +1,19 @@
+<article class="comment-card">
+  <div class="comment-rail" aria-hidden="true">
+    <span class="comment-avatar">
+      {{ ($any(comment())?.username || 'C').charAt(0).toUpperCase() }}
+    </span>
+  </div>
+
+  <div class="comment-bubble">
+    <header class="comment-header">
+      <p>{{ $any(comment())?.username || 'Community member' }}</p>
+      <span class="comment-label">
+        <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
+        Comment
+      </span>
+    </header>
+
+    <p class="comment-content">{{ $any(comment())?.content || $any(comment()) }}</p>
+  </div>
+</article>

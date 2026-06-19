@@ -13,7 +13,10 @@ db.getCollection('posts').insertMany([
     views: 18,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Buen arranque', 'Tiene muy buena pinta'],
+    comments: [
+      { username: 'laura_dev', content: 'Buen arranque' },
+      { username: 'sergio_js', content: 'Tiene muy buena pinta' },
+    ],
   },
   {
     username: 'laura_dev',
@@ -25,7 +28,10 @@ db.getCollection('posts').insertMany([
     views: 12,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Genial', 'Eso ya da vida a la app'],
+    comments: [
+      { username: 'marta_ui', content: 'Genial' },
+      { username: 'dani_code', content: 'Eso ya da vida a la app' },
+    ],
   },
   {
     username: 'sergio_js',
@@ -37,7 +43,10 @@ db.getCollection('posts').insertMany([
     views: 26,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Muy necesario', 'Luego hacemos el guard en Angular'],
+    comments: [
+      { username: 'nerea_db', content: 'Muy necesario' },
+      { username: 'ruben', content: 'Luego hacemos el guard en Angular' },
+    ],
   },
   {
     username: 'marta_ui',
@@ -49,7 +58,10 @@ db.getCollection('posts').insertMany([
     views: 14,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Se nota bastante', 'Quedo mucho mejor'],
+    comments: [
+      { username: 'alex_fullstack', content: 'Se nota bastante' },
+      { username: 'clara_net', content: 'Quedo mucho mejor' },
+    ],
   },
   {
     username: 'dani_code',
@@ -61,7 +73,10 @@ db.getCollection('posts').insertMany([
     views: 20,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Yo tambien lo uso', 'Ahorra mucho tiempo'],
+    comments: [
+      { username: 'ruben', content: 'Yo tambien lo uso' },
+      { username: 'laura_dev', content: 'Ahorra mucho tiempo' },
+    ],
   },
   {
     username: 'nerea_db',
@@ -73,7 +88,10 @@ db.getCollection('posts').insertMany([
     views: 21,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Buena separacion', 'Tiene sentido para este caso'],
+    comments: [
+      { username: 'sergio_js', content: 'Buena separacion' },
+      { username: 'marta_ui', content: 'Tiene sentido para este caso' },
+    ],
   },
   {
     username: 'alex_fullstack',
@@ -85,7 +103,7 @@ db.getCollection('posts').insertMany([
     views: 11,
     likes: 0,
     likedByUserIds: [],
-    comments: ['Ese filtro va a quedar muy bien'],
+    comments: [{ username: 'clara_net', content: 'Ese filtro va a quedar muy bien' }],
   },
   {
     username: 'clara_net',

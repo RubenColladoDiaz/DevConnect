@@ -1,3 +1,5 @@
+import { Comment } from './Comment';
+
 export type Post = {
   _id: string;
   username: string;
@@ -8,5 +10,5 @@ export type Post = {
   createdAt: Date;
   likes: number;
   liked?: boolean;
-  comments: string[];
+  comments: Comment[];
 };

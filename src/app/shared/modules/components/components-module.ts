@@ -6,11 +6,19 @@ import { OfflinePost } from '../../../views/components/offline-post/offline-post
 import { PostTemplate } from '../../../views/components/post-template/post-template';
 import { NewPostTemplate } from '../../../views/components/new-post-template/new-post-template';
 import { FormsModule } from '@angular/forms';
+import { CommentTemplate } from '../../../views/components/comment-template/comment-template';
 
 @NgModule({
-  declarations: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate],
+  declarations: [
+    Header,
+    NewPostButton,
+    OfflinePost,
+    PostTemplate,
+    NewPostTemplate,
+    CommentTemplate,
+  ],
   imports: [CommonModule, FormsModule],
-  exports: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate],
+  exports: [Header, NewPostButton, OfflinePost, PostTemplate, NewPostTemplate, CommentTemplate],
   providers: [DatePipe],
 })
 export class ComponentsModule {}

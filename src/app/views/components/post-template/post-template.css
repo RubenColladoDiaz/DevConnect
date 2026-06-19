@@ -149,7 +149,8 @@
   white-space: nowrap;
 }
 
-.like-button {
+.like-button,
+.comments-button {
   border: 0;
   background: transparent;
   font: inherit;
@@ -164,6 +165,11 @@
   transform: translateY(-1px);
   background: rgba(233, 19, 105, 0.08);
   color: #d91462;
+}
+.comments-button:hover {
+  transform: translateY(-1px);
+  background: rgba(233, 19, 105, 0.08);
+  color: #20c000;
 }
 
 .like-button:focus-visible {
