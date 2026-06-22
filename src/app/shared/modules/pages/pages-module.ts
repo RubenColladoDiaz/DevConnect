@@ -6,9 +6,10 @@ import { ComponentsModule } from '../components/components-module';
 import { LoginPage } from '../../../views/pages/login-page/login-page';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegisterPage } from '../../../views/pages/register-page/register-page';
+import { MyAccountPage } from '../../../views/pages/my-account-page/my-account-page';
 
 @NgModule({
-  declarations: [Home, LoginPage, RegisterPage],
+  declarations: [Home, LoginPage, RegisterPage, MyAccountPage],
   imports: [
     CommonModule,
     ComponentsModule,
@@ -17,6 +18,6 @@ import { RegisterPage } from '../../../views/pages/register-page/register-page';
     ReactiveFormsModule,
     RouterModule,
   ],
-  exports: [Home, LoginPage, RegisterPage],
+  exports: [Home, LoginPage, RegisterPage, MyAccountPage],
 })
 export class PagesModule {}

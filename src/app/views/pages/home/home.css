@@ -30,13 +30,15 @@ main {
     border-color 180ms ease;
 }
 
-.profile-card--guest:hover {
+.profile-card--guest:hover,
+.profile-card--account:hover {
   transform: translateY(-1px);
   border-color: rgba(86, 49, 149, 0.22);
   box-shadow: 0 7px 18px rgba(27, 31, 59, 0.12);
 }
 
-.profile-card--guest:focus-visible {
+.profile-card--guest:focus-visible,
+.profile-card--account:focus-visible {
   outline: 3px solid rgba(0, 168, 222, 0.22);
   outline-offset: 2px;
 }

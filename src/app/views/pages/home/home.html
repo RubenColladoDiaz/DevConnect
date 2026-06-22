@@ -3,7 +3,11 @@
 <main>
   <section class="profile-column">
     @if (user().username) {
-      <div class="profile-card">
+      <a
+        class="profile-card profile-card--account"
+        routerLink="/my-account"
+        aria-label="Open my account"
+      >
         <div class="profile-avatar">
           <img
             src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
@@ -19,7 +23,7 @@
             ><i class="fa-solid fa-circle-check"></i> Ready to connect</span
           >
         </div>
-      </div>
+      </a>
     } @else {
       <a class="profile-card profile-card--guest" routerLink="/login">
         <div class="profile-avatar">

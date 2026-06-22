@@ -1,0 +1,178 @@
+<main class="account-page">
+  <section class="profile-hero">
+    <div class="profile-cover">
+      <span class="cover-code" aria-hidden="true">&lt;/&gt;</span>
+      <div class="cover-copy">
+        <span>DEVCONNECT PROFILE</span>
+        <strong>Build. Share. Connect.</strong>
+      </div>
+    </div>
+
+    <div class="profile-identity">
+      <div class="profile-avatar">
+        <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
+        <span class="online-dot" title="Online"></span>
+      </div>
+
+      <div class="identity-copy">
+        <span class="profile-badge"><i class="fa-solid fa-code"></i> Developer profile</span>
+        <h1>Ruben</h1>
+        <p>@{{user().username}} · Full-stack developer</p>
+        <div class="identity-meta">
+          <span><i class="fa-regular fa-envelope"></i> {{user().email}}</span>
+          <span><i class="fa-solid fa-location-dot"></i> Spain</span>
+          <span><i class="fa-regular fa-calendar"></i> Member since 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-stats" aria-label="Profile statistics">
+      <div><strong>8</strong><span>Posts</span></div>
+      <div><strong>24</strong><span>Comments</span></div>
+      <div><strong>128</strong><span>Likes</span></div>
+      <div><strong>1.2K</strong><span>Views</span></div>
+    </div>
+  </section>
+
+  <div class="account-grid">
+    <aside class="profile-sidebar">
+      <section class="account-card about-card">
+        <header class="card-heading">
+          <span class="heading-icon"><i class="fa-regular fa-user"></i></span>
+          <div>
+            <span>PROFILE</span>
+            <h2>About me</h2>
+          </div>
+        </header>
+        <p>
+          Full-stack developer building useful products and learning something new with every
+          project. Interested in clean interfaces, scalable APIs and developer communities.
+        </p>
+      </section>
+
+      <section class="account-card details-card">
+        <header class="card-heading">
+          <span class="heading-icon"><i class="fa-solid fa-address-card"></i></span>
+          <div>
+            <span>ACCOUNT</span>
+            <h2>Personal details</h2>
+          </div>
+        </header>
+        <dl>
+          <div>
+            <dt>Username</dt>
+            <dd>@ruben</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>ruben@example.com</dd>
+          </div>
+          <div>
+            <dt>Account ID</dt>
+            <dd>#0001</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd class="verified"><i class="fa-solid fa-circle-check"></i> Active</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="account-card skills-card">
+        <header class="card-heading">
+          <span class="heading-icon"><i class="fa-solid fa-layer-group"></i></span>
+          <div>
+            <span>STACK</span>
+            <h2>Technologies</h2>
+          </div>
+        </header>
+        <div class="skill-list">
+          <span>Angular</span><span>TypeScript</span><span>Node.js</span><span>MongoDB</span><span>Express</span><span>MySQL</span>
+        </div>
+      </section>
+    </aside>
+
+    <section class="publications-section">
+      <header class="section-heading">
+        <div>
+          <span class="section-kicker">ACTIVITY</span>
+          <h2>My publications</h2>
+          <p>Ideas, progress and things shared with the community.</p>
+        </div>
+        <span class="post-count"><i class="fa-regular fa-file-lines"></i> 8 posts</span>
+      </header>
+
+      <div class="publication-list">
+        <article class="publication-card">
+          <header class="publication-header">
+            <div class="publication-author">
+              <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
+              <div><strong>Ruben</strong><span>Community post</span></div>
+            </div>
+            <time><i class="fa-regular fa-calendar"></i> 19 Jun 2026</time>
+          </header>
+          <div class="publication-body">
+            <p>
+              He terminado la nueva página de perfil de DevConnect y ya está lista para conectar con
+              los datos reales del usuario.
+            </p>
+            <div class="post-tags">
+              <span>#angular</span><span>#ui</span><span>#devconnect</span>
+            </div>
+          </div>
+          <footer class="publication-footer">
+            <span><i class="fa-regular fa-comment"></i> 6</span>
+            <span><i class="fa-regular fa-heart"></i> 24</span>
+            <span><i class="fa-regular fa-eye"></i> 180</span>
+          </footer>
+        </article>
+
+        <article class="publication-card">
+          <header class="publication-header">
+            <div class="publication-author">
+              <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
+              <div><strong>Ruben</strong><span>Community post</span></div>
+            </div>
+            <time><i class="fa-regular fa-calendar"></i> 12 Jun 2026</time>
+          </header>
+          <div class="publication-body">
+            <p>
+              Hoy he conectado los comentarios con MongoDB. La lista se actualiza sin recargar la
+              página y el flujo empieza a sentirse muy sólido.
+            </p>
+            <div class="post-tags"><span>#mongodb</span><span>#node</span><span>#api</span></div>
+          </div>
+          <footer class="publication-footer">
+            <span><i class="fa-regular fa-comment"></i> 9</span>
+            <span><i class="fa-regular fa-heart"></i> 31</span>
+            <span><i class="fa-regular fa-eye"></i> 264</span>
+          </footer>
+        </article>
+
+        <article class="publication-card">
+          <header class="publication-header">
+            <div class="publication-author">
+              <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
+              <div><strong>Ruben</strong><span>Community post</span></div>
+            </div>
+            <time><i class="fa-regular fa-calendar"></i> 05 Jun 2026</time>
+          </header>
+          <div class="publication-body">
+            <p>
+              Pequeño avance de hoy: autenticación con JWT, componentes reutilizables y una interfaz
+              mucho más coherente.
+            </p>
+            <div class="post-tags">
+              <span>#jwt</span><span>#typescript</span><span>#frontend</span>
+            </div>
+          </div>
+          <footer class="publication-footer">
+            <span><i class="fa-regular fa-comment"></i> 4</span>
+            <span><i class="fa-regular fa-heart"></i> 18</span>
+            <span><i class="fa-regular fa-eye"></i> 142</span>
+          </footer>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
