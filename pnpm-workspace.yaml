@@ -1,4 +1,5 @@
 allowBuilds:
+  '@compodoc/compodoc': true
   '@parcel/watcher': false
   bcrypt: false
   esbuild: false
