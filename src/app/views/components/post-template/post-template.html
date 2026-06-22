@@ -28,7 +28,7 @@
 
   <footer class="post-footer">
     <div class="post-metrics">
-      <button class="metric comments-button" type="button" (click)="updateComments()">
+      <button class="metric comments-button" type="button" (click)="toggleCreating()">
         <i class="fa-regular fa-comment" aria-hidden="true"></i>
         {{ post()?.comments?.length ?? 0 }}
       </button>
@@ -57,6 +57,10 @@
     </div>
   </footer>
 
+  @if (creatingComment() == true) {
+  <app-new-comment-template [(creatingComment)]="creatingComment" [postId]="post()?._id"
+    (updatedComments)="updateComments($event)"></app-new-comment-template>
+  }
   @if ((post()?.comments?.length ?? 0) > 0) {
   @for (comment of post()?.comments ?? []; track comment){
   <app-comment-template [comment]="comment"></app-comment-template>

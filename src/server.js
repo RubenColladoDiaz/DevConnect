@@ -220,6 +220,38 @@ app.post('/createPost', async function (req, res) {
   }
 });
 
+app.post('/createComment', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const username = decoded.username;
+    const content = req.body.content;
+    const postId = new ObjectId(req.body.postId);
+
+    const newComment = {
+      username,
+      content,
+    };
+    const result = await dbConnMongo.collection('posts').updateOne(
+      { _id: postId },
+      {
+        $push: {
+          comments: newComment,
+        },
+      },
+    );
+
+    const post = await dbConnMongo.collection('posts').findOne({ _id: postId });
+
+    return res.send(post.comments);
+  } catch (error) {
+    return res.status(401).json({
+      message: error.message || 'Invalid token',
+    });
+  }
+});
+
 function getDecodedToken(req) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) throw new Error('No token provided');

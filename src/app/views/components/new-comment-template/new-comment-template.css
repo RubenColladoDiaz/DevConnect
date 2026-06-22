@@ -1,0 +1,210 @@
+:host {
+  display: block;
+  border-top: 1px solid #eceef3;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(233, 19, 136, 0.05), transparent 32%), #fbfbfd;
+}
+
+.comment-composer {
+  padding: 15px 16px 16px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 11px;
+}
+
+.composer-avatar {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #00a8de, #563195 55%, #e91388);
+  color: #fff;
+  font-size: 0.7rem;
+  box-shadow: 0 0 0 1px rgba(86, 49, 149, 0.12);
+}
+
+.composer-panel {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e5e7ee;
+  border-radius: 4px 13px 13px 13px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(27, 31, 59, 0.05);
+}
+
+.composer-heading {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.composer-title,
+.composer-subtitle {
+  display: block;
+}
+
+.composer-title {
+  color: #343647;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.composer-title i {
+  margin-right: 4px;
+  color: #65329d;
+  font-size: 0.68rem;
+}
+
+.composer-subtitle {
+  margin-top: 3px;
+  color: #9498a7;
+  font-size: 0.66rem;
+}
+
+.heading-icon {
+  flex: 0 0 auto;
+  color: rgba(101, 50, 157, 0.42);
+  font-size: 0.85rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 82px;
+  padding: 11px 12px;
+  resize: vertical;
+  border: 1px solid #dfe2ea;
+  border-radius: 9px;
+  outline: none;
+  background: #f8f9fc;
+  color: #303243;
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+textarea::placeholder {
+  color: #9b9fad;
+}
+
+textarea:focus {
+  border-color: #65329d;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(101, 50, 157, 0.11);
+}
+
+.composer-footer {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.composer-hint {
+  color: #9296a5;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.composer-hint i {
+  margin-right: 4px;
+  color: #28a879;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.composer-actions button {
+  min-height: 32px;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.cancel-button {
+  border: 1px solid #dcdfe7;
+  background: #fff;
+  color: #727685;
+}
+
+.cancel-button:hover {
+  border-color: #bfc3ce;
+  background: #f5f6f9;
+}
+
+.comment-button {
+  border: 0;
+  background: linear-gradient(100deg, #333391 0%, #a51a93 55%, #e91369 100%);
+  color: #fff;
+  box-shadow: 0 3px 9px rgba(101, 50, 157, 0.22);
+}
+
+.comment-button i {
+  margin-right: 4px;
+}
+
+.comment-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(101, 50, 157, 0.28);
+}
+
+.composer-actions button:focus-visible {
+  outline: 3px solid rgba(0, 168, 222, 0.22);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .comment-composer {
+    padding: 13px 12px 14px;
+    grid-template-columns: 31px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .composer-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .composer-panel {
+    padding: 10px;
+  }
+
+  .composer-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .composer-hint {
+    white-space: normal;
+  }
+
+  .composer-actions {
+    justify-content: flex-end;
+  }
+
+  .composer-actions button {
+    min-width: 82px;
+  }
+}

@@ -1,0 +1,36 @@
+<section class="comment-composer" aria-label="Create a comment">
+  <div class="composer-avatar" aria-hidden="true">
+    <i class="fa-solid fa-pen"></i>
+  </div>
+
+  <div class="composer-panel">
+    <header class="composer-heading">
+      <div>
+        <span class="composer-title">
+          <i class="fa-solid fa-reply" aria-hidden="true"></i>
+          Join the conversation
+        </span>
+        <span class="composer-subtitle">Share your thoughts with the community</span>
+      </div>
+      <i class="fa-regular fa-comment-dots heading-icon" aria-hidden="true"></i>
+    </header>
+
+    <textarea [(ngModel)]="content" name="comment" maxlength="300" rows="3" placeholder="Write a thoughtful comment..."
+      aria-label="Comment content"></textarea>
+
+    <footer class="composer-footer">
+      <span class="composer-hint">
+        <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
+        Keep it constructive
+      </span>
+
+      <div class="composer-actions">
+        <button class="cancel-button" type="button" (click)="toggleCreating()">Cancel</button>
+        <button class="comment-button" type="button" (click)="createComment()">
+          <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+          Comment
+        </button>
+      </div>
+    </footer>
+  </div>
+</section>

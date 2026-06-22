@@ -1,7 +1,8 @@
-import { Component, model, ModelSignal } from '@angular/core';
+import { Component, model, ModelSignal, signal, WritableSignal } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { PostsService } from '../../../shared/services/posts-service';
 import { Router } from '@angular/router';
+import { Comment } from '../../../shared/types/Comment';
 
 @Component({
   selector: 'app-post-template',
@@ -17,13 +18,10 @@ export class PostTemplate {
 
   post: ModelSignal<Post | undefined> = model<Post>();
 
-  updateLikes(): void {
-    const token = localStorage.getItem('token');
+  creatingComment: WritableSignal<boolean> = signal<boolean>(false);
 
-    if (!token) {
-      this.router.navigate(['/login']);
-      return;
-    }
+  updateLikes(): void {
+    if (!this.checkLogin()) return;
 
     const id = this.post()?._id;
     if (!id) return;
@@ -39,5 +37,29 @@ export class PostTemplate {
     });
   }
 
-  updateComments(): void {}
+  toggleCreating(): void {
+    this.creatingComment.update((creating) => !creating);
+  }
+
+  updateComments(comments: Comment[]) {
+    this.post.update((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        comments: comments,
+      };
+    });
+    this.toggleCreating();
+  }
+
+  checkLogin(): boolean {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      this.router.navigate(['/login']);
+      return false;
+    }
+    return true;
+  }
 }

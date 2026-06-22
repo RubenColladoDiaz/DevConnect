@@ -24,6 +24,20 @@ export class PostsService {
     });
   }
 
+  createComment(postId: string, content: string): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    const body = {
+      postId: postId,
+      content: content,
+    };
+    return this.http.post(this.nodeURL + '/createComment', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
   getAllPosts(): Observable<any> {
     const token = localStorage.getItem('token');
 
