@@ -64,6 +64,7 @@ app.post('/login', function (req, res) {
 });
 
 app.post('/register', function (req, res) {
+  const display_name = req.body.display_name;
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
@@ -80,7 +81,7 @@ app.post('/register', function (req, res) {
 
       dbConn.query(
         'INSERT INTO users set ?',
-        { username: username, email: email, password: hashedPassword },
+        { username: username, email: email, password: hashedPassword, display_name: display_name },
         function (error, results, fields) {
           if (error) return res.status(500).json({ message: 'Database error: ' + error });
 
@@ -88,6 +89,7 @@ app.post('/register', function (req, res) {
             userId: results.insertId,
             username,
             email,
+            display_name,
           };
 
           const token = jwt.sign(

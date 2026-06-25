@@ -53,9 +53,9 @@ export class RegisterPage {
   Register(): void {
     if (this.registerForm.invalid) return;
 
-    const { username, email, password } = this.registerForm.value;
+    const { username, email, password, display_name } = this.registerForm.value;
 
-    this.userService.Register(username, email, password).subscribe({
+    this.userService.Register(username, email, password, display_name).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
