@@ -103,75 +103,9 @@
       </header>
 
       <div class="publication-list">
-        <article class="publication-card">
-          <header class="publication-header">
-            <div class="publication-author">
-              <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
-              <div><strong>Ruben</strong><span>Community post</span></div>
-            </div>
-            <time><i class="fa-regular fa-calendar"></i> 19 Jun 2026</time>
-          </header>
-          <div class="publication-body">
-            <p>
-              He terminado la nueva página de perfil de DevConnect y ya está lista para conectar con
-              los datos reales del usuario.
-            </p>
-            <div class="post-tags">
-              <span>#angular</span><span>#ui</span><span>#devconnect</span>
-            </div>
-          </div>
-          <footer class="publication-footer">
-            <span><i class="fa-regular fa-comment"></i> 6</span>
-            <span><i class="fa-regular fa-heart"></i> 24</span>
-            <span><i class="fa-regular fa-eye"></i> 180</span>
-          </footer>
-        </article>
-
-        <article class="publication-card">
-          <header class="publication-header">
-            <div class="publication-author">
-              <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
-              <div><strong>Ruben</strong><span>Community post</span></div>
-            </div>
-            <time><i class="fa-regular fa-calendar"></i> 12 Jun 2026</time>
-          </header>
-          <div class="publication-body">
-            <p>
-              Hoy he conectado los comentarios con MongoDB. La lista se actualiza sin recargar la
-              página y el flujo empieza a sentirse muy sólido.
-            </p>
-            <div class="post-tags"><span>#mongodb</span><span>#node</span><span>#api</span></div>
-          </div>
-          <footer class="publication-footer">
-            <span><i class="fa-regular fa-comment"></i> 9</span>
-            <span><i class="fa-regular fa-heart"></i> 31</span>
-            <span><i class="fa-regular fa-eye"></i> 264</span>
-          </footer>
-        </article>
-
-        <article class="publication-card">
-          <header class="publication-header">
-            <div class="publication-author">
-              <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
-              <div><strong>Ruben</strong><span>Community post</span></div>
-            </div>
-            <time><i class="fa-regular fa-calendar"></i> 05 Jun 2026</time>
-          </header>
-          <div class="publication-body">
-            <p>
-              Pequeño avance de hoy: autenticación con JWT, componentes reutilizables y una interfaz
-              mucho más coherente.
-            </p>
-            <div class="post-tags">
-              <span>#jwt</span><span>#typescript</span><span>#frontend</span>
-            </div>
-          </div>
-          <footer class="publication-footer">
-            <span><i class="fa-regular fa-comment"></i> 4</span>
-            <span><i class="fa-regular fa-heart"></i> 18</span>
-            <span><i class="fa-regular fa-eye"></i> 142</span>
-          </footer>
-        </article>
+        @for (post of postsFromUser; track post) {
+        <app-my-account-post [(user)]="user" [post]="post"></app-my-account-post>
+        }
       </div>
     </section>
   </div>

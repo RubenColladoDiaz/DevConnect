@@ -1,0 +1,22 @@
+<article class="publication-card">
+    <header class="publication-header">
+        <div class="publication-author">
+            <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
+            <div><strong>{{user()?.username}}</strong><span>Community post</span></div>
+        </div>
+        <time><i class="fa-regular fa-calendar"></i> {{post()?.createdAt}}</time>
+    </header>
+    <div class="publication-body">
+        <p>{{post()?.content}}</p>
+        <div class="post-tags">
+            @for (tag of post()?.tags; track tag) {
+            <span>{{tag}}</span>
+            }
+        </div>
+    </div>
+    <footer class="publication-footer">
+        <span><i class="fa-regular fa-comment"></i> {{post()?.comments?.length}}</span>
+        <span><i class="fa-regular fa-heart"></i> {{post()?.likes}}</span>
+        <span><i class="fa-regular fa-eye"></i> {{post()?.views}}</span>
+    </footer>
+</article>

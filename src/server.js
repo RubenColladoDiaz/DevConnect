@@ -138,6 +138,20 @@ app.get('/getAllPosts', async function (req, res) {
   }
 });
 
+app.get('/getAllPostsFromUser', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const username = decoded.username;
+
+    const posts = await dbConnMongo.collection('posts').find({ username: username }).toArray();
+
+    return res.send({ posts: posts });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/updateLikes', async function (req, res) {
   try {
     const postId = new ObjectId(req.body.postId); // En MongoDB el id no es ni numero ni string
