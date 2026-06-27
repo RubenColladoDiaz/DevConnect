@@ -13,6 +13,8 @@ export class MyAccountPage implements OnInit {
   user: WritableSignal<User> = signal<User>(JSON.parse(localStorage.getItem('user') || '{}'));
 
   postsFromUser: Post[] = [];
+  likes: number = 0;
+  comments: number = 0;
 
   constructor(
     private postsService: PostsService,
@@ -21,13 +23,27 @@ export class MyAccountPage implements OnInit {
 
   ngOnInit(): void {
     this.getAllPostsFromUser();
-    this.cdr.detectChanges();
+    this.getAllInfoFromUser();
   }
 
   getAllPostsFromUser(): void {
     this.postsService.getAllPostsFromUser().subscribe({
       next: (res: any) => {
         this.postsFromUser = res.posts;
+        this.cdr.detectChanges();
+      },
+      error: (res: any) => {
+        console.log(res);
+      },
+    });
+  }
+
+  getAllInfoFromUser(): void {
+    this.postsService.getAllInfoFromUser().subscribe({
+      next: (res: any) => {
+        this.likes = res.likes;
+        this.comments = res.comments;
+        this.cdr.detectChanges();
       },
       error: (res: any) => {
         console.log(res);

@@ -57,6 +57,9 @@ app.post('/login', function (req, res) {
         user: {
           userId: user.userId,
           username: user.username,
+          email: user.email,
+          display_name: user.display_name,
+          created_at: user.created_at,
         },
       });
     },
@@ -70,40 +73,43 @@ app.post('/register', function (req, res) {
   const password = req.body.password;
 
   dbConn.query(
-    'SELECT * FROM users WHERE email = ? OR username = ?',
-    [email, username],
-    async function (error, results, fields) {
+    'INSERT INTO users set ?',
+    {
+      username,
+      email,
+      password: hashedPassword,
+      display_name
+    },
+    function (error, results) {
       if (error) return res.status(500).json({ message: 'Database error: ' + error });
 
-      if (results.length > 0) return res.status(409).json({ message: 'User already exists' });
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
       dbConn.query(
-        'INSERT INTO users set ?',
-        { username: username, email: email, password: hashedPassword, display_name: display_name },
-        function (error, results, fields) {
-          if (error) return res.status(500).json({ message: 'Database error: ' + error });
+        'SELECT * FROM users WHERE userId = ?',
+        [results.insertId],
+        function (error2, rows) {
+          if (error2) return res.status(500).json({ message: 'Database error: ' + error2 });
 
-          const newUser = {
-            userId: results.insertId,
-            username,
-            email,
-            display_name,
-          };
+          const user = rows[0];
 
           const token = jwt.sign(
-            { userId: newUser.userId, username: newUser.username },
+            { userId: user.userId, username: user.username },
             JWT_SECRET,
-            {
-              expiresIn: '24h',
-            },
+            { expiresIn: '24h' }
           );
 
-          return res.send({ token, user: newUser });
-        },
+          return res.send({
+            token,
+            user: {
+              userId: user.userId,
+              username: user.username,
+              email: user.email,
+              display_name: user.display_name,
+              created_at: user.created_at,
+            },
+          });
+        }
       );
-    },
+    }
   );
 });
 
@@ -151,6 +157,28 @@ app.get('/getAllPostsFromUser', async function (req, res) {
     return res.status(401).json({ message: error.message });
   }
 });
+
+app.get('/getAllInfoFromUser', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const username = decoded.username;
+
+    const posts = await dbConnMongo.collection('posts').find({ username: username }).toArray();
+
+    let likes = 0;
+    let comments = 0;
+
+    for (const post of posts) {
+      likes += post.likes || 0;
+      comments += post.comments?.length || 0;
+    }
+
+    return res.send({ likes, comments })
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+})
 
 app.post('/updateLikes', async function (req, res) {
   try {
