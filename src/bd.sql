@@ -9,6 +9,10 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     display_name VARCHAR(100),
     bio TEXT,
+
+    stack JSON NOT NULL,
+    status ENUM('active', 'offline') NOT NULL DEFAULT 'offline',
+
     location VARCHAR(100),
     avatar_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
