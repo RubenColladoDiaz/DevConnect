@@ -66,11 +66,13 @@ app.post('/login', function (req, res) {
   );
 });
 
-app.post('/register', function (req, res) {
+app.post('/register', async function (req, res) {
   const display_name = req.body.display_name;
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
+
+  const hashedPassword = await bcrypt.hash(password, 12)
 
   dbConn.query(
     'INSERT INTO users set ?',
