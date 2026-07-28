@@ -35,6 +35,50 @@
             formControlName="password" required />
         </div>
 
+        <div class="stack-section">
+          <label for="stackInput" class="stack-label">
+            Technologies
+          </label>
+
+          <div class="stack-input-container">
+            <span class="field-icon">
+              <i class="fa-solid fa-code" aria-hidden="true"></i>
+            </span>
+
+            <input type="text" id="stackInput" class="form-control" placeholder="Type a technology and press Enter"
+              [(ngModel)]="technologyInput" [ngModelOptions]="{ standalone: true }"
+              (keydown.enter)="addTechnology($event)" list="technologySuggestions" />
+          </div>
+
+          <datalist id="technologySuggestions">
+            @for (technology of availableTechnologies; track technology) {
+            <option [value]="technology"></option>
+            }
+          </datalist>
+
+          <div class="stack-tags">
+            @for (technology of selectedTechnologies; track technology) {
+            <span class="stack-tag">
+              {{ technology }}
+
+              <button type="button" class="remove-technology" [attr.aria-label]="'Remove ' + technology"
+                (click)="removeTechnology(technology)">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+              </button>
+            </span>
+            }
+          </div>
+
+          @if (
+          registerForm.controls['stack'].touched &&
+          registerForm.controls['stack'].hasError('required')
+          ) {
+          <small class="field-error">
+            Select at least one technology.
+          </small>
+          }
+        </div>
+
         <div class="primary-actions">
           <button data-mdb-button-init data-mdb-ripple-init class="login-button gradient-custom-2" type="submit">
             REGISTER

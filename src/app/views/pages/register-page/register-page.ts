@@ -13,25 +13,38 @@ import { UsersService } from '../../../shared/services/users-service';
   styleUrl: './register-page.css',
 })
 export class RegisterPage {
-  /**
-   * Form group where we will modify username and password.
-   * @type {FormGroup}
-   */
   registerForm: FormGroup;
 
-  /**
-   * Text message where we show possible errors.
-   * @type {string}
-   * @default {''}
-   */
   message: string = '';
 
-  /**
-   * Constructor where we create essencial params for different methods and we validate inputs from the form.
-   * @param {FormBuilder} fb Builder for create the FormGroup.
-   * @param {HttpClient} http Property that is used to make API calls.
-   * @param {Router} router Property that is used to navigate within different web routes.
-   */
+  technologyInput: string = '';
+  selectedTechnologies: string[] = [];
+
+  availableTechnologies: string[] = [
+    'Angular',
+    'React',
+    'Vue',
+    'JavaScript',
+    'TypeScript',
+    'HTML',
+    'CSS',
+    'Java',
+    'Spring Boot',
+    'C#',
+    '.NET',
+    'PHP',
+    'Laravel',
+    'Python',
+    'Django',
+    'Node.js',
+    'Express',
+    'MySQL',
+    'PostgreSQL',
+    'MongoDB',
+    'Docker',
+    'Git',
+  ];
+
   constructor(
     private fb: FormBuilder,
     private userService: UsersService,
@@ -39,23 +52,51 @@ export class RegisterPage {
   ) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
-      email: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       display_name: ['', Validators.required],
+      stack: [[], [Validators.required, Validators.minLength(1)]],
     });
   }
 
-  /**
-   * This POST method register the user into the paltform saving the user object in localStorage.
-   * @type {void}
-   * @returns This method does not return any data.
-   */
+  addTechnology(event: Event) {
+    event.preventDefault();
+
+    const technology = this.technologyInput.trim();
+    if (!technology) return;
+
+    const technologyExists = this.selectedTechnologies.some(
+      (item) => item.toLowerCase() === technology.toLowerCase(),
+    );
+
+    if (technologyExists) {
+      this.technologyInput = '';
+      return;
+    }
+
+    this.selectedTechnologies.push(technology);
+
+    this.registerForm.patchValue({
+      stack: this.selectedTechnologies,
+    });
+
+    this.technologyInput = '';
+  }
+
+  removeTechnology(technology: string): void {
+    this.selectedTechnologies = this.selectedTechnologies.filter((item) => item !== technology);
+
+    this.registerForm.patchValue({
+      stack: this.selectedTechnologies,
+    });
+  }
+
   Register(): void {
     if (this.registerForm.invalid) return;
 
-    const { username, email, password, display_name } = this.registerForm.value;
+    const { username, email, password, display_name, stack } = this.registerForm.value;
 
-    this.userService.Register(username, email, password, display_name).subscribe({
+    this.userService.Register(username, email, password, display_name, stack).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));

@@ -5,3 +5,62 @@
 
   display: block;
 }
+
+.stack-section {
+  margin-bottom: 1rem;
+}
+
+.stack-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.stack-input-container {
+  position: relative;
+}
+
+.stack-input-container .form-control {
+  padding-left: 2.75rem;
+}
+
+.stack-input-container .field-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.stack-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: #eeeeee;
+  font-size: 0.875rem;
+}
+
+.remove-technology {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.field-error {
+  display: block;
+  margin-top: 0.5rem;
+  color: #c62828;
+}

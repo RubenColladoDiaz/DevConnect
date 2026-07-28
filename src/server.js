@@ -71,8 +71,9 @@ app.post('/register', async function (req, res) {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
+  const stack = req.body.stack;
 
-  const hashedPassword = await bcrypt.hash(password, 12)
+  const hashedPassword = await bcrypt.hash(password, 12);
 
   dbConn.query(
     'INSERT INTO users set ?',
@@ -80,7 +81,8 @@ app.post('/register', async function (req, res) {
       username,
       email,
       password: hashedPassword,
-      display_name
+      display_name,
+      stack: JSON.stringify(stack),
     },
     function (error, results) {
       if (error) return res.status(500).json({ message: 'Database error: ' + error });
@@ -93,11 +95,9 @@ app.post('/register', async function (req, res) {
 
           const user = rows[0];
 
-          const token = jwt.sign(
-            { userId: user.userId, username: user.username },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-          );
+          const token = jwt.sign({ userId: user.userId, username: user.username }, JWT_SECRET, {
+            expiresIn: '24h',
+          });
 
           return res.send({
             token,
@@ -106,12 +106,13 @@ app.post('/register', async function (req, res) {
               username: user.username,
               email: user.email,
               display_name: user.display_name,
+              stack: stack,
               created_at: user.created_at,
             },
           });
-        }
+        },
       );
-    }
+    },
   );
 });
 
@@ -176,11 +177,11 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       comments += post.comments?.length || 0;
     }
 
-    return res.send({ likes, comments })
+    return res.send({ likes, comments });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
-})
+});
 
 app.post('/updateLikes', async function (req, res) {
   try {

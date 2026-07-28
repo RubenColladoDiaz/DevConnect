@@ -10,10 +10,7 @@
 
     <div class="profile-identity">
       <div class="profile-avatar">
-        <img
-          src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
-          alt="User profile"
-        />
+        <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User profile" />
         <span class="online-dot" title="Online"></span>
       </div>
 
@@ -23,27 +20,22 @@
         <p>@{{ user().username }} · Full-stack developer</p>
         <div class="identity-meta">
           <span><i class="fa-regular fa-envelope"></i> {{ user().email }}</span>
-          <span><i class="fa-solid fa-location-dot"></i> Spain</span>
-          <span
-            ><i class="fa-regular fa-calendar"></i> Member since
-            {{ user().created_at | date: 'yyyy' }}</span
-          >
+          <span><i class="fa-solid fa-location-dot"></i> {{user().locatinon}}</span>
+          <span><i class="fa-regular fa-calendar"></i> Member since
+            {{ user().created_at | date: 'yyyy' }}</span>
         </div>
       </div>
     </div>
 
     <div class="profile-stats" aria-label="Profile statistics">
       <div>
-        <strong>{{ postsFromUser.length }}</strong
-        ><span>Posts</span>
+        <strong>{{ postsFromUser.length }}</strong><span>Posts</span>
       </div>
       <div>
-        <strong>{{ comments }}</strong
-        ><span>Comments</span>
+        <strong>{{ comments }}</strong><span>Comments</span>
       </div>
       <div>
-        <strong>{{ likes }}</strong
-        ><span>Likes</span>
+        <strong>{{ likes }}</strong><span>Likes</span>
       </div>
       <div><strong>0</strong><span>Views</span></div>
     </div>
@@ -60,8 +52,7 @@
           </div>
         </header>
         <p>
-          Full-stack developer building useful products and learning something new with every
-          project. Interested in clean interfaces, scalable APIs and developer communities.
+          {{user().bio}}
         </p>
       </section>
 
@@ -88,7 +79,7 @@
           </div>
           <div>
             <dt>Status</dt>
-            <dd class="verified"><i class="fa-solid fa-circle-check"></i> Active</dd>
+            <dd class="verified"><i class="fa-solid fa-circle-check"></i> {{user().status}}</dd>
           </div>
         </dl>
       </section>
@@ -102,8 +93,9 @@
           </div>
         </header>
         <div class="skill-list">
-          <span>Angular</span><span>TypeScript</span><span>Node.js</span><span>MongoDB</span
-          ><span>Express</span><span>MySQL</span>
+          @for (technology of user().stack; track technology) {
+          <span>{{ technology }}</span>
+          }
         </div>
       </section>
     </aside>
@@ -115,14 +107,12 @@
           <h2>My publications</h2>
           <p>Ideas, progress and things shared with the community.</p>
         </div>
-        <span class="post-count"
-          ><i class="fa-regular fa-file-lines"></i> {{ postsFromUser.length }} posts</span
-        >
+        <span class="post-count"><i class="fa-regular fa-file-lines"></i> {{ postsFromUser.length }} posts</span>
       </header>
 
       <div class="publication-list">
         @for (post of postsFromUser; track post) {
-          <app-my-account-post [(user)]="user" [post]="post"></app-my-account-post>
+        <app-my-account-post [(user)]="user" [post]="post"></app-my-account-post>
         }
       </div>
     </section>

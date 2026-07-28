@@ -17,12 +17,19 @@ export class UsersService {
     return this.http.post(this.nodeURL + '/login', body);
   }
 
-  Register(username: string, email: string, password: string, display_name: string) {
+  Register(
+    username: string,
+    email: string,
+    password: string,
+    display_name: string,
+    stack: string[],
+  ) {
     const body = {
       username,
       email,
       password,
       display_name,
+      stack,
     };
     return this.http.post(this.nodeURL + '/register', body);
   }
