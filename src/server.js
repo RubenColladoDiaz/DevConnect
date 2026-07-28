@@ -66,6 +66,49 @@ app.post('/login', function (req, res) {
   );
 });
 
+app.post('/logout', function (req, res) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({
+      message: 'No token provided',
+    });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  jwt.verify(token, JWT_SECRET, function (error, decoded) {
+    if (error) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+      });
+    }
+
+    dbConn.query(
+      'UPDATE users SET status = ? WHERE userId = ?',
+      ['offline', decoded.userId],
+      function (databaseError, results) {
+        if (databaseError) {
+          return res.status(500).json({
+            message: 'Database error: ' + databaseError,
+          });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({
+            message: 'User not found',
+          });
+        }
+
+        return res.json({
+          message: 'Logout successful',
+          status: 'offline',
+        });
+      },
+    );
+  });
+});
+
 app.post('/register', async function (req, res) {
   const display_name = req.body.display_name;
   const username = req.body.username;
@@ -76,28 +119,44 @@ app.post('/register', async function (req, res) {
   const hashedPassword = await bcrypt.hash(password, 12);
 
   dbConn.query(
-    'INSERT INTO users set ?',
+    'INSERT INTO users SET ?',
     {
       username,
       email,
       password: hashedPassword,
       display_name,
       stack: JSON.stringify(stack),
+      status: 'active',
     },
     function (error, results) {
-      if (error) return res.status(500).json({ message: 'Database error: ' + error });
+      if (error) {
+        return res.status(500).json({
+          message: 'Database error: ' + error,
+        });
+      }
 
       dbConn.query(
         'SELECT * FROM users WHERE userId = ?',
         [results.insertId],
         function (error2, rows) {
-          if (error2) return res.status(500).json({ message: 'Database error: ' + error2 });
+          if (error2) {
+            return res.status(500).json({
+              message: 'Database error: ' + error2,
+            });
+          }
 
           const user = rows[0];
 
-          const token = jwt.sign({ userId: user.userId, username: user.username }, JWT_SECRET, {
-            expiresIn: '24h',
-          });
+          const token = jwt.sign(
+            {
+              userId: user.userId,
+              username: user.username,
+            },
+            JWT_SECRET,
+            {
+              expiresIn: '24h',
+            },
+          );
 
           return res.send({
             token,
@@ -106,7 +165,11 @@ app.post('/register', async function (req, res) {
               username: user.username,
               email: user.email,
               display_name: user.display_name,
-              stack: stack,
+              bio: user.bio,
+              stack: user.stack,
+              status: user.status,
+              location: user.location,
+              avatar_url: user.avatar_url,
               created_at: user.created_at,
             },
           });

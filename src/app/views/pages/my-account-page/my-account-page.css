@@ -338,6 +338,24 @@
   transform: translateY(-1px);
 }
 
+.status-active {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.status-offline {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.status-active,
+.status-offline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: capitalize;
+}
+
 @media (max-width: 560px) {
   .account-page {
     padding: 22px 12px 50px;

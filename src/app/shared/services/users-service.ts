@@ -47,4 +47,18 @@ export class UsersService {
       },
     );
   }
+
+  Logout() {
+    const token = localStorage.getItem('token');
+
+    return this.http.post(
+      this.nodeURL + '/logout',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  }
 }

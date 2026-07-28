@@ -105,7 +105,18 @@
           </div>
           <div>
             <dt>Status</dt>
-            <dd class="verified"><i class="fa-solid fa-circle-check"></i> {{user().status}}</dd>
+
+            @if (user().status === 'active') {
+            <dd class="status-active">
+              <i class="fa-solid fa-circle-check"></i>
+              {{ user().status }}
+            </dd>
+            } @else {
+            <dd class="status-offline">
+              <i class="fa-solid fa-circle-xmark"></i>
+              {{ user().status }}
+            </dd>
+            }
           </div>
         </dl>
       </section>
