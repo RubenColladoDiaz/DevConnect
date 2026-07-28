@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@a
 import { User } from '../../../shared/types/User';
 import { PostsService } from '../../../shared/services/posts-service';
 import { Post } from '../../../shared/types/Post';
+import { UsersService } from '../../../shared/services/users-service';
 
 @Component({
   selector: 'app-my-account-page',
@@ -16,14 +17,42 @@ export class MyAccountPage implements OnInit {
   likes: number = 0;
   comments: number = 0;
 
+  editingBio: boolean = false;
+  editedBio: string = '';
+
   constructor(
     private postsService: PostsService,
+    private usersService: UsersService,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.getAllPostsFromUser();
     this.getAllInfoFromUser();
+  }
+
+  editBio(): void {
+    this.editedBio = this.user().bio;
+    this.editingBio = true;
+  }
+
+  saveBio(): void {
+    this.usersService.UpdateBio(this.editedBio).subscribe({
+      next: (res: any) => {
+        this.user().bio = res.bio;
+        localStorage.setItem('user', JSON.stringify(this.user()));
+        this.cdr.detectChanges();
+      },
+      error: (res: any) => {
+        console.log(res);
+      },
+    });
+    this.editingBio = false;
+  }
+
+  cancelBio(): void {
+    this.editedBio = '';
+    this.editingBio = false;
   }
 
   getAllPostsFromUser(): void {

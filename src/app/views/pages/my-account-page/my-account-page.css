@@ -226,6 +226,118 @@
 .verified {
   color: #239c6b;
 }
+
+.about-card .card-heading {
+  position: relative;
+}
+
+.edit-bio-button {
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.edit-bio-button:hover {
+  border-color: #7c3aed;
+  background: #f3e8ff;
+  color: #7c3aed;
+  transform: translateY(-1px);
+}
+
+.bio-editor {
+  margin-top: 18px;
+}
+
+.bio-textarea {
+  width: 100%;
+  min-height: 130px;
+  padding: 14px 16px;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  outline: none;
+  background: #f8fafc;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.bio-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.bio-textarea:focus {
+  border-color: #7c3aed;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.bio-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.bio-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 90px;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.cancel-bio-button {
+  border: 1px solid #dbe3ec;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.cancel-bio-button:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.save-bio-button {
+  border: 1px solid #7c3aed;
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+.save-bio-button:hover {
+  border-color: #6d28d9;
+  background: #6d28d9;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 560px) {
   .account-page {
     padding: 22px 12px 50px;

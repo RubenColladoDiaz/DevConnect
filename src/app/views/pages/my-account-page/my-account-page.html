@@ -45,15 +45,41 @@
     <aside class="profile-sidebar">
       <section class="account-card about-card">
         <header class="card-heading">
-          <span class="heading-icon"><i class="fa-regular fa-user"></i></span>
+          <span class="heading-icon">
+            <i class="fa-regular fa-user"></i>
+          </span>
+
           <div>
             <span>PROFILE</span>
             <h2>About me</h2>
           </div>
+
+          @if (!editingBio) {
+          <button type="button" class="edit-bio-button" aria-label="Edit biography" (click)="editBio()">
+            <i class="fa-solid fa-pencil"></i>
+          </button>
+          }
         </header>
-        <p>
-          {{user().bio}}
-        </p>
+
+        @if (!editingBio) {
+        <p>{{ user().bio }}</p>
+        } @else {
+        <div class="bio-editor">
+          <textarea class="bio-textarea" [(ngModel)]="editedBio" rows="5" maxlength="500"
+            placeholder="Write something about yourself..."></textarea>
+
+          <div class="bio-actions">
+            <button type="button" class="bio-button cancel-bio-button" (click)="cancelBio()">
+              Cancel
+            </button>
+
+            <button type="button" class="bio-button save-bio-button" (click)="saveBio()">
+              <i class="fa-solid fa-check"></i>
+              Save
+            </button>
+          </div>
+        </div>
+        }
       </section>
 
       <section class="account-card details-card">

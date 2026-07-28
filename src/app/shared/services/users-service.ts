@@ -33,4 +33,18 @@ export class UsersService {
     };
     return this.http.post(this.nodeURL + '/register', body);
   }
+
+  UpdateBio(bio: string) {
+    const token = localStorage.getItem('token');
+
+    return this.http.post(
+      this.nodeURL + '/updateBio',
+      { bio },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  }
 }

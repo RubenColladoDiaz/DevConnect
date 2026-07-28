@@ -221,6 +221,41 @@ app.post('/updateLikes', async function (req, res) {
   }
 });
 
+app.post('/updateBio', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    const bio = req.body.bio;
+
+    dbConn.query(
+      'UPDATE users SET bio = ? WHERE userId = ?',
+      [bio, userId],
+      function (error, results) {
+        if (error) {
+          return res.status(500).json({
+            message: 'Database error: ' + error,
+          });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({
+            message: 'User not found',
+          });
+        }
+
+        return res.json({
+          message: 'Bio updated successfully',
+          bio,
+        });
+      },
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/createPost', async function (req, res) {
   try {
     const token = getDecodedToken(req);
