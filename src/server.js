@@ -60,7 +60,7 @@ app.post('/login', function (req, res) {
           email: user.email,
           display_name: user.display_name,
           bio: user.bio,
-          stack: user.stack,
+          stack: JSON.parse(user.stack),
           status: 'active',
           location: user.location,
           avatar_url: user.avatar_url,
