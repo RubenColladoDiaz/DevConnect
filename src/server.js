@@ -420,9 +420,22 @@ app.post('/createComment', async function (req, res) {
     const content = req.body.content;
     const postId = new ObjectId(req.body.postId);
 
+    const avatarUrl = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT avatar_url FROM users WHERE userId = ?',
+        [decoded.userId],
+        function (error, results) {
+          if (error) return reject(error);
+          if (results.length === 0) return resolve(null);
+          resolve(results[0].avatar_url || null);
+        },
+      );
+    });
+
     const newComment = {
       username,
       content,
+      avatar_url: avatarUrl,
     };
     const result = await dbConnMongo.collection('posts').updateOne(
       { _id: postId },

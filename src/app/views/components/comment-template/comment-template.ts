@@ -1,4 +1,4 @@
-import { Component, model, ModelSignal } from '@angular/core';
+import { Component, model, ModelSignal, WritableSignal } from '@angular/core';
 import { Comment } from '../../../shared/types/Comment';
 
 @Component({
@@ -8,5 +8,5 @@ import { Comment } from '../../../shared/types/Comment';
   styleUrl: './comment-template.css',
 })
 export class CommentTemplate {
-  comment:ModelSignal<Comment | undefined> = model<Comment>();
+  comment: ModelSignal<Comment | undefined> = model<Comment>();
 }
