@@ -59,6 +59,11 @@ app.post('/login', function (req, res) {
           username: user.username,
           email: user.email,
           display_name: user.display_name,
+          bio: user.bio,
+          stack: user.stack,
+          status: 'active',
+          location: user.location,
+          avatar_url: user.avatar_url,
           created_at: user.created_at,
         },
       });
