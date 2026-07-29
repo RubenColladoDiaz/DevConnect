@@ -52,21 +52,27 @@ app.post('/login', function (req, res) {
         expiresIn: '24h',
       });
 
-      return res.send({
-        token,
-        user: {
-          userId: user.userId,
-          username: user.username,
-          email: user.email,
-          display_name: user.display_name,
-          bio: user.bio,
-          stack: JSON.parse(user.stack),
-          status: 'active',
-          location: user.location,
-          avatar_url: user.avatar_url,
-          created_at: user.created_at,
+      dbConn.query(
+        'UPDATE users SET status = ? WHERE userId = ?',
+        ['active', user.userId],
+        function () {
+          return res.send({
+            token,
+            user: {
+              userId: user.userId,
+              username: user.username,
+              email: user.email,
+              display_name: user.display_name,
+              bio: user.bio,
+              stack: JSON.parse(user.stack),
+              status: user.status,
+              location: user.location,
+              avatar_url: user.avatar_url,
+              created_at: user.created_at,
+            },
+          });
         },
-      });
+      );
     },
   );
 });
@@ -171,7 +177,7 @@ app.post('/register', async function (req, res) {
               email: user.email,
               display_name: user.display_name,
               bio: user.bio,
-              stack: user.stack,
+              stack: JSON.parse(user.stack),
               status: user.status,
               location: user.location,
               avatar_url: user.avatar_url,

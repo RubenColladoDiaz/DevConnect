@@ -14,7 +14,7 @@ CREATE TABLE users (
     status ENUM('active', 'offline') NOT NULL DEFAULT 'offline',
 
     location VARCHAR(100),
-    avatar_url VARCHAR(500),
+    avatar_url VARCHAR(500) DEFAULT 'https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

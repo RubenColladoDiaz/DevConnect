@@ -8,5 +8,6 @@ export type User = {
   password: string;
   locatinon: string;
   status: string;
+  avatar_url: string;
   created_at: string;
 };
