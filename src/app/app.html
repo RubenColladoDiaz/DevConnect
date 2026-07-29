@@ -13,34 +13,39 @@
         </a>
       </li>
 
-      @if (user.username) {
-        <li>
-          <button type="button" (click)="logout()">
-            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
-            <span>Log out</span>
-          </button>
-        </li>
+      @if (user().username) {
+      <li>
+        <button type="button" (click)="logout()">
+          <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+          <span>Log out</span>
+        </button>
+      </li>
       } @else {
-        <li>
-          <a routerLink="/login" routerLinkActive="is-active">
-            <i class="fa-regular fa-user" aria-hidden="true"></i>
-            <span>Login</span>
-          </a>
-        </li>
+      <li>
+        <a routerLink="/login" routerLinkActive="is-active">
+          <i class="fa-regular fa-user" aria-hidden="true"></i>
+          <span>Login</span>
+        </a>
+      </li>
       }
     </ul>
 
-    @if (user.username) {
-      <div class="welcome-pill">
-        <span class="welcome-avatar">{{ username.charAt(0).toUpperCase() }}</span>
-        <span class="welcome-copy">
-          <small>Welcome back</small>
-          <strong>{{ username }}</strong>
-        </span>
-        <span class="status-dot" title="Online"></span>
-      </div>
+    @if (user().username) {
+    <div class="welcome-pill">
+      @if (user().avatar_url) {
+      <img class="welcome-avatar" src="{{ user().avatar_url }}" alt="{{ user().username }} avatar" />
+      } @else {
+      <span class="welcome-avatar">{{ username.charAt(0).toUpperCase() }}</span>
+      }
+      <span class="welcome-copy">
+        <small>Welcome back</small>
+        <strong>{{ username }}</strong>
+      </span>
+      <span class="status-dot" title="Online"></span>
+    </div>
     }
   </nav>
 </header>
 
 <router-outlet />
+<app-footer />

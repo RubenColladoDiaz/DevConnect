@@ -5,10 +5,11 @@ import { provideHttpClient } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { PagesModule } from './shared/modules/pages/pages-module';
+import { ComponentsModule } from "./shared/modules/components/components-module";
 
 @NgModule({
   declarations: [App],
-  imports: [BrowserModule, AppRoutingModule, PagesModule],
+  imports: [BrowserModule, AppRoutingModule, PagesModule, ComponentsModule],
   providers: [provideBrowserGlobalErrorListeners(), provideHttpClient()],
   bootstrap: [App],
 })

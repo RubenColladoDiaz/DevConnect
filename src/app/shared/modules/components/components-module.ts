@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Header } from '../../../views/components/header/header';
 import { NewPostButton } from '../../../views/components/new-post-button/new-post-button';
 import { OfflinePost } from '../../../views/components/offline-post/offline-post';
@@ -9,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { CommentTemplate } from '../../../views/components/comment-template/comment-template';
 import { NewCommentTemplate } from '../../../views/components/new-comment-template/new-comment-template';
 import { MyAccountPost } from '../../../views/components/my-account-post/my-account-post';
+import { Footer } from '../../../views/components/footer/footer';
 
 @NgModule({
   declarations: [
@@ -20,8 +22,9 @@ import { MyAccountPost } from '../../../views/components/my-account-post/my-acco
     CommentTemplate,
     NewCommentTemplate,
     MyAccountPost,
+    Footer,
   ],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   exports: [
     Header,
     NewPostButton,
@@ -31,6 +34,7 @@ import { MyAccountPost } from '../../../views/components/my-account-post/my-acco
     CommentTemplate,
     NewCommentTemplate,
     MyAccountPost,
+    Footer,
   ],
   providers: [DatePipe],
 })

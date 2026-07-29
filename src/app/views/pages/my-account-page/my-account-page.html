@@ -11,6 +11,32 @@
     <div class="profile-identity">
       <div class="profile-avatar">
         <img src="{{user().avatar_url}}" alt="User profile" />
+        @if (!editingAvatar) {
+        <button type="button" class="edit-avatar-button" aria-label="Edit avatar" (click)="editAvatar()">
+          <i class="fa-solid fa-pencil"></i>
+        </button>
+        } @else {
+        <div class="avatar-popup">
+          <div class="avatar-modal" role="dialog" aria-modal="true">
+            <h3>Update avatar</h3>
+            <input class="avatar-input" [(ngModel)]="editedAvatar" placeholder="Paste image URL" />
+            <div class="avatar-preview">
+              <div>
+                <small>Preview</small>
+                <img src="{{ editedAvatar || user().avatar_url }}" alt="avatar preview" />
+              </div>
+              <div style="flex:1"></div>
+            </div>
+            @if (avatarError) {
+            <div class="avatar-error">{{ avatarError }}</div>
+            }
+            <div class="avatar-actions">
+              <button type="button" class="bio-button cancel-bio-button" (click)="cancelAvatar()">Cancel</button>
+              <button type="button" class="bio-button save-bio-button" (click)="saveAvatar()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+          </div>
+        </div>
+        }
         <span class="online-dot" title="Online"></span>
       </div>
 

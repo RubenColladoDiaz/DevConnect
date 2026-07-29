@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsersService } from '../../../shared/services/users-service';
+import { AuthService } from '../../../shared/services/auth-service';
 
 /**
  * Login component where the user will be able to login in a SQL Database.
@@ -30,12 +30,12 @@ export class LoginPage {
   /**
    * Constructor where we create essencial params for different methods and we validate inputs from the form.
    * @param {FormBuilder} fb Builder for create the FormGroup.
-   * @param {HttpClient} http Property that is used to make API calls.
    * @param {Router} router Property that is used to navigate within different web routes.
    */
   constructor(
     private fb: FormBuilder,
     private userService: UsersService,
+    private authService: AuthService,
     private router: Router,
   ) {
     this.loginForm = this.fb.group({
@@ -56,8 +56,8 @@ export class LoginPage {
 
     this.userService.Login(username, password).subscribe({
       next: (res: any) => {
+        this.authService.setUser(res.user);
         localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
         this.router.navigate(['/']);
       },
       error: (res: any) => {

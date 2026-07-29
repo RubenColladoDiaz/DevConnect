@@ -65,7 +65,7 @@ app.post('/login', function (req, res) {
               display_name: user.display_name,
               bio: user.bio,
               stack: JSON.parse(user.stack),
-              status: user.status,
+              status: 'active',
               location: user.location,
               avatar_url: user.avatar_url,
               created_at: user.created_at,
@@ -322,6 +322,41 @@ app.post('/updateBio', async function (req, res) {
         return res.json({
           message: 'Bio updated successfully',
           bio,
+        });
+      },
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
+app.post('/updateAvatar', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    const avatar_url = req.body.avatar_url;
+
+    dbConn.query(
+      'UPDATE users SET avatar_url = ? WHERE userId = ?',
+      [avatar_url, userId],
+      function (error, results) {
+        if (error) {
+          return res.status(500).json({
+            message: 'Database error: ' + error,
+          });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({
+            message: 'User not found',
+          });
+        }
+
+        return res.json({
+          message: 'Avatar updated successfully',
+          avatar_url,
         });
       },
     );

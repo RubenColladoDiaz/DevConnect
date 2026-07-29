@@ -3,6 +3,7 @@ import { User } from '../../../shared/types/User';
 import { PostsService } from '../../../shared/services/posts-service';
 import { Post } from '../../../shared/types/Post';
 import { UsersService } from '../../../shared/services/users-service';
+import { AuthService } from '../../../shared/services/auth-service';
 
 @Component({
   selector: 'app-my-account-page',
@@ -11,7 +12,7 @@ import { UsersService } from '../../../shared/services/users-service';
   styleUrl: './my-account-page.css',
 })
 export class MyAccountPage implements OnInit {
-  user: WritableSignal<User> = signal<User>(JSON.parse(localStorage.getItem('user') || '{}'));
+  user: WritableSignal<User>;
 
   postsFromUser: Post[] = [];
   likes: number = 0;
@@ -19,12 +20,18 @@ export class MyAccountPage implements OnInit {
 
   editingBio: boolean = false;
   editedBio: string = '';
+  editingAvatar: boolean = false;
+  editedAvatar: string = '';
+  avatarError: string = '';
 
   constructor(
     private postsService: PostsService,
     private usersService: UsersService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    this.user = this.authService.user;
+  }
 
   ngOnInit(): void {
     this.getAllPostsFromUser();
@@ -36,11 +43,44 @@ export class MyAccountPage implements OnInit {
     this.editingBio = true;
   }
 
+  editAvatar(): void {
+    this.editedAvatar = this.user().avatar_url || '';
+    this.editingAvatar = true;
+  }
+
+  saveAvatar(): void {
+    // basic URL validation
+    const urlPattern = /^(https?:\/\/).+/i;
+    if (!this.editedAvatar || !urlPattern.test(this.editedAvatar)) {
+      this.avatarError = 'Please enter a valid image URL starting with http:// or https://';
+      return;
+    }
+
+    this.avatarError = '';
+    this.usersService.UpdateAvatar(this.editedAvatar).subscribe({
+      next: (res: any) => {
+        const updatedUser = { ...this.user(), avatar_url: res.avatar_url };
+        this.authService.setUser(updatedUser);
+        this.cdr.detectChanges();
+        this.editingAvatar = false;
+      },
+      error: (res: any) => {
+        console.log(res);
+        this.avatarError = 'Failed to update avatar';
+      },
+    });
+  }
+
+  cancelAvatar(): void {
+    this.editedAvatar = '';
+    this.editingAvatar = false;
+  }
+
   saveBio(): void {
     this.usersService.UpdateBio(this.editedBio).subscribe({
       next: (res: any) => {
-        this.user().bio = res.bio;
-        localStorage.setItem('user', JSON.stringify(this.user()));
+        const updatedUser = { ...this.user(), bio: res.bio };
+        this.authService.setUser(updatedUser);
         this.cdr.detectChanges();
       },
       error: (res: any) => {

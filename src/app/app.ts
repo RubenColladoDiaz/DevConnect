@@ -1,6 +1,8 @@
 import { Component, signal } from '@angular/core';
-import { User } from './shared/types/User';
+import { WritableSignal } from '@angular/core';
+import { Router } from '@angular/router';
 import { UsersService } from './shared/services/users-service';
+import { AuthService } from './shared/services/auth-service';
 
 @Component({
   selector: 'app-root',
@@ -11,29 +13,35 @@ import { UsersService } from './shared/services/users-service';
 export class App {
   protected readonly title = signal('DevConnect');
 
-  user: User = JSON.parse(localStorage.getItem('user') || '{}');
-  username = this.user.username;
+  user!: WritableSignal<any>;
 
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private authService: AuthService,
+    private router: Router,
+  ) {
+    this.user = this.authService.user;
+  }
+
+  get username(): string {
+    return this.user().username || '';
+  }
 
   logout(): void {
     this.usersService.Logout().subscribe({
       next: () => {
-        this.clearSession();
+        this.authService.clearUser();
+        this.router.navigate(['/']);
       },
       error: () => {
-        this.clearSession();
+        this.authService.clearUser();
+        this.router.navigate(['/']);
       },
     });
   }
 
   clearSession(): void {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-
-    this.user = {} as User;
-    this.username = '';
-
-    window.location.reload();
+    this.authService.clearUser();
+    this.router.navigate(['/']);
   }
 }

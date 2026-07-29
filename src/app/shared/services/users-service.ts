@@ -48,6 +48,20 @@ export class UsersService {
     );
   }
 
+  UpdateAvatar(avatar_url: string) {
+    const token = localStorage.getItem('token');
+
+    return this.http.post(
+      this.nodeURL + '/updateAvatar',
+      { avatar_url },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  }
+
   Logout() {
     const token = localStorage.getItem('token');
 

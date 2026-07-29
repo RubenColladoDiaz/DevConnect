@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { User } from '../../../shared/types/User';
 import { PostsService } from '../../../shared/services/posts-service';
+import { AuthService } from '../../../shared/services/auth-service';
 
 /**
  * Home component where the user will be able to see all posts and user configuration.
@@ -15,11 +15,9 @@ import { PostsService } from '../../../shared/services/posts-service';
 })
 export class Home implements OnInit {
   /**
-   * We call the logged user object saved in localStorage and we save it in JSON data. In case the user is not logged, we save an empty JSON.
-   * @type {User}
-   * @default {}
+   * Shared reactive logged user signal from AuthService.
    */
-  user: WritableSignal<User> = signal<User>(JSON.parse(localStorage.getItem('user') || '{}'));
+  user: WritableSignal<User>;
   /**
    * List variable where we save all gotten post from getAllPosts.
    * @type {Post}
@@ -37,13 +35,15 @@ export class Home implements OnInit {
 
   /**
    * Constructor where we create essencial params for different methods.
-   * @param {HttpClient} http Property that is used to make API calls.
    * @param {ChangeDetectorRef} cdr Property that is used to detect changes in the view. We use it to detect when the posts are loaded.
    */
   constructor(
     private cdr: ChangeDetectorRef,
     private postsService: PostsService,
-  ) {}
+    private authService: AuthService,
+  ) {
+    this.user = this.authService.user;
+  }
 
   /**
    * This method is called in the first load of the view.
