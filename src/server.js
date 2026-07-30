@@ -240,8 +240,13 @@ app.get('/getAllInfoFromUser', async function (req, res) {
     const token = getDecodedToken(req);
     const decoded = jwt.verify(token, JWT_SECRET);
     const username = decoded.username;
+    const userId = decoded.userId;
 
     const posts = await dbConnMongo.collection('posts').find({ username: username }).toArray();
+    const reposts = await dbConnMongo
+      .collection('posts')
+      .find({ repostedByUserIds: userId })
+      .toArray();
 
     let likes = 0;
     let comments = 0;
@@ -251,7 +256,7 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       comments += post.comments?.length || 0;
     }
 
-    return res.send({ likes, comments });
+    return res.send({ likes, comments, reposts });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
@@ -290,6 +295,26 @@ app.post('/updateLikes', async function (req, res) {
     post = await dbConnMongo.collection('posts').findOne({ _id: postId });
 
     return res.send({ likes: post.likes, liked: liked });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
+app.post('/updateReposts', async function (req, res) {
+  try {
+    const postId = new ObjectId(req.body.postId);
+
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    await dbConnMongo
+      .collection('posts')
+      .updateOne({ _id: postId }, { $addToSet: { repostedByUserIds: userId } });
+
+    const post = await dbConnMongo.collection('posts').findOne({ _id: postId });
+
+    return res.send({ post: post });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }

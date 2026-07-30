@@ -41,6 +41,20 @@ export class PostTemplate {
     this.creatingComment.update((creating) => !creating);
   }
 
+  updateReposts(): void {
+    const id = this.post()?._id;
+    if (!id) return;
+
+    this.postsService.updateReposts(id).subscribe({
+      next: (res) => {
+        this.post.update((current) => {
+          if (!current) return current;
+          return { ...current, repostedByUserIds: res.repostedByUserIds };
+        });
+      },
+    });
+  }
+
   updateComments(comments: Comment[]) {
     this.post.update((current) => {
       if (!current) return current;

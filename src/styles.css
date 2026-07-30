@@ -431,12 +431,9 @@ body {
   gap: 16px;
 }
 
-.account-page .publication-card {
-  overflow: hidden;
-  border-radius: 16px;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+.account-page .reposts-list .post-card {
+  width: 100%;
+  max-width: none;
 }
 
 .account-page .publication-card:hover {

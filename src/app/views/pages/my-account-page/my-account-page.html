@@ -32,7 +32,8 @@
             }
             <div class="avatar-actions">
               <button type="button" class="bio-button cancel-bio-button" (click)="cancelAvatar()">Cancel</button>
-              <button type="button" class="bio-button save-bio-button" (click)="saveAvatar()"><i class="fa-solid fa-check"></i> Save</button>
+              <button type="button" class="bio-button save-bio-button" (click)="saveAvatar()"><i
+                  class="fa-solid fa-check"></i> Save</button>
             </div>
           </div>
         </div>
@@ -176,6 +177,22 @@
       <div class="publication-list">
         @for (post of postsFromUser; track post) {
         <app-my-account-post [(user)]="user" [post]="post"></app-my-account-post>
+        }
+      </div>
+    </section>
+
+    <section class="publications-section reposts-section">
+      <header class="section-heading">
+        <div>
+          <span class="section-kicker">ACTIVITY</span>
+          <h2>Reposts</h2>
+          <p>Shared content that has been reposted to the community.</p>
+        </div>
+      </header>
+
+      <div class="publication-list reposts-list">
+        @for (post of reposts; track post){
+        <app-post-template class="repost-card" [(post)]="post" />
         }
       </div>
     </section>

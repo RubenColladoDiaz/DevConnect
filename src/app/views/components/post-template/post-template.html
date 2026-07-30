@@ -33,10 +33,11 @@
         {{ post()?.comments?.length ?? 0 }}
       </button>
 
-      <span class="metric" title="Reposts">
+      <button class="metric repost-button" type="button" (click)="updateReposts()" title="Reposts"
+        [attr.aria-label]="'Repost this post'">
         <i class="fa-solid fa-retweet" aria-hidden="true"></i>
         {{ post()?.reposts ?? 0 }}
-      </span>
+      </button>
 
       <button class="metric like-button" type="button" (click)="updateLikes()" [class.is-liked]="post()?.liked === true"
         [attr.aria-label]="post()?.liked ? 'Remove like' : 'Like post'">

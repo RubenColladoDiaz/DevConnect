@@ -59,10 +59,21 @@ export class Home implements OnInit {
    * @type {void}
    * @returns This method does not return any data.
    */
+  private parseCreatedAt(value: any): Date | any {
+    if (!value) return value;
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') return new Date(value);
+    if (value.$date) return new Date(value.$date);
+    return new Date(value);
+  }
+
   getAllPosts(): void {
     this.postsService.getAllPosts().subscribe({
       next: (res: any) => {
-        this.posts = res.posts;
+        this.posts = res.posts.map((post: any) => ({
+          ...post,
+          createdAt: this.parseCreatedAt(post.createdAt),
+        }));
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error:', err),

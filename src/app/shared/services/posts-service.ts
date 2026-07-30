@@ -85,4 +85,18 @@ export class PostsService {
       },
     });
   }
+
+  updateReposts(id: string): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    const body = {
+      postId: id,
+    };
+
+    return this.http.post(this.nodeURL + '/updateReposts', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 }

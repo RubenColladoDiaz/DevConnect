@@ -1,3 +1,14 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host(.repost-card) .post-card,
+:host-context(.reposts-list) .post-card {
+  width: 100% !important;
+  max-width: none !important;
+}
+
 .post-card {
   width: 100%;
   max-width: 500px;
@@ -10,6 +21,11 @@
   transition:
     transform 180ms ease,
     box-shadow 180ms ease;
+}
+
+:host-context(.reposts-list) .post-card {
+  max-width: none !important;
+  width: 100% !important;
 }
 
 .post-card:hover {
@@ -143,6 +159,8 @@
   justify-content: center;
   gap: 5px;
   border-radius: 8px;
+  border: 1px solid transparent;
+  background: rgba(244, 246, 250, 0.95);
   color: #747887;
   font-size: 0.78rem;
   line-height: 1;
@@ -150,7 +168,8 @@
 }
 
 .like-button,
-.comments-button {
+.comments-button,
+.repost-button {
   border: 0;
   background: transparent;
   font: inherit;
@@ -161,15 +180,19 @@
     transform 150ms ease;
 }
 
-.like-button:hover {
+.metric:hover {
   transform: translateY(-1px);
   background: rgba(233, 19, 105, 0.08);
+}
+
+.like-button:hover {
   color: #d91462;
 }
 .comments-button:hover {
-  transform: translateY(-1px);
-  background: rgba(233, 19, 105, 0.08);
   color: #20c000;
+}
+.repost-button:hover {
+  color: #2b8cff;
 }
 
 .like-button:focus-visible {

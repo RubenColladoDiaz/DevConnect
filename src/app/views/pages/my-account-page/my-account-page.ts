@@ -15,6 +15,7 @@ export class MyAccountPage implements OnInit {
   user: WritableSignal<User>;
 
   postsFromUser: Post[] = [];
+  reposts: WritableSignal<Post>[] = [];
   likes: number = 0;
   comments: number = 0;
 
@@ -49,7 +50,6 @@ export class MyAccountPage implements OnInit {
   }
 
   saveAvatar(): void {
-    // basic URL validation
     const urlPattern = /^(https?:\/\/).+/i;
     if (!this.editedAvatar || !urlPattern.test(this.editedAvatar)) {
       this.avatarError = 'Please enter a valid image URL starting with http:// or https://';
@@ -95,10 +95,21 @@ export class MyAccountPage implements OnInit {
     this.editingBio = false;
   }
 
+  private parseCreatedAt(value: any): Date | any {
+    if (!value) return value;
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') return new Date(value);
+    if (value.$date) return new Date(value.$date);
+    return new Date(value);
+  }
+
   getAllPostsFromUser(): void {
     this.postsService.getAllPostsFromUser().subscribe({
       next: (res: any) => {
-        this.postsFromUser = res.posts;
+        this.postsFromUser = res.posts.map((post: any) => ({
+          ...post,
+          createdAt: this.parseCreatedAt(post.createdAt),
+        }));
         this.cdr.detectChanges();
       },
       error: (res: any) => {
@@ -112,6 +123,12 @@ export class MyAccountPage implements OnInit {
       next: (res: any) => {
         this.likes = res.likes;
         this.comments = res.comments;
+        this.reposts = res.reposts.map((post: any) =>
+          signal({
+            ...post,
+            createdAt: this.parseCreatedAt(post.createdAt),
+          }),
+        );
         this.cdr.detectChanges();
       },
       error: (res: any) => {
