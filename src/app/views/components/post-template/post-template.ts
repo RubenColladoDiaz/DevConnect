@@ -49,7 +49,13 @@ export class PostTemplate {
       next: (res) => {
         this.post.update((current) => {
           if (!current) return current;
-          return { ...current, repostedByUserIds: res.repostedByUserIds };
+
+          return {
+            ...current,
+            reposts: res.post.reposts,
+            repostedByUserIds: res.post.repostedByUserIds,
+            reposted: res.reposted,
+          };
         });
       },
     });

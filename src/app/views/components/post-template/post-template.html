@@ -33,9 +33,13 @@
         {{ post()?.comments?.length ?? 0 }}
       </button>
 
-      <button class="metric repost-button" type="button" (click)="updateReposts()" title="Reposts"
-        [attr.aria-label]="'Repost this post'">
-        <i class="fa-solid fa-retweet" aria-hidden="true"></i>
+      <button class="metric repost-button" type="button" (click)="updateReposts()"
+        [class.is-reposted]="post()?.reposted === true"
+        [attr.aria-label]="post()?.reposted ? 'Remove repost' : 'Repost this post'">
+
+        <i class="fa-solid fa-retweet" aria-hidden="true">
+        </i>
+
         {{ post()?.reposts ?? 0 }}
       </button>
 

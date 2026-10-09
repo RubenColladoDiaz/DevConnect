@@ -10,5 +10,6 @@ export type Post = {
   createdAt: Date;
   likes: number;
   liked?: boolean;
+  reposted?: boolean;
   comments: Comment[];
 };

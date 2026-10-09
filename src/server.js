@@ -213,6 +213,7 @@ app.get('/getAllPosts', async function (req, res) {
     const postsWithLiked = posts.map((post) => ({
       ...post,
       liked: (post.likedByUserIds || []).includes(userId),
+      reposted: (post.repostedByUserIds || []).includes(userId),
     }));
 
     return res.send({ posts: postsWithLiked });
@@ -308,13 +309,30 @@ app.post('/updateReposts', async function (req, res) {
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
 
-    await dbConnMongo
+    let reposted = false;
+
+    const result = await dbConnMongo
       .collection('posts')
-      .updateOne({ _id: postId }, { $addToSet: { repostedByUserIds: userId } });
+      .updateOne(
+        { _id: postId, repostedByUserIds: { $ne: userId } },
+        { $addToSet: { repostedByUserIds: userId }, $inc: { reposts: 1 } },
+      );
+
+    if (result.modifiedCount === 1) {
+      reposted = true;
+    } else {
+      await dbConnMongo
+        .collection('posts')
+        .updateOne(
+          { _id: postId, repostedByUserIds: userId },
+          { $pull: { repostedByUserIds: userId }, $inc: { reposts: -1 } },
+        );
+      reposted = false;
+    }
 
     const post = await dbConnMongo.collection('posts').findOne({ _id: postId });
 
-    return res.send({ post: post });
+    return res.send({ post: post, reposted: reposted });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }

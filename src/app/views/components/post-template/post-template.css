@@ -205,6 +205,14 @@
   background: rgba(233, 19, 105, 0.09);
 }
 
+.repost-button.is-reposted {
+  color: #00ba7c;
+}
+
+.repost-button.is-reposted i {
+  color: #00ba7c;
+}
+
 .post-tools {
   gap: 3px;
 }
