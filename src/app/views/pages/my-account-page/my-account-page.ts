@@ -18,6 +18,8 @@ export class MyAccountPage implements OnInit {
   reposts: WritableSignal<Post>[] = [];
   likes: number = 0;
   comments: number = 0;
+  followers: number = 0;
+  views: number = 0;
 
   editingBio: boolean = false;
   editedBio: string = '';
@@ -35,7 +37,6 @@ export class MyAccountPage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getAllPostsFromUser();
     this.getAllInfoFromUser();
   }
 
@@ -103,26 +104,16 @@ export class MyAccountPage implements OnInit {
     return new Date(value);
   }
 
-  getAllPostsFromUser(): void {
-    this.postsService.getAllPostsFromUser().subscribe({
+  getAllInfoFromUser(): void {
+    this.postsService.getAllInfoFromUser().subscribe({
       next: (res: any) => {
         this.postsFromUser = res.posts.map((post: any) => ({
           ...post,
           createdAt: this.parseCreatedAt(post.createdAt),
         }));
-        this.cdr.detectChanges();
-      },
-      error: (res: any) => {
-        console.log(res);
-      },
-    });
-  }
-
-  getAllInfoFromUser(): void {
-    this.postsService.getAllInfoFromUser().subscribe({
-      next: (res: any) => {
         this.likes = res.likes;
         this.comments = res.comments;
+        this.followers = res.followers;
         this.reposts = res.reposts.map((post: any) =>
           signal({
             ...post,

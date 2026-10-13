@@ -4,6 +4,7 @@ export type User = {
   display_name: string;
   bio: string;
   stack: string[];
+  followers: number[];
   email: string;
   password: string;
   locatinon: string;

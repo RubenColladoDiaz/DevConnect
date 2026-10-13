@@ -34,7 +34,7 @@ export class UsersService {
     return this.http.post(this.nodeURL + '/register', body);
   }
 
-  UpdateBio(bio: string) {
+  UpdateBio(bio: string | undefined) {
     const token = localStorage.getItem('token');
 
     return this.http.post(

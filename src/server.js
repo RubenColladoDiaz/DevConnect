@@ -222,20 +222,6 @@ app.get('/getAllPosts', async function (req, res) {
   }
 });
 
-app.get('/getAllPostsFromUser', async function (req, res) {
-  try {
-    const token = getDecodedToken(req);
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const username = decoded.username;
-
-    const posts = await dbConnMongo.collection('posts').find({ username: username }).toArray();
-
-    return res.send({ posts: posts });
-  } catch (error) {
-    return res.status(401).json({ message: error.message });
-  }
-});
-
 app.get('/getAllInfoFromUser', async function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -257,7 +243,21 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       comments += post.comments?.length || 0;
     }
 
-    return res.send({ likes, comments, reposts });
+    dbConn.query(
+      'SELECT JSON_LENGTH(followers) AS followers FROM users WHERE userId = ?',
+      [userId],
+      function (error, results) {
+        if (error) {
+          return res.status(500).json({ message: 'Database error: ' + error });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.send({ posts, likes, comments, reposts, followers: results[0].followers });
+      },
+    );
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }

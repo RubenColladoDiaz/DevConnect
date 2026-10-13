@@ -52,16 +52,6 @@ export class PostsService {
     });
   }
 
-  getAllPostsFromUser(): Observable<any> {
-    const token = localStorage.getItem('token');
-
-    return this.http.get(this.nodeURL + '/getAllPostsFromUser', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-
   getAllInfoFromUser(): Observable<any> {
     const token = localStorage.getItem('token');
 

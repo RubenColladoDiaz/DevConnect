@@ -64,7 +64,8 @@
       <div>
         <strong>{{ likes }}</strong><span>Likes</span>
       </div>
-      <div><strong>0</strong><span>Views</span></div>
+      <div><strong>{{views}}</strong><span>Views</span></div>
+      <div><strong>{{followers}}</strong><span>Followers</span></div>
     </div>
   </section>
 
@@ -168,7 +169,7 @@
       <header class="section-heading">
         <div>
           <span class="section-kicker">ACTIVITY</span>
-          <h2>My publications</h2>
+          <h2>Publications</h2>
           <p>Ideas, progress and things shared with the community.</p>
         </div>
         <span class="post-count"><i class="fa-regular fa-file-lines"></i> {{ postsFromUser.length }} posts</span>
