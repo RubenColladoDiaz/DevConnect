@@ -11,6 +11,7 @@ import { CommentTemplate } from '../../../views/components/comment-template/comm
 import { NewCommentTemplate } from '../../../views/components/new-comment-template/new-comment-template';
 import { MyAccountPost } from '../../../views/components/my-account-post/my-account-post';
 import { Footer } from '../../../views/components/footer/footer';
+import { CodeEditor } from '../../../views/components/code-editor/code-editor';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { Footer } from '../../../views/components/footer/footer';
     NewCommentTemplate,
     MyAccountPost,
     Footer,
+    CodeEditor,
   ],
   imports: [CommonModule, FormsModule, RouterModule],
   exports: [
@@ -35,6 +37,7 @@ import { Footer } from '../../../views/components/footer/footer';
     NewCommentTemplate,
     MyAccountPost,
     Footer,
+    CodeEditor,
   ],
   providers: [DatePipe],
 })

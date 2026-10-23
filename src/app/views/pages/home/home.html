@@ -46,7 +46,7 @@
 
   <section class="feed-column">
     @if (creating() && user().username) {
-      <app-new-post-template [(creating)]="creating" (postCreated)="getAllPosts()" />
+      <app-new-post-template [(creating)]="creating" (postCreated)="addNewPost($event)" />
     }
     @if (posts.length > 0) {
       @for (post of posts; track post) {

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.code-editor {
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid #303241;
+  border-radius: 9px;
+}
+
+:host(.read-only) .code-editor {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}

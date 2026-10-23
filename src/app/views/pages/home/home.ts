@@ -70,13 +70,27 @@ export class Home implements OnInit {
   getAllPosts(): void {
     this.postsService.getAllPosts().subscribe({
       next: (res: any) => {
-        this.posts = res.posts.map((post: any) => ({
-          ...post,
-          createdAt: this.parseCreatedAt(post.createdAt),
-        }));
+        this.posts = res.posts.map((post: any) =>
+          signal({
+            ...post,
+            createdAt: this.parseCreatedAt(post.createdAt),
+          }),
+        );
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error:', err),
     });
+  }
+
+  addNewPost(post: Post): void {
+    const newPost = {
+      ...post,
+      createdAt: this.parseCreatedAt(post.createdAt),
+    };
+    this.posts = [
+      signal(newPost),
+      ...this.posts.filter((existingPost) => existingPost()._id !== post._id).slice(0, 19),
+    ];
+    this.cdr.detectChanges();
   }
 }

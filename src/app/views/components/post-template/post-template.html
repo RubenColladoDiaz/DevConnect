@@ -1,9 +1,16 @@
 <article class="post-card">
   <header class="post-header">
     <div class="post-author">
-      <img src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg" alt="User logo" />
+      <img
+        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+        alt="User logo"
+      />
       <div class="author-info">
-        <p><a class="author-link" [routerLink]="['/account', post()?.username]">{{ post()?.username }}</a></p>
+        <p>
+          <a class="author-link" [routerLink]="['/account', post()?.username]">{{
+            post()?.username
+          }}</a>
+        </p>
         <span>Community post</span>
       </div>
     </div>
@@ -11,22 +18,43 @@
     <time class="post-date" [attr.datetime]="post()?.createdAt">
       <i class="fa-regular fa-calendar" aria-hidden="true"></i>
       @if (isToday(post()?.createdAt)) {
-      {{ post()?.createdAt | date: 'HH:mm' }}
+        {{ post()?.createdAt | date: 'HH:mm' }}
       } @else {
-      {{ post()?.createdAt | date: 'dd MMM yyyy' }}
+        {{ post()?.createdAt | date: 'dd MMM yyyy' }}
       }
     </time>
   </header>
 
   <div class="post-body">
-    <p class="post-content">{{ post()?.content }}</p>
+    @if (post()?.contentBlocks?.length) {
+      @for (block of post()?.contentBlocks ?? []; track $index) {
+        @if (block.type === 'text') {
+          <p class="post-content">{{ block.content }}</p>
+        } @else {
+          <section class="post-code-block">
+            <header>
+              <span>{{ block.language }}</span>
+              <span>{{ block.theme }}</span>
+            </header>
+            <app-code-editor
+              [value]="block.content"
+              [language]="block.language"
+              [theme]="block.theme"
+              [readOnly]="true"
+            />
+          </section>
+        }
+      }
+    } @else {
+      <p class="post-content">{{ post()?.content }}</p>
+    }
 
     @if (post()?.tags?.length) {
-    <div class="post-tags" aria-label="Post tags">
-      @for (tag of post()?.tags ?? []; track tag) {
-      <span>#{{ tag }}</span>
-      }
-    </div>
+      <div class="post-tags" aria-label="Post tags">
+        @for (tag of post()?.tags ?? []; track tag) {
+          <span>#{{ tag }}</span>
+        }
+      </div>
     }
   </div>
 
@@ -37,20 +65,31 @@
         {{ post()?.comments?.length ?? 0 }}
       </button>
 
-      <button class="metric repost-button" type="button" (click)="updateReposts()"
+      <button
+        class="metric repost-button"
+        type="button"
+        (click)="updateReposts()"
         [class.is-reposted]="post()?.reposted === true"
-        [attr.aria-label]="post()?.reposted ? 'Remove repost' : 'Repost this post'">
-
-        <i class="fa-solid fa-retweet" aria-hidden="true">
-        </i>
+        [attr.aria-label]="post()?.reposted ? 'Remove repost' : 'Repost this post'"
+      >
+        <i class="fa-solid fa-retweet" aria-hidden="true"> </i>
 
         {{ post()?.reposts ?? 0 }}
       </button>
 
-      <button class="metric like-button" type="button" (click)="updateLikes()" [class.is-liked]="post()?.liked === true"
-        [attr.aria-label]="post()?.liked ? 'Remove like' : 'Like post'">
-        <i class="fa-heart" aria-hidden="true" [class.fa-regular]="post()?.liked !== true"
-          [class.fa-solid]="post()?.liked === true"></i>
+      <button
+        class="metric like-button"
+        type="button"
+        (click)="updateLikes()"
+        [class.is-liked]="post()?.liked === true"
+        [attr.aria-label]="post()?.liked ? 'Remove like' : 'Like post'"
+      >
+        <i
+          class="fa-heart"
+          aria-hidden="true"
+          [class.fa-regular]="post()?.liked !== true"
+          [class.fa-solid]="post()?.liked === true"
+        ></i>
         {{ post()?.likes ?? 0 }}
       </button>
 
@@ -67,12 +106,15 @@
   </footer>
 
   @if (creatingComment() == true) {
-  <app-new-comment-template [(creatingComment)]="creatingComment" [postId]="post()?._id"
-    (updatedComments)="updateComments($event)"></app-new-comment-template>
+    <app-new-comment-template
+      [(creatingComment)]="creatingComment"
+      [postId]="post()?._id"
+      (updatedComments)="updateComments($event)"
+    ></app-new-comment-template>
   }
   @if ((post()?.comments?.length ?? 0) > 0) {
-  @for (comment of post()?.comments ?? []; track comment){
-  <app-comment-template [comment]="comment"></app-comment-template>
-  }
+    @for (comment of post()?.comments ?? []; track comment) {
+      <app-comment-template [comment]="comment"></app-comment-template>
+    }
   }
 </article>

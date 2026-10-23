@@ -15,7 +15,28 @@
     >
   </header>
   <div class="publication-body">
-    <p>{{ post()?.content }}</p>
+    @if (post()?.contentBlocks?.length) {
+      @for (block of post()?.contentBlocks ?? []; track $index) {
+        @if (block.type === 'text') {
+          <p>{{ block.content }}</p>
+        } @else {
+          <section class="post-code-block">
+            <header>
+              <span>{{ block.language }}</span>
+              <span>{{ block.theme }}</span>
+            </header>
+            <app-code-editor
+              [value]="block.content"
+              [language]="block.language"
+              [theme]="block.theme"
+              [readOnly]="true"
+            />
+          </section>
+        }
+      }
+    } @else {
+      <p>{{ post()?.content }}</p>
+    }
     <div class="post-tags">
       @for (tag of post()?.tags; track tag) {
         <span>{{ tag }}</span>

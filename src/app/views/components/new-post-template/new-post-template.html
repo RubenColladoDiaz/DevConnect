@@ -14,29 +14,67 @@
   </header>
 
   <div class="composer-body">
-    <label for="post-content">What do you want to share?</label>
-    <textarea
-      id="post-content"
-      [(ngModel)]="content"
-      maxlength="500"
-      placeholder="Share an idea, a project update or something you have learned..."
-      autofocus
-    ></textarea>
+    <label>What do you want to share?</label>
+    @for (block of contentBlocks; track $index) {
+      <section class="content-block">
+        <div class="block-heading">
+          @if (block.type === 'text') {
+            <strong>Text</strong>
+          } @else {
+            <strong>Code</strong>
+            <select aria-label="Code language" [(ngModel)]="block.language">
+              @for (language of languages; track language) {
+                <option [value]="language">{{ language }}</option>
+              }
+            </select>
+            <select aria-label="Code theme" [(ngModel)]="block.theme">
+              @for (theme of themes; track theme) {
+                <option [value]="theme">{{ theme }}</option>
+              }
+            </select>
+          }
+          <button
+            type="button"
+            class="remove-block"
+            aria-label="Remove block"
+            [disabled]="contentBlocks.length === 1"
+            (click)="removeBlock($index)"
+          >
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        @if (block.type === 'text') {
+          <textarea [(ngModel)]="block.content" placeholder="Write something..."></textarea>
+        } @else {
+          <app-code-editor
+            [(value)]="block.content"
+            [language]="block.language"
+            [theme]="block.theme"
+          />
+        }
+
+        <div class="block-insert">
+          <button type="button" (click)="addTextBlock($index)">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i> Add text below
+          </button>
+          <button type="button" (click)="addCodeBlock($index)">
+            <i class="fa-solid fa-code" aria-hidden="true"></i> Add code below
+          </button>
+        </div>
+      </section>
+    }
 
     <div class="composer-meta">
-      <span><i class="fa-solid fa-code" aria-hidden="true"></i> DevConnect community</span>
-      <span>{{ content.length }}/500</span>
+      <span
+        ><i class="fa-solid fa-code" aria-hidden="true"></i> Code blocks are displayed only</span
+      >
     </div>
   </div>
 
   <footer class="composer-actions">
     <button class="cancel-button" type="button" (click)="toggleCreating()">Cancel</button>
-    <button
-      class="publish-button"
-      type="button"
-      (click)="createPost()"
-      [disabled]="!content.trim()"
-    >
+    <button class="publish-button" type="button" (click)="createPost()" [disabled]="!hasContent">
       <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
       Publish
     </button>

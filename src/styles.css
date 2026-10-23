@@ -9,6 +9,24 @@ body {
   cursor: pointer;
 }
 
+.post-code-block {
+  margin: 14px 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: Consolas, 'Courier New', monospace;
+}
+
+.post-code-block header {
+  padding: 7px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-family: Arial, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
 /* Shared authentication layout */
 .auth-page {
   position: relative;

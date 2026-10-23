@@ -718,6 +718,43 @@ app.post('/createPost', async function (req, res) {
     const username = decoded.username;
     const content = req.body.content;
     const tags = req.body.tags;
+    const contentBlocks = req.body.contentBlocks;
+    if (contentBlocks !== undefined) {
+      if (!Array.isArray(contentBlocks) || contentBlocks.length > 50) {
+        return res.status(400).json({ message: 'Invalid post content blocks' });
+      }
+
+      const supportedLanguages = [
+        'JavaScript',
+        'TypeScript',
+        'Python',
+        'Java',
+        'C#',
+        'HTML',
+        'CSS',
+        'SQL',
+        'Text',
+      ];
+      const supportedThemes = ['dark', 'light', 'monokai'];
+
+      for (const block of contentBlocks) {
+        if (
+          !block ||
+          (block.type !== 'text' && block.type !== 'code') ||
+          typeof block.content !== 'string'
+        ) {
+          return res.status(400).json({ message: 'Invalid post content block' });
+        }
+
+        if (
+          block.type === 'code' &&
+          (!supportedLanguages.includes(block.language) || !supportedThemes.includes(block.theme))
+        ) {
+          return res.status(400).json({ message: 'Invalid code language or theme' });
+        }
+      }
+    }
+
     const createdAt = new Date();
     const reposts = 0;
     const views = 0;
@@ -727,6 +764,7 @@ app.post('/createPost', async function (req, res) {
     const result = await dbConnMongo.collection('posts').insertOne({
       username,
       content,
+      contentBlocks,
       tags,
       createdAt,
       reposts,
@@ -741,6 +779,7 @@ app.post('/createPost', async function (req, res) {
         _id: result.insertedId,
         username,
         content,
+        contentBlocks,
         tags,
         createdAt,
         reposts,
