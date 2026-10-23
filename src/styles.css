@@ -155,6 +155,10 @@ body.dark-theme .comment-block-heading select {
   color: #e3e5ee;
 }
 
+body.dark-theme .bio-textarea:focus {
+  background-color: #202331;
+}
+
 body.dark-theme .avatar-modal {
   background-color: #1d202c;
   color: #e3e5ee;
@@ -722,6 +726,143 @@ body.dark-theme .post-tags span {
 .account-page .reposts-list .post-card {
   width: 100%;
   max-width: none;
+}
+
+/* My Account CV and portfolio icons */
+.account-page .name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-page .profile-icon-button {
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #64748b;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.account-page .profile-icon-button:hover {
+  border-color: #7c3aed;
+  background: #f3e8ff;
+  color: #7c3aed;
+  transform: translateY(-1px);
+}
+
+body.dark-theme .profile-icon-button {
+  border-color: #414559;
+  background-color: #242736;
+  color: #d7d1fa;
+}
+
+body.dark-theme .profile-icon-button:hover {
+  border-color: #7c3aed;
+  background-color: #303348;
+  color: #ffffff;
+}
+
+/* My Account projects */
+.account-page .projects-area {
+  width: min(1100px, 100%);
+  margin: 32px auto 0;
+  display: grid;
+  gap: 28px;
+}
+
+.account-page .projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.account-page .projects-empty {
+  margin: 0;
+  color: #858997;
+  font-size: 0.8rem;
+}
+
+.account-page .invitations-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-page .invitation-item {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid rgba(51, 51, 145, 0.08);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.account-page .invitation-item span {
+  display: grid;
+  gap: 3px;
+}
+
+.account-page .invitation-item small {
+  color: #858997;
+}
+
+.account-page .invitation-item .bio-actions {
+  margin: 0;
+}
+
+.account-page .project-form {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.account-page .project-form .bio-textarea {
+  min-height: 80px;
+}
+
+.account-page .project-form select {
+  padding: 9px 11px;
+  border: 1px solid #dbe3ec;
+  border-radius: 9px;
+  background: #f8fafc;
+  font-size: 0.8rem;
+}
+
+.account-page .project-dates {
+  display: flex;
+  gap: 10px;
+}
+
+.account-page .project-dates label {
+  flex: 1;
+}
+
+.account-page .project-hint {
+  color: #858997;
+  font-size: 0.7rem;
+}
+
+body.dark-theme .invitation-item {
+  border-color: #343747;
+  background-color: #1d202c;
+}
+
+body.dark-theme .project-form select {
+  border-color: #414559;
+  background-color: #202331;
+  color: #e3e5ee;
 }
 
 .account-page .publication-card:hover {

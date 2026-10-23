@@ -12,6 +12,7 @@ import { NewCommentTemplate } from '../../../views/components/new-comment-templa
 import { MyAccountPost } from '../../../views/components/my-account-post/my-account-post';
 import { Footer } from '../../../views/components/footer/footer';
 import { CodeEditor } from '../../../views/components/code-editor/code-editor';
+import { ProjectTemplate } from '../../../views/components/project-template/project-template';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { CodeEditor } from '../../../views/components/code-editor/code-editor';
     MyAccountPost,
     Footer,
     CodeEditor,
+    ProjectTemplate,
   ],
   imports: [CommonModule, FormsModule, RouterModule],
   exports: [
@@ -38,6 +40,7 @@ import { CodeEditor } from '../../../views/components/code-editor/code-editor';
     MyAccountPost,
     Footer,
     CodeEditor,
+    ProjectTemplate,
   ],
   providers: [DatePipe],
 })

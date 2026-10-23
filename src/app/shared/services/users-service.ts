@@ -39,12 +39,31 @@ export class UsersService {
     });
   }
 
-  UpdateProfile(display_name: string, username: string, location: string) {
+  UpdateProfile(
+    display_name: string,
+    username: string,
+    location: string,
+    job_title: string,
+    company: string,
+    portfolio_url: string,
+  ) {
     return this.http.post(
       this.nodeURL + '/updateProfile',
-      { display_name, username, location },
+      { display_name, username, location, job_title, company, portfolio_url },
       { headers: this.getAuthHeaders() },
     );
+  }
+
+  UploadCv(file_name: string, data: string) {
+    return this.http.post(
+      this.nodeURL + '/uploadCv',
+      { file_name, data },
+      { headers: this.getAuthHeaders() },
+    );
+  }
+
+  GetCvUrl(userId: number): string {
+    return `${this.nodeURL}/cv/${userId}`;
   }
 
   UpdateStack(stack: string[]) {

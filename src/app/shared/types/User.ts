@@ -11,6 +11,9 @@ export type User = {
   status: string;
   avatar_url: string;
   cover_url?: string;
+  job_title?: string;
+  company?: string;
+  portfolio_url?: string;
   profile_views?: number;
   created_at: string;
 };

@@ -1,0 +1,245 @@
+:host {
+  display: block;
+}
+
+.project-card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(51, 51, 145, 0.08);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 3px 14px rgba(27, 31, 59, 0.09);
+}
+
+.project-image {
+  width: 100%;
+  height: 150px;
+  display: block;
+  object-fit: cover;
+}
+
+.project-body {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.project-header h3 {
+  min-width: 0;
+  margin: 0;
+  flex: 1;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.project-tools {
+  display: flex;
+  gap: 4px;
+}
+
+.project-icon-button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.project-icon-button:hover {
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+.project-icon-button.delete:hover,
+.project-button.delete {
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.project-confirm {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #b91c1c;
+  font-size: 0.78rem;
+}
+
+.project-confirm span {
+  flex: 1;
+}
+
+.project-status {
+  flex: 0 0 auto;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.project-status.in-progress {
+  background: rgba(245, 166, 35, 0.14);
+  color: #c47f0a;
+}
+
+.project-status.finished {
+  background: #eaf7f0;
+  color: #168455;
+}
+
+.project-description {
+  margin: 0;
+  color: #696d7b;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #858997;
+  font-size: 0.74rem;
+}
+
+.project-meta a {
+  color: #563195;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.project-meta a:hover {
+  text-decoration: underline;
+}
+
+.project-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-person {
+  padding: 3px 9px 3px 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  background: rgba(86, 49, 149, 0.08);
+  color: #5f3a93;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.project-person a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-person button {
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.project-person img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.project-person small {
+  color: #9b9eaa;
+  font-weight: 500;
+}
+
+.project-person.pending {
+  opacity: 0.65;
+}
+
+.project-invite {
+  display: flex;
+  gap: 7px;
+}
+
+.project-invite input {
+  min-width: 0;
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #dbe3ec;
+  border-radius: 9px;
+  background: #f8fafc;
+  font-size: 0.78rem;
+}
+
+.project-button {
+  justify-self: start;
+  padding: 7px 11px;
+  border: 1px solid #dbe3ec;
+  border-radius: 9px;
+  background: #fff;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.project-button:hover {
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+.project-button.save {
+  border-color: #7c3aed;
+  background: #7c3aed;
+  color: #fff;
+}
+
+.project-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.75rem;
+}
+
+:host-context(body.dark-theme) .project-card {
+  border-color: #343747;
+  background: #1d202c;
+}
+
+:host-context(body.dark-theme) .project-description,
+:host-context(body.dark-theme) .project-meta {
+  color: #b2b6c5;
+}
+
+:host-context(body.dark-theme) .project-meta a,
+:host-context(body.dark-theme) .project-person {
+  background-color: #303348;
+  color: #d7d1fa;
+}
+
+:host-context(body.dark-theme) .project-meta a {
+  background: transparent;
+}
+
+:host-context(body.dark-theme) .project-icon-button,
+:host-context(body.dark-theme) .project-button:not(.save) {
+  border-color: #414559;
+  background: #202331;
+  color: #e3e5ee;
+}

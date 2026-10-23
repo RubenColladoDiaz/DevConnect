@@ -1,0 +1,146 @@
+<article class="project-card">
+  @if (project()?.image_url) {
+    <img class="project-image" src="{{ project()?.image_url }}" alt="Project image" />
+  }
+
+  <div class="project-body">
+    <header class="project-header">
+      <h3>{{ project()?.name }}</h3>
+      @if (project()?.status === 'in_progress') {
+        <span class="project-status in-progress">In progress</span>
+      } @else {
+        <span class="project-status finished">Finished</span>
+      }
+      @if (canManage) {
+        <span class="project-tools">
+          <button
+            type="button"
+            class="project-icon-button"
+            aria-label="Edit project"
+            title="Edit project"
+            (click)="editProject()"
+          >
+            <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+          </button>
+          <button
+            type="button"
+            class="project-icon-button delete"
+            aria-label="Delete project"
+            title="Delete project"
+            (click)="toggleConfirmingDelete()"
+          >
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          </button>
+        </span>
+      }
+    </header>
+
+    @if (canManage && confirmingDelete() == true) {
+      <div class="project-confirm">
+        <span>Delete this project?</span>
+        <button type="button" class="project-button" (click)="toggleConfirmingDelete()">No</button>
+        <button type="button" class="project-button delete" (click)="deleteProject()">
+          Yes, delete
+        </button>
+      </div>
+    }
+
+    @if (project()?.description) {
+      <p class="project-description">{{ project()?.description }}</p>
+    }
+
+    <div class="project-meta">
+      @if (project()?.start_date) {
+        <span>
+          <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+          {{ project()?.start_date | date: 'MMM yyyy' }}
+          @if (project()?.status === 'in_progress') {
+            - Present
+          } @else if (project()?.end_date) {
+            - {{ project()?.end_date | date: 'MMM yyyy' }}
+          }
+        </span>
+      }
+      @if (project()?.git_url) {
+        <a href="{{ project()?.git_url }}" target="_blank" rel="noopener">
+          <i class="fa-brands fa-github" aria-hidden="true"></i> Repository
+        </a>
+      }
+    </div>
+
+    <div class="project-people">
+      @if (project()?.owner) {
+        <a class="project-person" [routerLink]="['/account', project()?.owner?.username]">
+          <img [src]="project()?.owner?.avatar_url" [alt]="project()?.owner?.username + ' avatar'" />
+          <span>@{{ project()?.owner?.username }}</span>
+          <small>Owner</small>
+        </a>
+      }
+      @for (collaborator of project()?.collaborators ?? []; track collaborator.userId) {
+        <span class="project-person">
+          <a [routerLink]="['/account', collaborator.username]">
+            <img [src]="collaborator.avatar_url" [alt]="collaborator.username + ' avatar'" />
+            <span>@{{ collaborator.username }}</span>
+          </a>
+          @if (canManage) {
+            <button
+              type="button"
+              [attr.aria-label]="'Remove ' + collaborator.username"
+              title="Remove collaborator"
+              (click)="removeCollaborator(collaborator.userId)"
+            >
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          }
+        </span>
+      }
+      @if (canManage) {
+        @for (invited of project()?.invited ?? []; track invited.userId) {
+          <span class="project-person pending">
+            <img [src]="invited.avatar_url" [alt]="invited.username + ' avatar'" />
+            <span>@{{ invited.username }}</span>
+            <small>Pending</small>
+            <button
+              type="button"
+              [attr.aria-label]="'Cancel invitation for ' + invited.username"
+              title="Cancel invitation"
+              (click)="removeCollaborator(invited.userId)"
+            >
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </span>
+        }
+      }
+    </div>
+
+    @if (canManage) {
+      @if (inviting() == true) {
+        <div class="project-invite">
+          <input
+            [(ngModel)]="inviteUsername"
+            (keydown.enter)="inviteCollaborator()"
+            placeholder="Username to invite"
+          />
+          <button type="button" class="project-button save" (click)="inviteCollaborator()">
+            Invite
+          </button>
+          <button type="button" class="project-button" (click)="toggleInviting()">Cancel</button>
+        </div>
+      } @else {
+        <button type="button" class="project-button" (click)="toggleInviting()">
+          <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Invite collaborator
+        </button>
+      }
+    }
+
+    @if (canLeave) {
+      <button type="button" class="project-button delete" (click)="leaveProject()">
+        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Leave project
+      </button>
+    }
+
+    @if (errorMessage()) {
+      <p class="project-error">{{ errorMessage() }}</p>
+    }
+  </div>
+</article>
