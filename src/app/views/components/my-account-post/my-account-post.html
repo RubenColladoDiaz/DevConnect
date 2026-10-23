@@ -1,10 +1,14 @@
 <article class="publication-card" [class.question-publication]="post()?.type === 'question'">
   <header class="publication-header">
     <div class="publication-author">
-      <img
-        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
-        alt="User profile"
-      />
+      @if (user()?.avatar_url) {
+        <img src="{{ user()?.avatar_url }}" alt="User profile" />
+      } @else {
+        <img
+          src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+          alt="User profile"
+        />
+      }
       <div>
         <strong>{{ user()?.username }}</strong
         ><span>Community post</span>

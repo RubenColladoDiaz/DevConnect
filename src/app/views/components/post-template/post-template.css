@@ -303,14 +303,43 @@
   gap: 3px;
 }
 
-.post-tools span {
+.tool-button {
   width: 32px;
   height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: 0;
   border-radius: 8px;
+  background: transparent;
   color: #858997;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.tool-button:hover {
+  transform: translateY(-1px);
+  background: rgba(233, 19, 105, 0.08);
+}
+
+.save-button:hover {
+  color: #f5a623;
+}
+.share-button:hover {
+  color: #2b8cff;
+}
+
+.save-button.is-saved {
+  color: #f5a623;
+}
+
+.link-copied {
+  margin-left: 4px;
+  color: #858997;
+  font-size: 0.72rem;
 }
 
 :host-context(body.dark-theme) .question-banner,

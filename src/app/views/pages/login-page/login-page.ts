@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsersService } from '../../../shared/services/users-service';
@@ -31,12 +31,14 @@ export class LoginPage {
    * Constructor where we create essencial params for different methods and we validate inputs from the form.
    * @param {FormBuilder} fb Builder for create the FormGroup.
    * @param {Router} router Property that is used to navigate within different web routes.
+   * @param {ChangeDetectorRef} cdr Property that is used to detect changes in the view. We use it to show the login response without a second click.
    */
   constructor(
     private fb: FormBuilder,
     private userService: UsersService,
     private authService: AuthService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -61,10 +63,12 @@ export class LoginPage {
         this.userService.UpdatePresence().subscribe({
           error: (error) => console.error('Error setting online status:', error),
         });
+        this.cdr.detectChanges();
         this.router.navigate(['/']);
       },
       error: (res: any) => {
         this.message = res.error.message ?? 'Unexpected error';
+        this.cdr.detectChanges();
       },
     });
   }

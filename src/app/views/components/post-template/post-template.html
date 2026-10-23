@@ -1,10 +1,14 @@
 <article class="post-card" [class.question-post]="post()?.type === 'question'">
   <header class="post-header">
     <div class="post-author">
-      <img
-        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
-        alt="User logo"
-      />
+      @if (post()?.avatar_url) {
+        <img src="{{ post()?.avatar_url }}" alt="User logo" />
+      } @else {
+        <img
+          src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+          alt="User logo"
+        />
+      }
       <div class="author-info">
         <p>
           <a class="author-link" [routerLink]="['/account', post()?.username]">{{
@@ -110,8 +114,33 @@
     </div>
 
     <div class="post-tools" aria-label="Post tools">
-      <span title="Bookmark"><i class="fa-regular fa-bookmark" aria-hidden="true"></i></span>
-      <span title="Share"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></span>
+      <button
+        class="tool-button save-button"
+        type="button"
+        title="Bookmark"
+        (click)="updateSaved()"
+        [class.is-saved]="post()?.saved === true"
+        [attr.aria-label]="post()?.saved ? 'Remove from saved posts' : 'Save post'"
+      >
+        <i
+          class="fa-bookmark"
+          aria-hidden="true"
+          [class.fa-regular]="post()?.saved !== true"
+          [class.fa-solid]="post()?.saved === true"
+        ></i>
+      </button>
+      <button
+        class="tool-button share-button"
+        type="button"
+        title="Share"
+        aria-label="Share post"
+        (click)="sharePost()"
+      >
+        <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+      </button>
+      @if (linkCopied() == true) {
+        <span class="link-copied">Link copied</span>
+      }
     </div>
   </footer>
 

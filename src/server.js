@@ -26,7 +26,8 @@ let dbConnMongo;
 
 // --- MIDDLEWARES ---
 app.use(cors({ origin: 'http://localhost:4200' }));
-app.use(bodyParser.json());
+// The limit is bigger than the default because the CV PDF is sent as base64
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // USERS SERVICE
@@ -78,6 +79,9 @@ app.post('/login', function (req, res) {
               location: user.location || 'Unknown',
               avatar_url: user.avatar_url,
               cover_url: user.cover_url,
+              job_title: user.job_title,
+              company: user.company,
+              portfolio_url: user.portfolio_url,
               created_at: user.created_at,
             },
           });
@@ -203,6 +207,9 @@ app.post('/register', async function (req, res) {
               location: user.location || 'Unknown',
               avatar_url: user.avatar_url,
               cover_url: user.cover_url,
+              job_title: user.job_title,
+              company: user.company,
+              portfolio_url: user.portfolio_url,
               created_at: user.created_at,
             },
           });
@@ -285,11 +292,13 @@ app.get('/getAllPosts', async function (req, res) {
     }
 
     await normalizePostComments(posts);
+    await addAuthorAvatars(posts);
 
     const postsWithLiked = posts.map((post) => ({
       ...post,
       liked: (post.likedByUserIds || []).includes(userId),
       reposted: (post.repostedByUserIds || []).includes(userId),
+      saved: (post.savedByUserIds || []).includes(userId),
     }));
 
     return res.send({ posts: postsWithLiked });
@@ -515,6 +524,7 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       .toArray();
     await normalizePostComments(posts);
     await normalizePostComments(reposts);
+    await addAuthorAvatars(reposts);
 
     let likes = 0;
     let comments = 0;
@@ -523,6 +533,10 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       likes += post.likes || 0;
       comments += post.comments?.length || 0;
     }
+
+    const cv = await dbConnMongo
+      .collection('cvs')
+      .findOne({ userId: userId }, { projection: { _id: 1 } });
 
     dbConn.query(
       'SELECT JSON_LENGTH(followers) AS followers, profile_views FROM users WHERE userId = ?',
@@ -543,9 +557,36 @@ app.get('/getAllInfoFromUser', async function (req, res) {
           reposts,
           followers: results[0].followers,
           views: results[0].profile_views,
+          hasCv: cv !== null,
         });
       },
     );
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
+app.get('/getSavedPosts', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    const savedPosts = await dbConnMongo
+      .collection('posts')
+      .find({ savedByUserIds: userId })
+      .toArray();
+    await normalizePostComments(savedPosts);
+    await addAuthorAvatars(savedPosts);
+
+    const savedPostsWithState = savedPosts.map((post) => ({
+      ...post,
+      liked: (post.likedByUserIds || []).includes(userId),
+      reposted: (post.repostedByUserIds || []).includes(userId),
+      saved: true,
+    }));
+
+    return res.send({ posts: savedPostsWithState });
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
@@ -555,7 +596,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
   try {
     const users = await new Promise((resolve, reject) => {
       dbConn.query(
-        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, cover_url, created_at, followers, profile_views, JSON_LENGTH(followers) AS followersCount FROM users WHERE username = ?',
+        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, cover_url, job_title, company, portfolio_url, created_at, followers, profile_views, JSON_LENGTH(followers) AS followersCount FROM users WHERE username = ?',
         [req.params.username],
         function (error, results) {
           if (error) return reject(error);
@@ -626,6 +667,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       .toArray();
     await normalizePostComments(posts);
     await normalizePostComments(reposts);
+    await addAuthorAvatars(reposts);
 
     let likes = 0;
     let comments = 0;
@@ -646,6 +688,10 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       reposted: (post.repostedByUserIds || []).includes(viewerId),
     }));
 
+    const cv = await dbConnMongo
+      .collection('cvs')
+      .findOne({ userId: account.userId }, { projection: { _id: 1 } });
+
     return res.send({
       user: {
         ...account,
@@ -662,6 +708,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       followers: account.followersCount,
       isFollowing:
         viewerId !== null && followerIds.some((followerId) => Number(followerId) === viewerId),
+      hasCv: cv !== null,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -932,6 +979,41 @@ app.post('/updateReposts', async function (req, res) {
   }
 });
 
+app.post('/updateSaved', async function (req, res) {
+  try {
+    const postId = new ObjectId(req.body.postId);
+
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    let saved = false;
+
+    const result = await dbConnMongo
+      .collection('posts')
+      .updateOne(
+        { _id: postId, savedByUserIds: { $ne: userId } },
+        { $addToSet: { savedByUserIds: userId } },
+      );
+
+    if (result.modifiedCount === 1) {
+      saved = true;
+    } else {
+      await dbConnMongo
+        .collection('posts')
+        .updateOne(
+          { _id: postId, savedByUserIds: userId },
+          { $pull: { savedByUserIds: userId } },
+        );
+      saved = false;
+    }
+
+    return res.send({ saved: saved });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/updateBio', async function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -975,20 +1057,36 @@ app.post('/updateProfile', async function (req, res) {
     const username = typeof req.body.username === 'string' ? req.body.username.trim() : '';
     const location =
       typeof req.body.location === 'string' ? req.body.location.trim() || 'Unknown' : 'Unknown';
+    const jobTitle = String(req.body.job_title || '').trim();
+    const company = String(req.body.company || '').trim();
+    const portfolioUrl = String(req.body.portfolio_url || '').trim();
 
     if (
       !displayName ||
       displayName.length > 100 ||
       !username ||
       username.length > 100 ||
-      location.length > 100
+      location.length > 100 ||
+      jobTitle.length > 100 ||
+      company.length > 100
     ) {
       return res.status(400).json({ message: 'Please enter valid profile details' });
     }
+    if (portfolioUrl && (!/^https?:\/\/.+/i.test(portfolioUrl) || portfolioUrl.length > 500)) {
+      return res.status(400).json({ message: 'Please enter a valid portfolio URL' });
+    }
 
     dbConn.query(
-      'UPDATE users SET display_name = ?, username = ?, location = ? WHERE userId = ?',
-      [displayName, username, location, decoded.userId],
+      'UPDATE users SET display_name = ?, username = ?, location = ?, job_title = ?, company = ?, portfolio_url = ? WHERE userId = ?',
+      [
+        displayName,
+        username,
+        location,
+        jobTitle || null,
+        company || null,
+        portfolioUrl || null,
+        decoded.userId,
+      ],
       async function (error, results) {
         if (error) {
           if (error.code === 'ER_DUP_ENTRY') {
@@ -1023,6 +1121,9 @@ app.post('/updateProfile', async function (req, res) {
             username,
             display_name: displayName,
             location,
+            job_title: jobTitle || null,
+            company: company || null,
+            portfolio_url: portfolioUrl || null,
           },
         });
       },
@@ -1116,6 +1217,61 @@ app.post('/updateCover', async function (req, res) {
   }
 });
 
+app.post('/uploadCv', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const fileName = String(req.body.file_name || 'cv.pdf');
+    const data = String(req.body.data || '');
+    const prefix = 'data:application/pdf;base64,';
+
+    if (!data.startsWith(prefix)) {
+      return res.status(400).json({ message: 'Please choose a PDF file' });
+    }
+    // 5 MB of PDF are about 7 MB in base64
+    if (data.length > 7 * 1024 * 1024) {
+      return res.status(400).json({ message: 'The PDF must be 5 MB or less' });
+    }
+
+    await dbConnMongo.collection('cvs').updateOne(
+      { userId: decoded.userId },
+      {
+        $set: {
+          userId: decoded.userId,
+          file_name: fileName,
+          data: data.slice(prefix.length),
+          uploadedAt: new Date(),
+        },
+      },
+      { upsert: true },
+    );
+
+    return res.send({ hasCv: true });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.get('/cv/:userId', async function (req, res) {
+  try {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const cv = await dbConnMongo.collection('cvs').findOne({ userId: userId });
+    if (!cv) {
+      return res.status(404).json({ message: 'CV not found' });
+    }
+
+    res.set('Content-Type', 'application/pdf');
+    res.set('Content-Disposition', 'attachment; filename="' + encodeURIComponent(cv.file_name) + '"');
+    return res.send(Buffer.from(cv.data, 'base64'));
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 app.post('/createPost', async function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -1154,6 +1310,7 @@ app.post('/createPost', async function (req, res) {
       comments,
       likedByUserIds: [],
       viewedByUserIds: [],
+      savedByUserIds: [],
     });
 
     return res.send({
@@ -1284,10 +1441,428 @@ app.post('/toggleAcceptedAnswer', async function (req, res) {
   }
 });
 
+// PROJECTS SERVICE
+
+app.get('/getProjects/:userId', async function (req, res) {
+  try {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const projects = await dbConnMongo
+      .collection('projects')
+      .find({ ownerId: userId })
+      .sort({ createdAt: -1 })
+      .toArray();
+    const collaborations = await dbConnMongo
+      .collection('projects')
+      .find({ collaboratorIds: userId })
+      .sort({ createdAt: -1 })
+      .toArray();
+    await addProjectUsers(projects);
+    await addProjectUsers(collaborations);
+
+    return res.send({ projects, collaborations });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/getProjectInvitations', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const invitations = await dbConnMongo
+      .collection('projects')
+      .find({ invitedUserIds: decoded.userId })
+      .sort({ createdAt: -1 })
+      .toArray();
+    await addProjectUsers(invitations);
+
+    return res.send(invitations);
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
+app.post('/createProject', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const name = String(req.body.name || '').trim();
+    const description = String(req.body.description || '').trim();
+    const image_url = String(req.body.image_url || '').trim();
+    const git_url = String(req.body.git_url || '').trim();
+    const status = req.body.status;
+    const start_date = String(req.body.start_date || '');
+    const end_date = String(req.body.end_date || '');
+    const collaborators = req.body.collaborators || [];
+
+    const fieldsError = validateProjectFields(name, description, image_url, git_url, status);
+    if (fieldsError) {
+      return res.status(400).json({ message: fieldsError });
+    }
+    if (!Array.isArray(collaborators)) {
+      return res.status(400).json({ message: 'Invalid collaborators list' });
+    }
+
+    const invitedUserIds = [];
+    if (collaborators.length > 0) {
+      const users = await new Promise((resolve, reject) => {
+        dbConn.query(
+          'SELECT userId, username FROM users WHERE username IN (?)',
+          [collaborators],
+          function (error, results) {
+            if (error) return reject(error);
+            resolve(results);
+          },
+        );
+      });
+
+      for (const username of collaborators) {
+        const user = users.find(
+          (item) => item.username.toLowerCase() === String(username).toLowerCase(),
+        );
+        if (!user) {
+          return res.status(404).json({ message: 'User ' + username + ' not found' });
+        }
+        if (user.userId !== decoded.userId && !invitedUserIds.includes(user.userId)) {
+          invitedUserIds.push(user.userId);
+        }
+      }
+    }
+
+    const project = {
+      ownerId: decoded.userId,
+      name,
+      description,
+      image_url,
+      git_url,
+      status,
+      start_date,
+      end_date,
+      collaboratorIds: [],
+      invitedUserIds,
+      createdAt: new Date(),
+    };
+    await dbConnMongo.collection('projects').insertOne(project);
+    await addProjectUsers([project]);
+
+    return res.send({ project });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/inviteCollaborator', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const projectId = req.body.projectId;
+    const username = String(req.body.username || '').trim();
+
+    if (!ObjectId.isValid(projectId) || !username) {
+      return res.status(400).json({ message: 'Invalid invitation' });
+    }
+
+    const projectObjectId = new ObjectId(projectId);
+    const project = await dbConnMongo.collection('projects').findOne({ _id: projectObjectId });
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    if (project.ownerId !== decoded.userId) {
+      return res.status(403).json({ message: 'Only the project owner can invite collaborators' });
+    }
+
+    const users = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT userId FROM users WHERE username = ?',
+        [username],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const invitedId = users[0].userId;
+    if (invitedId === decoded.userId) {
+      return res.status(400).json({ message: 'You cannot invite yourself' });
+    }
+    if ((project.collaboratorIds || []).includes(invitedId)) {
+      return res.status(400).json({ message: 'That user is already a collaborator' });
+    }
+
+    await dbConnMongo
+      .collection('projects')
+      .updateOne({ _id: projectObjectId }, { $addToSet: { invitedUserIds: invitedId } });
+
+    const updatedProject = await dbConnMongo
+      .collection('projects')
+      .findOne({ _id: projectObjectId });
+    await addProjectUsers([updatedProject]);
+
+    return res.send({ project: updatedProject });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/respondProjectInvitation', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const projectId = req.body.projectId;
+    const accepted = req.body.accepted;
+
+    if (!ObjectId.isValid(projectId) || typeof accepted !== 'boolean') {
+      return res.status(400).json({ message: 'Invalid invitation answer' });
+    }
+
+    const projectObjectId = new ObjectId(projectId);
+    const project = await dbConnMongo
+      .collection('projects')
+      .findOne({ _id: projectObjectId, invitedUserIds: decoded.userId });
+    if (!project) {
+      return res.status(404).json({ message: 'Invitation not found' });
+    }
+
+    let update;
+    if (accepted) {
+      update = {
+        $pull: { invitedUserIds: decoded.userId },
+        $addToSet: { collaboratorIds: decoded.userId },
+      };
+    } else {
+      update = { $pull: { invitedUserIds: decoded.userId } };
+    }
+    await dbConnMongo.collection('projects').updateOne({ _id: projectObjectId }, update);
+
+    return res.send({ accepted });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/updateProject', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const projectId = req.body.projectId;
+
+    if (!ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: 'Invalid project ID' });
+    }
+
+    const name = String(req.body.name || '').trim();
+    const description = String(req.body.description || '').trim();
+    const image_url = String(req.body.image_url || '').trim();
+    const git_url = String(req.body.git_url || '').trim();
+    const status = req.body.status;
+    const start_date = String(req.body.start_date || '');
+    const end_date = String(req.body.end_date || '');
+
+    const fieldsError = validateProjectFields(name, description, image_url, git_url, status);
+    if (fieldsError) {
+      return res.status(400).json({ message: fieldsError });
+    }
+
+    const projectObjectId = new ObjectId(projectId);
+    const project = await dbConnMongo.collection('projects').findOne({ _id: projectObjectId });
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    if (project.ownerId !== decoded.userId) {
+      return res.status(403).json({ message: 'Only the project owner can edit it' });
+    }
+
+    await dbConnMongo.collection('projects').updateOne(
+      { _id: projectObjectId },
+      { $set: { name, description, image_url, git_url, status, start_date, end_date } },
+    );
+
+    const updatedProject = await dbConnMongo
+      .collection('projects')
+      .findOne({ _id: projectObjectId });
+    await addProjectUsers([updatedProject]);
+
+    return res.send({ project: updatedProject });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/deleteProject', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const projectId = req.body.projectId;
+
+    if (!ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: 'Invalid project ID' });
+    }
+
+    const projectObjectId = new ObjectId(projectId);
+    const project = await dbConnMongo.collection('projects').findOne({ _id: projectObjectId });
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    if (project.ownerId !== decoded.userId) {
+      return res.status(403).json({ message: 'Only the project owner can delete it' });
+    }
+
+    await dbConnMongo.collection('projects').deleteOne({ _id: projectObjectId });
+
+    return res.send({ message: 'Project deleted' });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/removeCollaborator', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const projectId = req.body.projectId;
+    const userId = Number(req.body.userId);
+
+    if (!ObjectId.isValid(projectId) || !Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid collaborator' });
+    }
+
+    const projectObjectId = new ObjectId(projectId);
+    const project = await dbConnMongo.collection('projects').findOne({ _id: projectObjectId });
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    if (project.ownerId !== decoded.userId) {
+      return res.status(403).json({ message: 'Only the project owner can remove collaborators' });
+    }
+
+    await dbConnMongo
+      .collection('projects')
+      .updateOne(
+        { _id: projectObjectId },
+        { $pull: { collaboratorIds: userId, invitedUserIds: userId } },
+      );
+
+    const updatedProject = await dbConnMongo
+      .collection('projects')
+      .findOne({ _id: projectObjectId });
+    await addProjectUsers([updatedProject]);
+
+    return res.send({ project: updatedProject });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/leaveProject', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const projectId = req.body.projectId;
+
+    if (!ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: 'Invalid project ID' });
+    }
+
+    const projectObjectId = new ObjectId(projectId);
+    const project = await dbConnMongo
+      .collection('projects')
+      .findOne({ _id: projectObjectId, collaboratorIds: decoded.userId });
+    if (!project) {
+      return res.status(404).json({ message: 'You are not a collaborator of this project' });
+    }
+
+    await dbConnMongo
+      .collection('projects')
+      .updateOne({ _id: projectObjectId }, { $pull: { collaboratorIds: decoded.userId } });
+
+    return res.send({ message: 'You left the project' });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
 function getDecodedToken(req) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) throw new Error('No token provided');
   return token;
+}
+
+async function addAuthorAvatars(posts) {
+  if (posts.length === 0) return;
+
+  const usernames = posts.map((post) => post.username);
+  const users = await new Promise((resolve, reject) => {
+    dbConn.query(
+      'SELECT username, avatar_url FROM users WHERE username IN (?)',
+      [usernames],
+      function (error, results) {
+        if (error) return reject(error);
+        resolve(results);
+      },
+    );
+  });
+
+  for (const post of posts) {
+    const author = users.find((user) => user.username === post.username);
+    if (author) {
+      post.avatar_url = author.avatar_url;
+    }
+  }
+}
+
+function validateProjectFields(name, description, image_url, git_url, status) {
+  if (!name || name.length > 100 || description.length > 1000) {
+    return 'Please enter a valid project name and description';
+  }
+  if (status !== 'in_progress' && status !== 'finished') {
+    return 'Invalid project status';
+  }
+  if (image_url && !/^https?:\/\/.+/i.test(image_url)) {
+    return 'Please enter a valid image URL';
+  }
+  if (git_url && !/^https?:\/\/.+/i.test(git_url)) {
+    return 'Please enter a valid Git URL';
+  }
+  return '';
+}
+
+async function addProjectUsers(projects) {
+  let userIds = [];
+  for (const project of projects) {
+    userIds.push(project.ownerId);
+    userIds = userIds.concat(project.collaboratorIds || [], project.invitedUserIds || []);
+  }
+  if (userIds.length === 0) return;
+
+  const users = await new Promise((resolve, reject) => {
+    dbConn.query(
+      'SELECT userId, username, display_name, avatar_url FROM users WHERE userId IN (?)',
+      [userIds],
+      function (error, results) {
+        if (error) return reject(error);
+        resolve(results);
+      },
+    );
+  });
+
+  for (const project of projects) {
+    project.owner = users.find((user) => user.userId === project.ownerId);
+    project.collaborators = users.filter((user) =>
+      (project.collaboratorIds || []).includes(user.userId),
+    );
+    project.invited = users.filter((user) => (project.invitedUserIds || []).includes(user.userId));
+  }
 }
 
 async function normalizePostComments(posts) {
@@ -1440,6 +2015,51 @@ async function startServer() {
           resolve();
         },
       );
+    });
+  }
+
+  const jobTitleColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'job_title'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!jobTitleColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query('ALTER TABLE users ADD COLUMN job_title VARCHAR(100) NULL', (error) => {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+  }
+
+  const companyColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'company'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!companyColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query('ALTER TABLE users ADD COLUMN company VARCHAR(100) NULL', (error) => {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+  }
+
+  const portfolioColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'portfolio_url'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!portfolioColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query('ALTER TABLE users ADD COLUMN portfolio_url VARCHAR(500) NULL', (error) => {
+        if (error) return reject(error);
+        resolve();
+      });
     });
   }
 

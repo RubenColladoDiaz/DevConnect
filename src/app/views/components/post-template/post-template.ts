@@ -22,6 +22,8 @@ export class PostTemplate implements OnInit {
 
   creatingComment: WritableSignal<boolean> = signal<boolean>(false);
 
+  linkCopied: WritableSignal<boolean> = signal<boolean>(false);
+
   ngOnInit(): void {
     this.registerView();
   }
@@ -75,6 +77,42 @@ export class PostTemplate implements OnInit {
           };
         });
       },
+    });
+  }
+
+  updateSaved(): void {
+    if (!this.checkLogin()) return;
+
+    const id = this.post()?._id;
+    if (!id) return;
+
+    this.postsService.updateSaved(id).subscribe({
+      next: (res) => {
+        this.post.update((current) => {
+          if (!current) return current;
+          return { ...current, saved: res.saved };
+        });
+      },
+      error: (err) => console.error('Error:', err),
+    });
+  }
+
+  sharePost(): void {
+    const currentPost = this.post();
+    if (!currentPost) return;
+
+    const url = window.location.origin + '/account/' + currentPost.username;
+
+    if (navigator.share) {
+      navigator
+        .share({ title: 'DevConnect', text: currentPost.content, url: url })
+        .catch((err) => console.error('Error sharing post:', err));
+      return;
+    }
+
+    navigator.clipboard.writeText(url).then(() => {
+      this.linkCopied.set(true);
+      setTimeout(() => this.linkCopied.set(false), 2000);
     });
   }
 

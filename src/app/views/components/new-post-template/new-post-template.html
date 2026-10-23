@@ -1,10 +1,14 @@
 <article class="post-composer">
   <header class="composer-header">
     <div class="author">
-      <img
-        src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
-        alt="User logo"
-      />
+      @if (user.avatar_url) {
+        <img src="{{ user.avatar_url }}" alt="User logo" />
+      } @else {
+        <img
+          src="https://i.pinimg.com/474x/16/e3/16/16e31690d95888a1532ea992b8f3ddf4.jpg"
+          alt="User logo"
+        />
+      }
       <div>
         <p class="author-name">{{ user.username }}</p>
         @if (postType === 'question') {

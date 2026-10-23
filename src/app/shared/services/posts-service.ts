@@ -139,6 +139,30 @@ export class PostsService {
     });
   }
 
+  updateSaved(id: string): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    const body = {
+      postId: id,
+    };
+
+    return this.http.post(this.nodeURL + '/updateSaved', body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  getSavedPosts(): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    return this.http.get(this.nodeURL + '/getSavedPosts', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
   registerPostView(id: string): Observable<{ views: number }> {
     const token = localStorage.getItem('token');
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;

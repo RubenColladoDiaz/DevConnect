@@ -30,6 +30,7 @@ export type PostType = 'post' | 'question';
 export type Post = {
   _id: string;
   username: string;
+  avatar_url?: string;
   authorId?: number;
   type?: PostType;
   acceptedAnswerIds?: string[];
@@ -42,5 +43,6 @@ export type Post = {
   likes: number;
   liked?: boolean;
   reposted?: boolean;
+  saved?: boolean;
   comments: Comment[];
 };

@@ -88,8 +88,58 @@
 
       <div class="identity-copy">
         <span class="profile-badge"><i class="fa-solid fa-code"></i> Developer profile</span>
-        <h1>{{ user().display_name }}</h1>
-        <p>@{{ user().username }} · Full-stack developer</p>
+        <div class="name-row">
+          <h1>{{ user().display_name }}</h1>
+          @if (hasCv) {
+            <a
+              class="profile-icon-button"
+              href="{{ cvUrl }}"
+              aria-label="Download CV"
+              title="Download CV"
+            >
+              <i class="fa-solid fa-file-arrow-down"></i>
+            </a>
+          }
+          @if (isOwnProfile) {
+            @if (hasCv) {
+              <label class="profile-icon-button" aria-label="Replace CV" title="Replace CV (PDF)">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <input type="file" accept="application/pdf" hidden (change)="uploadCv($event)" />
+              </label>
+            } @else {
+              <label class="profile-icon-button" aria-label="Upload CV" title="Upload CV (PDF)">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <input type="file" accept="application/pdf" hidden (change)="uploadCv($event)" />
+              </label>
+            }
+          }
+          @if (user().portfolio_url) {
+            <a
+              class="profile-icon-button"
+              href="{{ user().portfolio_url }}"
+              target="_blank"
+              rel="noopener"
+              aria-label="Portfolio website"
+              title="Portfolio website"
+            >
+              <i class="fa-solid fa-globe"></i>
+            </a>
+          }
+        </div>
+        <p>
+          @{{ user().username }} ·
+          @if (user().job_title) {
+            {{ user().job_title }}
+          } @else {
+            Developer
+          }
+          @if (user().company) {
+            at {{ user().company }}
+          }
+        </p>
+        @if (cvError) {
+          <span class="avatar-error">{{ cvError }}</span>
+        }
         @if (!isOwnProfile && isLoggedIn) {
           <button
             type="button"
@@ -265,6 +315,24 @@
             <label
               >Country<input [(ngModel)]="editedLocation" maxlength="100" placeholder="Unknown"
             /></label>
+            <label
+              >Current position<input
+                [(ngModel)]="editedJobTitle"
+                maxlength="100"
+                placeholder="Frontend developer, student..."
+            /></label>
+            <label
+              >Company or school<input
+                [(ngModel)]="editedCompany"
+                maxlength="100"
+                placeholder="Where you work or study"
+            /></label>
+            <label
+              >Portfolio website<input
+                [(ngModel)]="editedPortfolio"
+                maxlength="500"
+                placeholder="https://..."
+            /></label>
             @if (profileError) {
               <p class="avatar-error">{{ profileError }}</p>
             }
@@ -287,6 +355,18 @@
               <div>
                 <dt>Email</dt>
                 <dd>{{ user().email }}</dd>
+              </div>
+            }
+            @if (user().job_title) {
+              <div>
+                <dt>Position</dt>
+                <dd>{{ user().job_title }}</dd>
+              </div>
+            }
+            @if (user().company) {
+              <div>
+                <dt>Company or school</dt>
+                <dd>{{ user().company }}</dd>
               </div>
             }
             <div>
@@ -415,5 +495,248 @@
         }
       </div>
     </section>
+
+    @if (isOwnProfile) {
+      <section class="publications-section reposts-section">
+        <header class="section-heading">
+          <div>
+            <span class="section-kicker">PRIVATE</span>
+            <h2>Saved Posts</h2>
+            <p>Posts you have saved. Only you can see this section.</p>
+          </div>
+          <span class="post-count"
+            ><i class="fa-regular fa-bookmark"></i> {{ savedPosts.length }} saved</span
+          >
+        </header>
+
+        <div class="publication-list reposts-list">
+          @for (post of savedPosts; track post) {
+            <app-post-template class="repost-card" [(post)]="post" />
+          }
+        </div>
+      </section>
+    }
   </div>
+
+  <section class="projects-area">
+    <section class="publications-section">
+      <header class="section-heading">
+        <div>
+          <span class="section-kicker">PORTFOLIO</span>
+          <h2>Projects</h2>
+          <p>Personal projects built by this developer.</p>
+        </div>
+        @if (isOwnProfile) {
+          <button
+            type="button"
+            class="edit-bio-button"
+            aria-label="Add project"
+            title="Add project"
+            (click)="newProject()"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        }
+      </header>
+
+      @if (projects.length === 0) {
+        <p class="projects-empty">No projects yet.</p>
+      }
+      <div class="projects-list">
+        @for (project of projects; track project) {
+          <app-project-template
+            [(project)]="project"
+            [canManage]="isOwnProfile"
+            (editRequested)="editProject($event)"
+            (removed)="removeProject($event)"
+          />
+        }
+      </div>
+    </section>
+
+    @if (isOwnProfile && projectInvitations.length > 0) {
+      <section class="publications-section">
+        <header class="section-heading">
+          <div>
+            <span class="section-kicker">PRIVATE</span>
+            <h2>Project invitations</h2>
+            <p>Other developers want you to collaborate on their projects.</p>
+          </div>
+        </header>
+
+        <div class="invitations-list">
+          @for (invitation of projectInvitations; track invitation._id) {
+            <div class="invitation-item">
+              <span>
+                <strong>{{ invitation.name }}</strong>
+                <small>Invited by @{{ invitation.owner?.username }}</small>
+              </span>
+              <div class="bio-actions">
+                <button
+                  type="button"
+                  class="bio-button cancel-bio-button"
+                  (click)="respondInvitation(invitation._id, false)"
+                >
+                  Decline
+                </button>
+                <button
+                  type="button"
+                  class="bio-button save-bio-button"
+                  (click)="respondInvitation(invitation._id, true)"
+                >
+                  <i class="fa-solid fa-check"></i> Accept
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="publications-section">
+      <header class="section-heading">
+        <div>
+          <span class="section-kicker">TEAMWORK</span>
+          <h2>Collaborations</h2>
+          <p>Projects from other developers where this developer collaborates.</p>
+        </div>
+      </header>
+
+      @if (collaborations.length === 0) {
+        <p class="projects-empty">No collaborations yet.</p>
+      }
+      <div class="projects-list">
+        @for (project of collaborations; track project) {
+          <app-project-template
+            [(project)]="project"
+            [canLeave]="isOwnProfile"
+            (removed)="removeProject($event)"
+          />
+        }
+      </div>
+    </section>
+  </section>
+
+  @if (isOwnProfile && creatingProject) {
+    <div class="avatar-popup">
+      <div class="avatar-modal project-form" role="dialog" aria-modal="true">
+        @if (editingProjectId) {
+          <h3>Edit project</h3>
+        } @else {
+          <h3>New project</h3>
+        }
+        <div class="profile-editor">
+          <label>Name<input [(ngModel)]="newProjectName" maxlength="100" /></label>
+          <label
+            >Description
+            <textarea
+              class="bio-textarea"
+              [(ngModel)]="newProjectDescription"
+              rows="3"
+              maxlength="1000"
+              placeholder="What is this project about?"
+            ></textarea>
+          </label>
+          <label
+            >Image URL<input [(ngModel)]="newProjectImage" placeholder="https://..."
+          /></label>
+          <label
+            >Git repository URL<input
+              [(ngModel)]="newProjectGit"
+              placeholder="https://github.com/..."
+          /></label>
+          <label
+            >Status
+            <select [(ngModel)]="newProjectStatus">
+              <option value="in_progress">In progress</option>
+              <option value="finished">Finished</option>
+            </select>
+          </label>
+          <div class="project-dates">
+            <label>Start date<input type="date" [(ngModel)]="newProjectStartDate" /></label>
+            @if (newProjectStatus === 'finished') {
+              <label>End date<input type="date" [(ngModel)]="newProjectEndDate" /></label>
+            }
+          </div>
+          @if (!editingProjectId) {
+            <label>
+              Collaborators
+              <span class="stack-add">
+                <input
+                  [(ngModel)]="collaboratorInput"
+                  (keydown.enter)="$event.preventDefault(); addCollaborator()"
+                  placeholder="DevConnect username"
+                />
+                <button
+                  type="button"
+                  class="bio-button save-bio-button"
+                  (click)="addCollaborator()"
+                >
+                  Add
+                </button>
+              </span>
+            </label>
+            <div class="skill-list">
+              @for (collaborator of newProjectCollaborators; track collaborator) {
+                <span
+                  >@{{ collaborator }}
+                  <button
+                    type="button"
+                    [attr.aria-label]="'Remove ' + collaborator"
+                    (click)="removeCollaborator(collaborator)"
+                  >
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </span>
+              }
+            </div>
+            <small class="project-hint">They will receive an invitation and must accept it.</small>
+          }
+        </div>
+        @if (projectError) {
+          <div class="avatar-error">{{ projectError }}</div>
+        }
+        <div class="avatar-actions">
+          <button type="button" class="bio-button cancel-bio-button" (click)="cancelProject()">
+            Cancel
+          </button>
+          <button type="button" class="bio-button save-bio-button" (click)="saveProject()">
+            @if (editingProjectId) {
+              <i class="fa-solid fa-check"></i> Save
+            } @else {
+              <i class="fa-solid fa-check"></i> Create
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (isOwnProfile && sharingProject) {
+    <div class="avatar-popup">
+      <div class="avatar-modal project-form" role="dialog" aria-modal="true">
+        <h3>Project created! Share it with the community?</h3>
+        <p class="project-hint">
+          We have written a post for you. You can change it before publishing.
+        </p>
+        <textarea
+          class="bio-textarea"
+          [(ngModel)]="projectPostContent"
+          rows="8"
+          maxlength="2000"
+        ></textarea>
+        @if (projectPostError) {
+          <div class="avatar-error">{{ projectPostError }}</div>
+        }
+        <div class="avatar-actions">
+          <button type="button" class="bio-button cancel-bio-button" (click)="cancelProjectPost()">
+            Not now
+          </button>
+          <button type="button" class="bio-button save-bio-button" (click)="publishProjectPost()">
+            <i class="fa-solid fa-paper-plane"></i> Publish post
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </main>

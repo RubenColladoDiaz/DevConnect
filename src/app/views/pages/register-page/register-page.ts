@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsersService } from '../../../shared/services/users-service';
@@ -52,6 +52,7 @@ export class RegisterPage {
     private userService: UsersService,
     private authService: AuthService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
@@ -108,10 +109,12 @@ export class RegisterPage {
           this.userService.UpdatePresence().subscribe({
             error: (error) => console.error('Error setting online status:', error),
           });
+          this.cdr.detectChanges();
           this.router.navigate(['/']);
         },
         error: (res: any) => {
           this.message = res.error.message ?? 'Unexpected error';
+          this.cdr.detectChanges();
         },
       });
   }
