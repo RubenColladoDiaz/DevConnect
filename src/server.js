@@ -56,6 +56,14 @@ app.post('/login', function (req, res) {
         'UPDATE users SET status = ? WHERE userId = ?',
         ['active', user.userId],
         function () {
+          let followers = user.followers;
+          if (typeof followers === 'string') {
+            followers = JSON.parse(followers);
+          }
+          if (!followers) {
+            followers = [];
+          }
+
           return res.send({
             token,
             user: {
@@ -65,6 +73,7 @@ app.post('/login', function (req, res) {
               display_name: user.display_name,
               bio: user.bio,
               stack: JSON.parse(user.stack),
+              followers,
               status: 'active',
               location: user.location,
               avatar_url: user.avatar_url,
@@ -169,6 +178,14 @@ app.post('/register', async function (req, res) {
             },
           );
 
+          let followers = user.followers;
+          if (typeof followers === 'string') {
+            followers = JSON.parse(followers);
+          }
+          if (!followers) {
+            followers = [];
+          }
+
           return res.send({
             token,
             user: {
@@ -178,6 +195,7 @@ app.post('/register', async function (req, res) {
               display_name: user.display_name,
               bio: user.bio,
               stack: JSON.parse(user.stack),
+              followers,
               status: user.status,
               location: user.location,
               avatar_url: user.avatar_url,
@@ -195,7 +213,10 @@ app.post('/register', async function (req, res) {
 app.get('/getAllPosts', async function (req, res) {
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    let token = null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
     const hasValidToken = token && token !== 'null' && token !== 'undefined';
 
     let userId = null;
@@ -267,7 +288,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
   try {
     const users = await new Promise((resolve, reject) => {
       dbConn.query(
-        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, created_at, JSON_LENGTH(followers) AS followers FROM users WHERE username = ?',
+        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, created_at, followers, JSON_LENGTH(followers) AS followersCount FROM users WHERE username = ?',
         [req.params.username],
         function (error, results) {
           if (error) return reject(error);
@@ -281,9 +302,16 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
     }
 
     const account = users[0];
+    let followerIds = account.followers || [];
+    if (typeof followerIds === 'string') {
+      followerIds = JSON.parse(followerIds);
+    }
     let viewerId = null;
     const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    let token = null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
 
     if (token) {
       try {
@@ -310,6 +338,11 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       comments += post.comments?.length || 0;
     }
 
+    let stack = account.stack;
+    if (typeof stack === 'string') {
+      stack = JSON.parse(stack);
+    }
+
     const postsWithViewerState = posts.map((post) => ({
       ...post,
       liked: (post.likedByUserIds || []).includes(viewerId),
@@ -319,15 +352,145 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
     return res.send({
       user: {
         ...account,
-        stack: typeof account.stack === 'string' ? JSON.parse(account.stack) : account.stack,
+        stack,
+        followers: followerIds,
         locatinon: account.location,
       },
       posts: postsWithViewerState,
       likes,
       comments,
       reposts,
-      followers: account.followers,
+      followers: account.followersCount,
+      isFollowing:
+        viewerId !== null && followerIds.some((followerId) => Number(followerId) === viewerId),
     });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.post('/follow/:userId', async function (req, res) {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+
+    const followerId = decoded.userId;
+    const followedId = Number(req.params.userId);
+
+    if (!Number.isInteger(followedId) || followedId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    if (followerId === followedId) {
+      return res.status(400).json({ message: 'You cannot follow yourself' });
+    }
+
+    const users = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT followers FROM users WHERE userId = ?',
+        [followedId],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    let followers = users[0].followers || [];
+    if (typeof followers === 'string') {
+      followers = JSON.parse(followers);
+    }
+    const isFollowing = followers.some((id) => Number(id) === followerId);
+    let updatedFollowers;
+    if (isFollowing) {
+      updatedFollowers = followers.filter((id) => Number(id) !== followerId);
+    } else {
+      updatedFollowers = [...followers, followerId];
+    }
+
+    await new Promise((resolve, reject) => {
+      dbConn.query(
+        'UPDATE users SET followers = ? WHERE userId = ?',
+        [JSON.stringify(updatedFollowers), followedId],
+        function (error) {
+          if (error) return reject(error);
+          resolve();
+        },
+      );
+    });
+
+    return res.send({
+      followers: updatedFollowers,
+      followersCount: updatedFollowers.length,
+      isFollowing: !isFollowing,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/getUserConnections/:userId', async function (req, res) {
+  try {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const users = await new Promise((resolve, reject) => {
+      dbConn.query('SELECT followers FROM users WHERE userId = ?', [userId], function (error, results) {
+        if (error) return reject(error);
+        resolve(results);
+      });
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    let followerIds = users[0].followers || [];
+    if (typeof followerIds === 'string') {
+      followerIds = JSON.parse(followerIds);
+    }
+
+    let followers = [];
+    if (followerIds.length > 0) {
+      followers = await new Promise((resolve, reject) => {
+        dbConn.query(
+          'SELECT userId, username, display_name, avatar_url FROM users WHERE userId IN (?)',
+          [followerIds],
+          function (error, results) {
+            if (error) return reject(error);
+            resolve(results);
+          },
+        );
+      });
+    }
+
+    const following = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT userId, username, display_name, avatar_url FROM users WHERE JSON_CONTAINS(followers, CAST(? AS JSON))',
+        [userId],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
+    });
+
+    return res.send({ followers, following });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

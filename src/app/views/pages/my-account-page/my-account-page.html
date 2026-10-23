@@ -45,16 +45,82 @@
         <span class="profile-badge"><i class="fa-solid fa-code"></i> Developer profile</span>
         <h1>{{ user().display_name }}</h1>
         <p>@{{ user().username }} · Full-stack developer</p>
+        @if (!isOwnProfile && isLoggedIn) {
+        <button
+          type="button"
+          class="bio-button"
+          [class.save-bio-button]="!isFollowing"
+          [class.cancel-bio-button]="isFollowing"
+          [disabled]="isUpdatingFollow"
+          (click)="toggleFollow()"
+        >
+          @if (isFollowing) {
+          Unfollow
+          } @else {
+          Follow
+          }
+        </button>
+        @if (followError) {
+        <span class="avatar-error">{{ followError }}</span>
+        }
+        }
         <div class="identity-meta">
           @if (isOwnProfile) {
           <span><i class="fa-regular fa-envelope"></i> {{ user().email }}</span>
           }
+          <button type="button" class="connection-count" (click)="toggleUserList('followers')">
+            <i class="fa-solid fa-users"></i> {{ followers }} followers
+          </button>
+          <button type="button" class="connection-count" (click)="toggleUserList('following')">
+            <i class="fa-solid fa-user-plus"></i> {{ followingList.length }} following
+          </button>
           <span><i class="fa-solid fa-location-dot"></i> {{user().locatinon}}</span>
           <span><i class="fa-regular fa-calendar"></i> Member since
             {{ user().created_at | date: 'yyyy' }}</span>
         </div>
       </div>
     </div>
+
+    @if (activeUserList) {
+    <section class="connections-list">
+      @if (activeUserList === 'followers') {
+      <h2>Followers</h2>
+      } @else {
+      <h2>Following</h2>
+      }
+      @if (connectionsError) {
+      <p>{{ connectionsError }}</p>
+      } @else if (activeUserList === 'followers') {
+      @if (followersList.length === 0) {
+      <p>No followers yet.</p>
+      } @else {
+      @for (person of followersList; track person.userId) {
+      <a class="connection-person" [routerLink]="['/account', person.username]">
+        <img [src]="person.avatar_url" [alt]="person.username + ' avatar'" />
+        <span>
+          <strong>{{ person.display_name }}</strong>
+          <small>@{{ person.username }}</small>
+        </span>
+      </a>
+      }
+      }
+      } @else {
+      @if (followingList.length === 0) {
+      <p>Not following anyone yet.</p>
+      } @else {
+      @for (person of followingList; track person.userId) {
+      <a class="connection-person" [routerLink]="['/account', person.username]">
+        <img [src]="person.avatar_url" [alt]="person.username + ' avatar'" />
+        <span>
+          <strong>{{ person.display_name }}</strong>
+          <small>@{{ person.username }}</small>
+        </span>
+      </a>
+      }
+      }
+      }
+    </section>
+    }
 
     <div class="profile-stats" aria-label="Profile statistics">
       <div>
@@ -67,7 +133,6 @@
         <strong>{{ likes }}</strong><span>Likes</span>
       </div>
       <div><strong>{{views}}</strong><span>Views</span></div>
-      <div><strong>{{followers}}</strong><span>Followers</span></div>
     </div>
   </section>
 

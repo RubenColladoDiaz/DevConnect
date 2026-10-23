@@ -62,6 +62,24 @@ export class UsersService {
     );
   }
 
+  ToggleFollow(userId: number) {
+    const token = localStorage.getItem('token');
+
+    return this.http.post(
+      `${this.nodeURL}/follow/${userId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  }
+
+  GetUserConnections(userId: number) {
+    return this.http.get(`${this.nodeURL}/getUserConnections/${userId}`);
+  }
+
   Logout() {
     const token = localStorage.getItem('token');
 
