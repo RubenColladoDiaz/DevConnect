@@ -23,4 +23,14 @@ describe('PostTemplate', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('shows whether a post date is today', () => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    expect(component.isToday(today)).toBe(true);
+    expect(component.isToday(yesterday)).toBe(false);
+    expect(component.isToday(undefined)).toBe(false);
+  });
 });

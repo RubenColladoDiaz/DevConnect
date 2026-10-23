@@ -56,8 +56,8 @@ export class LoginPage {
 
     this.userService.Login(username, password).subscribe({
       next: (res: any) => {
-        this.authService.setUser(res.user);
         localStorage.setItem('token', res.token);
+        this.authService.setUser(res.user);
         this.router.navigate(['/']);
       },
       error: (res: any) => {

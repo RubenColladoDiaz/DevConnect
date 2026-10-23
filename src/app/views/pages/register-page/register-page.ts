@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsersService } from '../../../shared/services/users-service';
+import { AuthService } from '../../../shared/services/auth-service';
 
 /**
  * Register component where the user will be able to register his data in the platform.
@@ -48,6 +49,7 @@ export class RegisterPage {
   constructor(
     private fb: FormBuilder,
     private userService: UsersService,
+    private authService: AuthService,
     private router: Router,
   ) {
     this.registerForm = this.fb.group({
@@ -99,7 +101,7 @@ export class RegisterPage {
     this.userService.Register(username, email, password, display_name, stack).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
+        this.authService.setUser(res.user);
         this.router.navigate(['/']);
       },
       error: (res: any) => {

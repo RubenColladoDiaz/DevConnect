@@ -20,6 +20,17 @@ export class PostTemplate {
 
   creatingComment: WritableSignal<boolean> = signal<boolean>(false);
 
+  isToday(date: Date | undefined): boolean {
+    if (!date) return false;
+
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  }
+
   updateLikes(): void {
     if (!this.checkLogin()) return;
 

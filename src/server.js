@@ -231,6 +231,7 @@ app.get('/getAllPosts', async function (req, res) {
     }
 
     const maxPosts = 20;
+    const maxFollowedPosts = 10;
     let followedUsernames = [];
 
     if (userId !== null) {
@@ -253,7 +254,8 @@ app.get('/getAllPosts', async function (req, res) {
         .collection('posts')
         .aggregate([
           { $match: { username: { $in: followedUsernames } } },
-          { $sample: { size: maxPosts } },
+          { $sort: { createdAt: -1 } },
+          { $limit: maxFollowedPosts },
         ])
         .toArray();
     }

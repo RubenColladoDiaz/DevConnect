@@ -10,7 +10,11 @@
 
     <time class="post-date" [attr.datetime]="post()?.createdAt">
       <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+      @if (isToday(post()?.createdAt)) {
+      {{ post()?.createdAt | date: 'HH:mm' }}
+      } @else {
       {{ post()?.createdAt | date: 'dd MMM yyyy' }}
+      }
     </time>
   </header>
 
