@@ -30,6 +30,41 @@
       }
     </ul>
 
+    <div class="user-search">
+      <label class="user-search-box">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input
+          type="search"
+          placeholder="Search users"
+          aria-label="Search users"
+          [value]="searchQuery"
+          (input)="searchUsers($any($event.target).value)"
+          (keydown.enter)="searchOnEnter()"
+        />
+      </label>
+      @if (searchQuery.trim().length >= 2) {
+      <div class="user-search-results">
+        @if (searchLoading) {
+        <p>Searching...</p>
+        } @else if (searchError) {
+        <p>{{ searchError }}</p>
+        } @else if (searchResults.length === 0) {
+        <p>No users found</p>
+        } @else {
+        @for (result of searchResults; track result.userId) {
+        <button type="button" (click)="openUserProfile(result.username)">
+          <img [src]="result.avatar_url" [alt]="result.username + ' avatar'" />
+          <span>
+            <strong>{{ result.display_name }}</strong>
+            <small>@{{ result.username }}</small>
+          </span>
+        </button>
+        }
+        }
+      </div>
+      }
+    </div>
+
     @if (user().username) {
     <div class="welcome-pill">
       @if (user().avatar_url) {

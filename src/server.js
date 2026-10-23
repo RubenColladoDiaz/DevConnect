@@ -230,7 +230,54 @@ app.get('/getAllPosts', async function (req, res) {
       }
     }
 
-    const posts = await dbConnMongo.collection('posts').find().sort({ _id: -1 }).toArray();
+    const maxPosts = 20;
+    let followedUsernames = [];
+
+    if (userId !== null) {
+      const following = await new Promise((resolve, reject) => {
+        dbConn.query(
+          'SELECT username FROM users WHERE JSON_CONTAINS(followers, CAST(? AS JSON))',
+          [userId],
+          function (error, results) {
+            if (error) return reject(error);
+            resolve(results);
+          },
+        );
+      });
+      followedUsernames = following.map((user) => user.username);
+    }
+
+    let posts = [];
+    if (followedUsernames.length > 0) {
+      posts = await dbConnMongo
+        .collection('posts')
+        .aggregate([
+          { $match: { username: { $in: followedUsernames } } },
+          { $sample: { size: maxPosts } },
+        ])
+        .toArray();
+    }
+
+    const remainingSlots = maxPosts - posts.length;
+    if (remainingSlots > 0) {
+      let randomPosts;
+      if (followedUsernames.length > 0) {
+        randomPosts = await dbConnMongo
+          .collection('posts')
+          .aggregate([
+            { $match: { username: { $nin: followedUsernames } } },
+            { $sample: { size: remainingSlots } },
+          ])
+          .toArray();
+      } else {
+        randomPosts = await dbConnMongo
+          .collection('posts')
+          .aggregate([{ $sample: { size: remainingSlots } }])
+          .toArray();
+      }
+      posts = posts.concat(randomPosts);
+    }
+
     const postsWithLiked = posts.map((post) => ({
       ...post,
       liked: (post.likedByUserIds || []).includes(userId),
@@ -241,6 +288,26 @@ app.get('/getAllPosts', async function (req, res) {
   } catch (error) {
     return res.status(401).json({ message: error.message });
   }
+});
+
+app.get('/searchUsers', function (req, res) {
+  const query = String(req.query.query || '').trim();
+  if (query.length < 2) {
+    return res.send([]);
+  }
+
+  const search = `%${query}%`;
+  dbConn.query(
+    'SELECT userId, username, display_name, avatar_url FROM users WHERE username LIKE ? OR display_name LIKE ? ORDER BY username LIMIT 8',
+    [search, search],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ message: 'Database error: ' + error });
+      }
+
+      return res.send(results);
+    },
+  );
 });
 
 app.get('/getAllInfoFromUser', async function (req, res) {

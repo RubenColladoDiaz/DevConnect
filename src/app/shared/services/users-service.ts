@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { UserSearchResult } from '../types/User';
 
 @Injectable({
   providedIn: 'root',
@@ -78,6 +80,12 @@ export class UsersService {
 
   GetUserConnections(userId: number) {
     return this.http.get(`${this.nodeURL}/getUserConnections/${userId}`);
+  }
+
+  SearchUsers(query: string): Observable<UserSearchResult[]> {
+    return this.http.get<UserSearchResult[]>(`${this.nodeURL}/searchUsers`, {
+      params: { query },
+    });
   }
 
   Logout() {

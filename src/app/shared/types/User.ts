@@ -12,3 +12,5 @@ export type User = {
   avatar_url: string;
   created_at: string;
 };
+
+export type UserSearchResult = Pick<User, 'userId' | 'username' | 'display_name' | 'avatar_url'>;
