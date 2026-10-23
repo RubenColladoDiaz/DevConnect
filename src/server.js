@@ -53,7 +53,7 @@ app.post('/login', function (req, res) {
       });
 
       dbConn.query(
-        'UPDATE users SET status = ? WHERE userId = ?',
+        'UPDATE users SET status = ?, last_seen_at = CURRENT_TIMESTAMP WHERE userId = ?',
         ['active', user.userId],
         function () {
           let followers = user.followers;
@@ -75,8 +75,9 @@ app.post('/login', function (req, res) {
               stack: JSON.parse(user.stack),
               followers,
               status: 'active',
-              location: user.location,
+              location: user.location || 'Unknown',
               avatar_url: user.avatar_url,
+              cover_url: user.cover_url,
               created_at: user.created_at,
             },
           });
@@ -135,6 +136,7 @@ app.post('/register', async function (req, res) {
   const email = req.body.email;
   const password = req.body.password;
   const stack = req.body.stack;
+  const location = typeof req.body.location === 'string' ? req.body.location.trim() : 'Unknown';
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -146,6 +148,7 @@ app.post('/register', async function (req, res) {
       password: hashedPassword,
       display_name,
       stack: JSON.stringify(stack),
+      location: location || 'Unknown',
       status: 'active',
     },
     function (error, results) {
@@ -197,8 +200,9 @@ app.post('/register', async function (req, res) {
               stack: JSON.parse(user.stack),
               followers,
               status: user.status,
-              location: user.location,
+              location: user.location || 'Unknown',
               avatar_url: user.avatar_url,
+              cover_url: user.cover_url,
               created_at: user.created_at,
             },
           });
@@ -280,6 +284,8 @@ app.get('/getAllPosts', async function (req, res) {
       posts = posts.concat(randomPosts);
     }
 
+    await normalizePostComments(posts);
+
     const postsWithLiked = posts.map((post) => ({
       ...post,
       liked: (post.likedByUserIds || []).includes(userId),
@@ -312,6 +318,189 @@ app.get('/searchUsers', function (req, res) {
   );
 });
 
+app.get('/topFollowers', function (req, res) {
+  dbConn.query(
+    'SELECT userId, username, display_name, avatar_url, COALESCE(JSON_LENGTH(followers), 0) AS followersCount FROM users ORDER BY followersCount DESC, username ASC LIMIT 5',
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ message: 'Database error: ' + error });
+      }
+
+      return res.send(results);
+    },
+  );
+});
+
+app.get('/topProfileViews', function (req, res) {
+  dbConn.query(
+    'SELECT userId, username, display_name, avatar_url, profile_views FROM users ORDER BY profile_views DESC, username ASC LIMIT 5',
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({ message: 'Database error: ' + error });
+      }
+
+      return res.send(results);
+    },
+  );
+});
+
+app.get('/topQuestionSolvers', async function (req, res) {
+  try {
+    const solvers = await dbConnMongo
+      .collection('posts')
+      .aggregate([
+        {
+          $match: {
+            type: 'question',
+            acceptedAnswerIds: { $exists: true, $ne: [] },
+          },
+        },
+        { $unwind: '$comments' },
+        {
+          $match: {
+            $expr: {
+              $in: ['$comments.answerId', { $ifNull: ['$acceptedAnswerIds', []] }],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              username: '$comments.username',
+              postId: '$_id',
+            },
+            solvedQuestionCount: { $sum: 1 },
+          },
+        },
+        {
+          $group: {
+            _id: '$_id.username',
+            solvedQuestionCount: { $sum: 1 },
+          },
+        },
+        { $sort: { solvedQuestionCount: -1, _id: 1 } },
+        { $limit: 5 },
+      ])
+      .toArray();
+
+    if (solvers.length === 0) {
+      return res.send([]);
+    }
+
+    const usernames = solvers.map((solver) => solver._id);
+    const users = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT userId, username, display_name, avatar_url FROM users WHERE username IN (?)',
+        [usernames],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
+    });
+    const usersByUsername = new Map(users.map((user) => [user.username, user]));
+    const result = solvers
+      .map((solver) => {
+        const user = usersByUsername.get(solver._id);
+        if (!user) return null;
+        return {
+          ...user,
+          solvedQuestionCount: solver.solvedQuestionCount,
+        };
+      })
+      .filter(Boolean);
+
+    return res.send(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/followingPresence', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const users = await new Promise((resolve, reject) => {
+      dbConn.query(
+        `SELECT userId, username, display_name, avatar_url,
+                (status = 'active' AND last_seen_at >= DATE_SUB(NOW(), INTERVAL 60 SECOND)) AS online
+         FROM users
+         WHERE JSON_CONTAINS(followers, CAST(? AS JSON))
+         ORDER BY online DESC, username ASC`,
+        [decoded.userId],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
+    });
+
+    return res.send(
+      users.map((user) => ({
+        ...user,
+        online: Boolean(user.online),
+      })),
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.post('/heartbeat', function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    dbConn.query(
+      "UPDATE users SET status = 'active', last_seen_at = CURRENT_TIMESTAMP WHERE userId = ?",
+      [decoded.userId],
+      function (error) {
+        if (error) {
+          return res.status(500).json({ message: 'Database error: ' + error });
+        }
+        return res.send({ status: 'active' });
+      },
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
+app.get('/trendingLanguages', async function (req, res) {
+  try {
+    const supportedLanguages = [
+      'JavaScript',
+      'TypeScript',
+      'Python',
+      'Java',
+      'C#',
+      'HTML',
+      'CSS',
+      'SQL',
+    ];
+    const counts = new Map(supportedLanguages.map((language) => [language, 0]));
+    const posts = await dbConnMongo
+      .collection('posts')
+      .find({}, { projection: { contentBlocks: 1, 'comments.contentBlocks': 1 } })
+      .toArray();
+
+    for (const post of posts) {
+      countCodeBlocks(post.contentBlocks, counts);
+      for (const comment of post.comments || []) {
+        countCodeBlocks(comment.contentBlocks, counts);
+      }
+    }
+
+    const trendingLanguages = supportedLanguages
+      .map((language) => ({ language, count: counts.get(language) || 0 }))
+      .sort((first, second) => second.count - first.count)
+      .slice(0, 5);
+
+    return res.send(trendingLanguages);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 app.get('/getAllInfoFromUser', async function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -324,6 +513,8 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       .collection('posts')
       .find({ repostedByUserIds: userId })
       .toArray();
+    await normalizePostComments(posts);
+    await normalizePostComments(reposts);
 
     let likes = 0;
     let comments = 0;
@@ -334,7 +525,7 @@ app.get('/getAllInfoFromUser', async function (req, res) {
     }
 
     dbConn.query(
-      'SELECT JSON_LENGTH(followers) AS followers FROM users WHERE userId = ?',
+      'SELECT JSON_LENGTH(followers) AS followers, profile_views FROM users WHERE userId = ?',
       [userId],
       function (error, results) {
         if (error) {
@@ -345,7 +536,14 @@ app.get('/getAllInfoFromUser', async function (req, res) {
           return res.status(404).json({ message: 'User not found' });
         }
 
-        return res.send({ posts, likes, comments, reposts, followers: results[0].followers });
+        return res.send({
+          posts,
+          likes,
+          comments,
+          reposts,
+          followers: results[0].followers,
+          views: results[0].profile_views,
+        });
       },
     );
   } catch (error) {
@@ -357,7 +555,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
   try {
     const users = await new Promise((resolve, reject) => {
       dbConn.query(
-        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, created_at, followers, JSON_LENGTH(followers) AS followersCount FROM users WHERE username = ?',
+        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, cover_url, created_at, followers, profile_views, JSON_LENGTH(followers) AS followersCount FROM users WHERE username = ?',
         [req.params.username],
         function (error, results) {
           if (error) return reject(error);
@@ -390,6 +588,34 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       }
     }
 
+    if (viewerId !== null && Number(viewerId) !== Number(account.userId)) {
+      await new Promise((resolve, reject) => {
+        dbConn.query(
+          `UPDATE users
+           SET profile_viewer_ids = JSON_ARRAY_APPEND(profile_viewer_ids, '$', ?),
+               profile_views = profile_views + 1
+           WHERE userId = ?
+             AND NOT JSON_CONTAINS(profile_viewer_ids, CAST(? AS JSON))`,
+          [viewerId, account.userId, viewerId],
+          function (error) {
+            if (error) return reject(error);
+            resolve();
+          },
+        );
+      });
+    }
+
+    const profileViews = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT profile_views FROM users WHERE userId = ?',
+        [account.userId],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results[0].profile_views);
+        },
+      );
+    });
+
     const posts = await dbConnMongo
       .collection('posts')
       .find({ username: account.username })
@@ -398,6 +624,8 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       .collection('posts')
       .find({ repostedByUserIds: account.userId })
       .toArray();
+    await normalizePostComments(posts);
+    await normalizePostComments(reposts);
 
     let likes = 0;
     let comments = 0;
@@ -423,7 +651,9 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
         ...account,
         stack,
         followers: followerIds,
-        locatinon: account.location,
+        profile_views: profileViews,
+        location: account.location || 'Unknown',
+        cover_url: account.cover_url,
       },
       posts: postsWithViewerState,
       likes,
@@ -519,10 +749,14 @@ app.get('/getUserConnections/:userId', async function (req, res) {
     }
 
     const users = await new Promise((resolve, reject) => {
-      dbConn.query('SELECT followers FROM users WHERE userId = ?', [userId], function (error, results) {
-        if (error) return reject(error);
-        resolve(results);
-      });
+      dbConn.query(
+        'SELECT followers FROM users WHERE userId = ?',
+        [userId],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
     });
 
     if (users.length === 0) {
@@ -603,6 +837,64 @@ app.post('/updateLikes', async function (req, res) {
   }
 });
 
+app.post('/registerPostView', async function (req, res) {
+  try {
+    const postId = req.body.postId;
+    if (typeof postId !== 'string' || !ObjectId.isValid(postId)) {
+      return res.status(400).json({ message: 'Invalid post ID' });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      const post = await dbConnMongo
+        .collection('posts')
+        .findOne({ _id: new ObjectId(postId) }, { projection: { views: 1 } });
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+      }
+      return res.send({ views: post.views || 0 });
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Invalid authorization header' });
+    }
+    const token = authHeader.slice(7).trim();
+    if (!token) {
+      return res.status(401).json({ message: 'Invalid authorization header' });
+    }
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const postObjectId = new ObjectId(postId);
+    const post = await dbConnMongo.collection('posts').findOne({ _id: postObjectId });
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const isAuthor =
+      post.authorId === decoded.userId ||
+      (post.authorId === undefined && decoded.username === post.username);
+    if (!isAuthor) {
+      await dbConnMongo.collection('posts').updateOne(
+        { _id: postObjectId, viewedByUserIds: { $ne: decoded.userId } },
+        {
+          $addToSet: { viewedByUserIds: decoded.userId },
+          $inc: { views: 1 },
+        },
+      );
+    }
+
+    const updatedPost = await dbConnMongo
+      .collection('posts')
+      .findOne({ _id: postObjectId }, { projection: { views: 1 } });
+
+    return res.send({ views: updatedPost.views || 0 });
+  } catch (error) {
+    const status =
+      error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError' ? 401 : 500;
+    return res.status(status).json({ message: error.message });
+  }
+});
+
 app.post('/updateReposts', async function (req, res) {
   try {
     const postId = new ObjectId(req.body.postId);
@@ -675,6 +967,99 @@ app.post('/updateBio', async function (req, res) {
   }
 });
 
+app.post('/updateProfile', async function (req, res) {
+  try {
+    const decoded = jwt.verify(getDecodedToken(req), JWT_SECRET);
+    const displayName =
+      typeof req.body.display_name === 'string' ? req.body.display_name.trim() : '';
+    const username = typeof req.body.username === 'string' ? req.body.username.trim() : '';
+    const location =
+      typeof req.body.location === 'string' ? req.body.location.trim() || 'Unknown' : 'Unknown';
+
+    if (
+      !displayName ||
+      displayName.length > 100 ||
+      !username ||
+      username.length > 100 ||
+      location.length > 100
+    ) {
+      return res.status(400).json({ message: 'Please enter valid profile details' });
+    }
+
+    dbConn.query(
+      'UPDATE users SET display_name = ?, username = ?, location = ? WHERE userId = ?',
+      [displayName, username, location, decoded.userId],
+      async function (error, results) {
+        if (error) {
+          if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'That username is already taken' });
+          }
+          return res.status(500).json({ message: 'Database error: ' + error });
+        }
+        const token = jwt.sign({ userId: decoded.userId, username }, JWT_SECRET, {
+          expiresIn: '24h',
+        });
+        if (decoded.username !== username) {
+          try {
+            await dbConnMongo
+              .collection('posts')
+              .updateMany({ username: decoded.username }, { $set: { username } });
+            await dbConnMongo
+              .collection('posts')
+              .updateMany(
+                { 'comments.username': decoded.username },
+                { $set: { 'comments.$[comment].username': username } },
+                { arrayFilters: [{ 'comment.username': decoded.username }] },
+              );
+          } catch (mongoError) {
+            console.error('Could not update historical usernames:', mongoError);
+          }
+        }
+
+        return res.json({
+          token,
+          user: {
+            userId: decoded.userId,
+            username,
+            display_name: displayName,
+            location,
+          },
+        });
+      },
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
+app.post('/updateStack', async function (req, res) {
+  try {
+    const decoded = jwt.verify(getDecodedToken(req), JWT_SECRET);
+    const stack = req.body.stack;
+    if (
+      !Array.isArray(stack) ||
+      stack.length > 50 ||
+      stack.some(
+        (technology) =>
+          typeof technology !== 'string' || !technology.trim() || technology.length > 50,
+      )
+    ) {
+      return res.status(400).json({ message: 'Please enter a valid technology list' });
+    }
+
+    dbConn.query(
+      'UPDATE users SET stack = ? WHERE userId = ?',
+      [JSON.stringify([...new Set(stack.map((technology) => technology.trim()))]), decoded.userId],
+      function (error, results) {
+        if (error) return res.status(500).json({ message: 'Database error: ' + error });
+        return res.json({ stack: [...new Set(stack.map((technology) => technology.trim()))] });
+      },
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/updateAvatar', async function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -710,6 +1095,27 @@ app.post('/updateAvatar', async function (req, res) {
   }
 });
 
+app.post('/updateCover', async function (req, res) {
+  try {
+    const decoded = jwt.verify(getDecodedToken(req), JWT_SECRET);
+    const cover_url = typeof req.body.cover_url === 'string' ? req.body.cover_url.trim() : '';
+    if (cover_url && (!/^https?:\/\/.+/i.test(cover_url) || cover_url.length > 500)) {
+      return res.status(400).json({ message: 'Please enter a valid image URL' });
+    }
+
+    dbConn.query(
+      'UPDATE users SET cover_url = ? WHERE userId = ?',
+      [cover_url || null, decoded.userId],
+      function (error, results) {
+        if (error) return res.status(500).json({ message: 'Database error: ' + error });
+        return res.json({ cover_url });
+      },
+    );
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.post('/createPost', async function (req, res) {
   try {
     const token = getDecodedToken(req);
@@ -719,40 +1125,12 @@ app.post('/createPost', async function (req, res) {
     const content = req.body.content;
     const tags = req.body.tags;
     const contentBlocks = req.body.contentBlocks;
-    if (contentBlocks !== undefined) {
-      if (!Array.isArray(contentBlocks) || contentBlocks.length > 50) {
-        return res.status(400).json({ message: 'Invalid post content blocks' });
-      }
-
-      const supportedLanguages = [
-        'JavaScript',
-        'TypeScript',
-        'Python',
-        'Java',
-        'C#',
-        'HTML',
-        'CSS',
-        'SQL',
-        'Text',
-      ];
-      const supportedThemes = ['dark', 'light', 'monokai'];
-
-      for (const block of contentBlocks) {
-        if (
-          !block ||
-          (block.type !== 'text' && block.type !== 'code') ||
-          typeof block.content !== 'string'
-        ) {
-          return res.status(400).json({ message: 'Invalid post content block' });
-        }
-
-        if (
-          block.type === 'code' &&
-          (!supportedLanguages.includes(block.language) || !supportedThemes.includes(block.theme))
-        ) {
-          return res.status(400).json({ message: 'Invalid code language or theme' });
-        }
-      }
+    const type = req.body.type || 'post';
+    if (type !== 'post' && type !== 'question') {
+      return res.status(400).json({ message: 'Invalid post type' });
+    }
+    if (contentBlocks !== undefined && !isValidContentBlocks(contentBlocks)) {
+      return res.status(400).json({ message: 'Invalid post content blocks' });
     }
 
     const createdAt = new Date();
@@ -763,6 +1141,9 @@ app.post('/createPost', async function (req, res) {
 
     const result = await dbConnMongo.collection('posts').insertOne({
       username,
+      authorId: decoded.userId,
+      type,
+      acceptedAnswerIds: [],
       content,
       contentBlocks,
       tags,
@@ -772,12 +1153,16 @@ app.post('/createPost', async function (req, res) {
       likes,
       comments,
       likedByUserIds: [],
+      viewedByUserIds: [],
     });
 
     return res.send({
       post: {
         _id: result.insertedId,
         username,
+        authorId: decoded.userId,
+        type,
+        acceptedAnswerIds: [],
         content,
         contentBlocks,
         tags,
@@ -802,6 +1187,10 @@ app.post('/createComment', async function (req, res) {
 
     const username = decoded.username;
     const content = req.body.content;
+    const contentBlocks = req.body.contentBlocks;
+    if (contentBlocks !== undefined && !isValidContentBlocks(contentBlocks)) {
+      return res.status(400).json({ message: 'Invalid comment content blocks' });
+    }
     const postId = new ObjectId(req.body.postId);
 
     const avatarUrl = await new Promise((resolve, reject) => {
@@ -817,8 +1206,10 @@ app.post('/createComment', async function (req, res) {
     });
 
     const newComment = {
+      answerId: new ObjectId().toString(),
       username,
       content,
+      contentBlocks,
       avatar_url: avatarUrl,
     };
     const result = await dbConnMongo.collection('posts').updateOne(
@@ -840,10 +1231,120 @@ app.post('/createComment', async function (req, res) {
   }
 });
 
+app.post('/toggleAcceptedAnswer', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { postId, answerId, accepted } = req.body;
+
+    if (
+      !ObjectId.isValid(postId) ||
+      typeof answerId !== 'string' ||
+      typeof accepted !== 'boolean'
+    ) {
+      return res.status(400).json({ message: 'Invalid answer selection' });
+    }
+
+    const postObjectId = new ObjectId(postId);
+    const post = await dbConnMongo.collection('posts').findOne({ _id: postObjectId });
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    if (post.type !== 'question') {
+      return res.status(400).json({ message: 'Only questions can have helpful answers' });
+    }
+
+    let isAuthor = false;
+    if (post.authorId !== undefined) {
+      isAuthor = String(post.authorId) === String(decoded.userId);
+    } else {
+      isAuthor = post.username === decoded.username;
+    }
+    if (!isAuthor) {
+      return res.status(403).json({ message: 'Only the question author can mark answers' });
+    }
+    if (!(post.comments || []).some((comment) => comment.answerId === answerId)) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    let update;
+    if (accepted) {
+      update = { $addToSet: { acceptedAnswerIds: answerId } };
+    } else {
+      update = { $pull: { acceptedAnswerIds: answerId } };
+    }
+    await dbConnMongo.collection('posts').updateOne({ _id: postObjectId }, update);
+
+    const updatedPost = await dbConnMongo
+      .collection('posts')
+      .findOne({ _id: postObjectId }, { projection: { acceptedAnswerIds: 1 } });
+    return res.send({ acceptedAnswerIds: updatedPost.acceptedAnswerIds || [] });
+  } catch (error) {
+    return res.status(401).json({ message: error.message || 'Invalid token' });
+  }
+});
+
 function getDecodedToken(req) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) throw new Error('No token provided');
   return token;
+}
+
+async function normalizePostComments(posts) {
+  for (const post of posts) {
+    if (!Array.isArray(post.comments)) continue;
+
+    let changed = false;
+    const comments = post.comments.map((comment) => {
+      if (!comment || typeof comment !== 'object' || comment.answerId) return comment;
+      changed = true;
+      return { ...comment, answerId: new ObjectId().toString() };
+    });
+
+    if (changed) {
+      await dbConnMongo.collection('posts').updateOne({ _id: post._id }, { $set: { comments } });
+      post.comments = comments;
+    }
+  }
+}
+
+function isValidContentBlocks(contentBlocks) {
+  if (!Array.isArray(contentBlocks) || contentBlocks.length > 50) return false;
+
+  const supportedLanguages = [
+    'JavaScript',
+    'TypeScript',
+    'Python',
+    'Java',
+    'C#',
+    'HTML',
+    'CSS',
+    'SQL',
+    'Text',
+  ];
+  const supportedThemes = ['dark', 'light', 'monokai'];
+
+  return contentBlocks.every((block) => {
+    if (
+      !block ||
+      (block.type !== 'text' && block.type !== 'code') ||
+      typeof block.content !== 'string'
+    ) {
+      return false;
+    }
+    return (
+      block.type === 'text' ||
+      (supportedLanguages.includes(block.language) && supportedThemes.includes(block.theme))
+    );
+  });
+}
+
+function countCodeBlocks(contentBlocks, counts) {
+  for (const block of contentBlocks || []) {
+    if (block?.type === 'code' && counts.has(block.language)) {
+      counts.set(block.language, counts.get(block.language) + 1);
+    }
+  }
 }
 
 async function mongoConnection() {
@@ -876,6 +1377,72 @@ function SQLConnection() {
 }
 
 async function startServer() {
+  const coverColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'cover_url'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!coverColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query('ALTER TABLE users ADD COLUMN cover_url VARCHAR(500) NULL', (error) => {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+  }
+
+  const profileViewsColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'profile_views'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!profileViewsColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query('ALTER TABLE users ADD COLUMN profile_views INT NOT NULL DEFAULT 0', (error) => {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+  }
+
+  const profileViewerIdsColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'profile_viewer_ids'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!profileViewerIdsColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query(
+        'ALTER TABLE users ADD COLUMN profile_viewer_ids JSON NOT NULL DEFAULT (JSON_ARRAY())',
+        (error) => {
+          if (error) return reject(error);
+          resolve();
+        },
+      );
+    });
+  }
+
+  const lastSeenColumnExists = await new Promise((resolve, reject) => {
+    dbConn.query("SHOW COLUMNS FROM users LIKE 'last_seen_at'", (error, rows) => {
+      if (error) return reject(error);
+      resolve(rows.length > 0);
+    });
+  });
+  if (!lastSeenColumnExists) {
+    await new Promise((resolve, reject) => {
+      dbConn.query(
+        'ALTER TABLE users ADD COLUMN last_seen_at TIMESTAMP NULL DEFAULT NULL',
+        (error) => {
+          if (error) return reject(error);
+          resolve();
+        },
+      );
+    });
+  }
+
   dbConnMongo = await mongoConnection();
   if (!dbConnMongo) {
     console.error('Mongo no conectado. No arrancando server');

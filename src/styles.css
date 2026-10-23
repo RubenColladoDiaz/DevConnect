@@ -5,6 +5,276 @@ html,
 body {
   font-family: Arial, sans-serif;
 }
+
+body.dark-theme {
+  background: #12141d;
+  color: #e3e5ee;
+}
+
+body.dark-theme app-root {
+  background: #12141d;
+}
+
+body.dark-theme .account-page,
+body.dark-theme app-home {
+  background: #12141d;
+  color: #e3e5ee;
+}
+
+body.dark-theme .account-page {
+  background-color: #12141d;
+  color: #e3e5ee;
+}
+
+body.dark-theme .account-page {
+  background-image:
+    radial-gradient(circle at 8% 10%, rgba(0, 168, 222, 0.08), transparent 25%),
+    radial-gradient(circle at 92% 35%, rgba(233, 19, 136, 0.07), transparent 26%),
+    linear-gradient(#12141d, #12141d);
+}
+
+body.dark-theme .profile-hero,
+body.dark-theme .account-card,
+body.dark-theme .profile-card,
+body.dark-theme .trending-card,
+body.dark-theme .post-card,
+body.dark-theme .post-composer,
+body.dark-theme .comment-bubble,
+body.dark-theme .composer-panel,
+body.dark-theme .connections-list {
+  border-color: #343747;
+  background-color: #1d202c;
+  color: #e3e5ee;
+}
+
+body.dark-theme .identity-copy h1,
+body.dark-theme .card-heading h2,
+body.dark-theme .details-card dd,
+body.dark-theme .profile-copy strong,
+body.dark-theme .trending-heading h2,
+body.dark-theme .trending-list strong,
+body.dark-theme .top-users-list a:hover strong,
+body.dark-theme .comment-header > p,
+body.dark-theme .composer-title {
+  color: #e3e5ee;
+}
+
+body.dark-theme .identity-copy > p,
+body.dark-theme .identity-meta,
+body.dark-theme .about-card > p,
+body.dark-theme .details-card dt,
+body.dark-theme .post-content,
+body.dark-theme .comment-content,
+body.dark-theme .profile-status,
+body.dark-theme .trending-caption,
+body.dark-theme .trending-rank,
+body.dark-theme .trending-count,
+body.dark-theme .profile-stats span {
+  color: #b2b6c5;
+}
+
+body.dark-theme .profile-eyebrow {
+  color: #df1888;
+}
+
+body.dark-theme .presence-table th,
+body.dark-theme .presence-table strong,
+body.dark-theme .presence-status,
+body.dark-theme .presence-empty,
+body.dark-theme .composer-body > label,
+body.dark-theme .block-heading > strong,
+body.dark-theme .comment-block-heading > strong,
+body.dark-theme .post-type-options button {
+  color: #e3e5ee;
+}
+
+body.dark-theme .trending-heading h2 {
+  color: #df1888;
+}
+
+body.dark-theme .trending-caption,
+body.dark-theme .trending-list strong,
+body.dark-theme .trending-rank,
+body.dark-theme .trending-count,
+body.dark-theme .profile-status,
+body.dark-theme .comment-header > p,
+body.dark-theme .comment-label,
+body.dark-theme .comment-content {
+  color: #e3e5ee;
+}
+
+/* Keep the accepted-answer indicator distinct from regular comment text. */
+body.dark-theme .accepted-label,
+body.dark-theme .accepted-label i {
+  color: #168455;
+}
+
+/* Dark-theme text inside components with their own scoped color rules. */
+body.dark-theme .question-status,
+body.dark-theme .post-tags span,
+body.dark-theme .metric {
+  color: #e3e5ee;
+}
+
+body.dark-theme .question-banner strong {
+  color: #df1888;
+}
+
+body.dark-theme .profile-stats,
+body.dark-theme .profile-stats div,
+body.dark-theme .details-card dl div,
+body.dark-theme .post-footer,
+body.dark-theme .comment-card,
+body.dark-theme .presence-table td {
+  border-color: #343747;
+}
+
+body.dark-theme .post-footer,
+body.dark-theme .composer-body,
+body.dark-theme .comment-composer {
+  background-color: #191b26;
+}
+
+body.dark-theme .metric,
+body.dark-theme .comment-bubble,
+body.dark-theme .composer-panel,
+body.dark-theme .connections-list {
+  background-color: #242736;
+}
+
+body.dark-theme textarea,
+body.dark-theme input,
+body.dark-theme .profile-editor input,
+body.dark-theme .stack-editor input,
+body.dark-theme .avatar-input,
+body.dark-theme .bio-textarea,
+body.dark-theme .composer-body select,
+body.dark-theme .comment-block-heading select {
+  border-color: #414559;
+  background-color: #202331;
+  color: #e3e5ee;
+}
+
+body.dark-theme .avatar-modal {
+  background-color: #1d202c;
+  color: #e3e5ee;
+}
+
+body.dark-theme .app-footer {
+  border-color: #343747;
+  background: rgba(29, 32, 44, 0.9);
+}
+
+body.dark-theme .footer-content {
+  color: #b2b6c5;
+}
+
+body.dark-theme .footer-links a {
+  color: #c5b6ff;
+}
+
+body.dark-theme .auth-page {
+  background: #12141d;
+  color: #e3e5ee;
+}
+
+body.dark-theme .auth-card,
+body.dark-theme .auth-form-panel {
+  background: #1d202c;
+  color: #e3e5ee;
+}
+
+body.dark-theme .skill-list span,
+body.dark-theme .post-tags span {
+  background-color: #303348;
+  color: #d7d1fa;
+}
+
+.profile-cover.has-cover::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(20, 20, 35, 0.38);
+  content: '';
+}
+
+.cover-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.edit-cover-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 10px;
+  background: rgba(20, 20, 35, 0.35);
+  color: #fff;
+  cursor: pointer;
+}
+
+.edit-cover-button:hover {
+  background: rgba(20, 20, 35, 0.65);
+}
+
+.profile-editor,
+.stack-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-editor label,
+.stack-editor label {
+  display: grid;
+  gap: 5px;
+  color: #777b89;
+  font-size: 0.72rem;
+}
+
+.profile-editor input,
+.stack-editor input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #dbe3ec;
+  border-radius: 9px;
+  background: #f8fafc;
+  color: #303244;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.stack-add {
+  display: flex;
+  gap: 7px;
+}
+
+.stack-add .bio-button {
+  min-width: 58px;
+  padding: 7px 11px;
+}
+
+.skills-card .card-heading .edit-bio-button,
+.details-card .card-heading .edit-bio-button {
+  margin-left: auto;
+}
+
+.skill-list span button {
+  margin-left: 4px;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

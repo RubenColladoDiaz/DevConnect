@@ -7,10 +7,28 @@ export type User = {
   followers: number[];
   email: string;
   password: string;
-  locatinon: string;
+  location: string;
   status: string;
   avatar_url: string;
+  cover_url?: string;
+  profile_views?: number;
   created_at: string;
 };
 
 export type UserSearchResult = Pick<User, 'userId' | 'username' | 'display_name' | 'avatar_url'>;
+
+export type TopFollowerUser = UserSearchResult & {
+  followersCount: number;
+};
+
+export type TopViewedUser = UserSearchResult & {
+  profile_views: number;
+};
+
+export type FollowingPresence = UserSearchResult & {
+  online: boolean;
+};
+
+export type TopQuestionSolver = UserSearchResult & {
+  solvedQuestionCount: number;
+};

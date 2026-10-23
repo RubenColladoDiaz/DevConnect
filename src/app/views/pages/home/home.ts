@@ -1,8 +1,24 @@
-import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
-import { Post } from '../../../shared/types/Post';
-import { User } from '../../../shared/types/User';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild,
+  WritableSignal,
+} from '@angular/core';
+import { Post, PostCodeLanguage } from '../../../shared/types/Post';
+import {
+  FollowingPresence,
+  TopFollowerUser,
+  TopQuestionSolver,
+  TopViewedUser,
+  User,
+} from '../../../shared/types/User';
 import { PostsService } from '../../../shared/services/posts-service';
 import { AuthService } from '../../../shared/services/auth-service';
+import { UsersService } from '../../../shared/services/users-service';
 
 /**
  * Home component where the user will be able to see all posts and user configuration.
@@ -13,7 +29,9 @@ import { AuthService } from '../../../shared/services/auth-service';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
+  @ViewChild('feedTop') feedTop?: ElementRef<HTMLElement>;
+
   /**
    * Shared reactive logged user signal from AuthService.
    */
@@ -24,6 +42,11 @@ export class Home implements OnInit {
    * @default {[]}
    */
   posts: WritableSignal<Post>[] = [];
+  trendingLanguages: { language: Exclude<PostCodeLanguage, 'Text'>; count: number }[] = [];
+  topFollowers: TopFollowerUser[] = [];
+  topProfileViews: TopViewedUser[] = [];
+  topQuestionSolvers: TopQuestionSolver[] = [];
+  followingPresence: FollowingPresence[] = [];
   /**
    * Text message where we show possible errors.
    * @type {string}
@@ -32,6 +55,7 @@ export class Home implements OnInit {
   message: string = '';
 
   creating: WritableSignal<boolean> = signal(false);
+  private rankingsRefreshInterval: ReturnType<typeof setInterval> | undefined;
 
   /**
    * Constructor where we create essencial params for different methods.
@@ -41,6 +65,7 @@ export class Home implements OnInit {
     private cdr: ChangeDetectorRef,
     private postsService: PostsService,
     private authService: AuthService,
+    private usersService: UsersService,
   ) {
     this.user = this.authService.user;
   }
@@ -52,6 +77,14 @@ export class Home implements OnInit {
    */
   ngOnInit(): void {
     this.getAllPosts();
+    this.refreshRankings();
+    this.rankingsRefreshInterval = setInterval(() => this.refreshRankings(), 5000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.rankingsRefreshInterval) {
+      clearInterval(this.rankingsRefreshInterval);
+    }
   }
 
   /**
@@ -82,6 +115,75 @@ export class Home implements OnInit {
     });
   }
 
+  getTopFollowers(): void {
+    this.usersService.GetTopFollowers().subscribe({
+      next: (users) => {
+        this.topFollowers = users;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading top followers:', err),
+    });
+  }
+
+  getTopProfileViews(): void {
+    this.usersService.GetTopProfileViews().subscribe({
+      next: (users) => {
+        this.topProfileViews = users;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading top profile views:', err),
+    });
+  }
+
+  getTrendingLanguages(): void {
+    this.postsService.getTrendingLanguages().subscribe({
+      next: (languages) => {
+        this.trendingLanguages = languages;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading trending languages:', err),
+    });
+  }
+
+  getTopQuestionSolvers(): void {
+    this.usersService.GetTopQuestionSolvers().subscribe({
+      next: (users) => {
+        this.topQuestionSolvers = users;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading top question solvers:', err),
+    });
+  }
+
+  getFollowingPresence(): void {
+    if (!this.user()?.userId) {
+      this.followingPresence = [];
+      return;
+    }
+
+    this.usersService.GetFollowingPresence().subscribe({
+      next: (users) => {
+        this.followingPresence = users;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading following presence:', err),
+    });
+  }
+
+  private refreshRankings(): void {
+    this.getTrendingLanguages();
+    this.getTopFollowers();
+    this.getTopProfileViews();
+    this.getTopQuestionSolvers();
+    this.getFollowingPresence();
+  }
+
+  scrollToFeedTop(): void {
+    requestAnimationFrame(() => {
+      this.feedTop?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   addNewPost(post: Post): void {
     const newPost = {
       ...post,
@@ -91,6 +193,7 @@ export class Home implements OnInit {
       signal(newPost),
       ...this.posts.filter((existingPost) => existingPost()._id !== post._id).slice(0, 19),
     ];
+    this.getTrendingLanguages();
     this.cdr.detectChanges();
   }
 }

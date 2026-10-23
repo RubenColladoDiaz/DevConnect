@@ -33,6 +33,11 @@
   box-shadow: 0 7px 22px rgba(27, 31, 59, 0.13);
 }
 
+.post-card:has(.views-metric:hover) {
+  transform: none;
+  box-shadow: 0 3px 14px rgba(27, 31, 59, 0.09);
+}
+
 .post-header {
   min-height: 64px;
   padding: 10px 16px;
@@ -113,6 +118,73 @@
   padding: 20px 18px 18px;
 }
 
+.question-post {
+  border-color: rgba(86, 49, 149, 0.28);
+}
+
+.question-banner {
+  margin: -2px 0 15px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #e5def1;
+  border-radius: 8px;
+  background: #f8f5fc;
+  color: #563195;
+  font-size: 0.78rem;
+}
+
+.question-banner strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.question-status {
+  color: #858093;
+  font-size: 0.72rem;
+}
+
+.question-status.solved {
+  color: #168455;
+  font-weight: 700;
+}
+
+.comment-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.comment-row app-comment-template {
+  flex: 1;
+  min-width: 0;
+}
+
+.mark-answer-button {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dfe2e8;
+  border-radius: 50%;
+  background: #fff;
+  color: #9297a5;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.mark-answer-button.accepted-answer {
+  border-color: #168455;
+  background: #eaf7f0;
+  color: #168455;
+}
+
 .post-content {
   margin: 0;
   overflow-wrap: anywhere;
@@ -189,9 +261,14 @@
     transform 150ms ease;
 }
 
-.metric:hover {
+.metric:not(.views-metric):hover {
   transform: translateY(-1px);
   background: rgba(233, 19, 105, 0.08);
+}
+
+.views-metric,
+.views-metric:hover {
+  background: transparent;
 }
 
 .like-button:hover {
@@ -234,6 +311,27 @@
   justify-content: center;
   border-radius: 8px;
   color: #858997;
+}
+
+:host-context(body.dark-theme) .question-banner,
+:host-context(body.dark-theme) .question-status,
+:host-context(body.dark-theme) .post-tags span,
+:host-context(body.dark-theme) .metric {
+  color: #e3e5ee;
+}
+
+:host-context(body.dark-theme) .question-banner {
+  border-color: #3a3d50;
+  background: #242736;
+}
+
+:host-context(body.dark-theme) .question-banner strong {
+  color: #df1888;
+}
+
+:host-context(body.dark-theme) .question-status.solved,
+:host-context(body.dark-theme) .mark-answer-button.accepted-answer {
+  color: #168455;
 }
 
 @media (max-width: 520px) {

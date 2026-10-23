@@ -1,4 +1,4 @@
-<article class="post-card">
+<article class="post-card" [class.question-post]="post()?.type === 'question'">
   <header class="post-header">
     <div class="post-author">
       <img
@@ -26,6 +26,16 @@
   </header>
 
   <div class="post-body">
+    @if (post()?.type === 'question') {
+      <div class="question-banner">
+        <strong><i class="fa-regular fa-circle-question" aria-hidden="true"></i> Question</strong>
+        @if ((post()?.acceptedAnswerIds?.length ?? 0) > 0) {
+          <span class="question-status solved">Answered</span>
+        } @else {
+          <span class="question-status">Needs an answer</span>
+        }
+      </div>
+    }
     @if (post()?.contentBlocks?.length) {
       @for (block of post()?.contentBlocks ?? []; track $index) {
         @if (block.type === 'text') {
@@ -93,7 +103,7 @@
         {{ post()?.likes ?? 0 }}
       </button>
 
-      <span class="metric" title="Views">
+      <span class="metric views-metric" title="Views">
         <i class="fa-regular fa-eye" aria-hidden="true"></i>
         {{ post()?.views ?? 0 }}
       </span>
@@ -109,12 +119,31 @@
     <app-new-comment-template
       [(creatingComment)]="creatingComment"
       [postId]="post()?._id"
+      [isQuestion]="post()?.type === 'question'"
       (updatedComments)="updateComments($event)"
     ></app-new-comment-template>
   }
   @if ((post()?.comments?.length ?? 0) > 0) {
-    @for (comment of post()?.comments ?? []; track comment) {
-      <app-comment-template [comment]="comment"></app-comment-template>
+    @for (comment of post()?.comments ?? []; track comment.answerId || $index) {
+      <div class="comment-row">
+        <app-comment-template
+          [comment]="comment"
+          [isAnswer]="post()?.type === 'question'"
+          [accepted]="isAcceptedAnswer(comment.answerId)"
+        ></app-comment-template>
+        @if (post()?.type === 'question' && canManageAnswers() && comment.answerId) {
+          <button
+            class="mark-answer-button"
+            type="button"
+            [class.accepted-answer]="isAcceptedAnswer(comment.answerId)"
+            [attr.aria-pressed]="isAcceptedAnswer(comment.answerId)"
+            aria-label="Toggle helpful answer"
+            (click)="toggleAcceptedAnswer(comment.answerId)"
+          >
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
     }
   }
 </article>

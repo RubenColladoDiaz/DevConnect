@@ -64,6 +64,30 @@
   font-weight: 700;
 }
 
+.post-type-options {
+  margin-bottom: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.post-type-options button {
+  padding: 7px 12px;
+  border: 1px solid #dfe2ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #65697a;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.post-type-options button.active {
+  border-color: #65329d;
+  background: #f4f1fa;
+  color: #563195;
+}
+
 .composer-body textarea {
   display: block;
   width: 100%;
@@ -159,6 +183,17 @@
   border-color: #65329d;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(101, 50, 157, 0.12);
+}
+
+:host-context(body.dark-theme) .composer-body textarea,
+:host-context(body.dark-theme) .composer-body textarea:focus {
+  border-color: #414559;
+  background: #202331;
+  color: #e3e5ee;
+}
+
+:host-context(body.dark-theme) .composer-body textarea::placeholder {
+  color: #aeb3c2;
 }
 
 .composer-meta {

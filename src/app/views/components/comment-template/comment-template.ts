@@ -1,4 +1,4 @@
-import { Component, model, ModelSignal, WritableSignal } from '@angular/core';
+import { Component, Input, model, ModelSignal } from '@angular/core';
 import { Comment } from '../../../shared/types/Comment';
 
 @Component({
@@ -8,5 +8,8 @@ import { Comment } from '../../../shared/types/Comment';
   styleUrl: './comment-template.css',
 })
 export class CommentTemplate {
+  @Input() isAnswer = false;
+  @Input() accepted = false;
+
   comment: ModelSignal<Comment | undefined> = model<Comment>();
 }

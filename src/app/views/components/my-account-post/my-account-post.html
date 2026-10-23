@@ -1,4 +1,4 @@
-<article class="publication-card">
+<article class="publication-card" [class.question-publication]="post()?.type === 'question'">
   <header class="publication-header">
     <div class="publication-author">
       <img
@@ -15,6 +15,16 @@
     >
   </header>
   <div class="publication-body">
+    @if (post()?.type === 'question') {
+      <div class="question-publication-label">
+        <strong><i class="fa-regular fa-circle-question" aria-hidden="true"></i> Question</strong>
+        @if ((post()?.acceptedAnswerIds?.length ?? 0) > 0) {
+          <span>Answered</span>
+        } @else {
+          <span>Needs an answer</span>
+        }
+      </div>
+    }
     @if (post()?.contentBlocks?.length) {
       @for (block of post()?.contentBlocks ?? []; track $index) {
         @if (block.type === 'text') {

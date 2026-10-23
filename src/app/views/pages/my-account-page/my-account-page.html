@@ -1,42 +1,87 @@
 <main class="account-page">
   <section class="profile-hero">
-    <div class="profile-cover">
+    <div class="profile-cover" [class.has-cover]="!!user().cover_url">
+      @if (user().cover_url) {
+        <img class="cover-image" [src]="user().cover_url" alt="Profile cover" />
+      }
       <span class="cover-code" aria-hidden="true">&lt;/&gt;</span>
       <div class="cover-copy">
         <span>DEVCONNECT PROFILE</span>
         <strong>Build. Share. Connect.</strong>
       </div>
+      @if (isOwnProfile) {
+        <button
+          type="button"
+          class="edit-cover-button"
+          aria-label="Edit cover image"
+          (click)="editCover()"
+        >
+          <i class="fa-solid fa-pencil"></i>
+        </button>
+      }
     </div>
+
+    @if (isOwnProfile && editingCover) {
+      <div class="avatar-popup">
+        <div class="avatar-modal" role="dialog" aria-modal="true">
+          <h3>Update cover image</h3>
+          <input class="avatar-input" [(ngModel)]="editedCover" placeholder="Paste image URL" />
+          @if (coverError) {
+            <div class="avatar-error">{{ coverError }}</div>
+          }
+          <div class="avatar-actions">
+            <button type="button" class="bio-button cancel-bio-button" (click)="cancelCover()">
+              Cancel
+            </button>
+            <button type="button" class="bio-button save-bio-button" (click)="saveCover()">
+              <i class="fa-solid fa-check"></i> Save
+            </button>
+          </div>
+        </div>
+      </div>
+    }
 
     <div class="profile-identity">
       <div class="profile-avatar">
-        <img src="{{user().avatar_url}}" alt="User profile" />
+        <img src="{{ user().avatar_url }}" alt="User profile" />
         @if (isOwnProfile && !editingAvatar) {
-        <button type="button" class="edit-avatar-button" aria-label="Edit avatar" (click)="editAvatar()">
-          <i class="fa-solid fa-pencil"></i>
-        </button>
+          <button
+            type="button"
+            class="edit-avatar-button"
+            aria-label="Edit avatar"
+            (click)="editAvatar()"
+          >
+            <i class="fa-solid fa-pencil"></i>
+          </button>
         } @else if (isOwnProfile) {
-        <div class="avatar-popup">
-          <div class="avatar-modal" role="dialog" aria-modal="true">
-            <h3>Update avatar</h3>
-            <input class="avatar-input" [(ngModel)]="editedAvatar" placeholder="Paste image URL" />
-            <div class="avatar-preview">
-              <div>
-                <small>Preview</small>
-                <img src="{{ editedAvatar || user().avatar_url }}" alt="avatar preview" />
+          <div class="avatar-popup">
+            <div class="avatar-modal" role="dialog" aria-modal="true">
+              <h3>Update avatar</h3>
+              <input
+                class="avatar-input"
+                [(ngModel)]="editedAvatar"
+                placeholder="Paste image URL"
+              />
+              <div class="avatar-preview">
+                <div>
+                  <small>Preview</small>
+                  <img src="{{ editedAvatar || user().avatar_url }}" alt="avatar preview" />
+                </div>
+                <div style="flex: 1"></div>
               </div>
-              <div style="flex:1"></div>
-            </div>
-            @if (avatarError) {
-            <div class="avatar-error">{{ avatarError }}</div>
-            }
-            <div class="avatar-actions">
-              <button type="button" class="bio-button cancel-bio-button" (click)="cancelAvatar()">Cancel</button>
-              <button type="button" class="bio-button save-bio-button" (click)="saveAvatar()"><i
-                  class="fa-solid fa-check"></i> Save</button>
+              @if (avatarError) {
+                <div class="avatar-error">{{ avatarError }}</div>
+              }
+              <div class="avatar-actions">
+                <button type="button" class="bio-button cancel-bio-button" (click)="cancelAvatar()">
+                  Cancel
+                </button>
+                <button type="button" class="bio-button save-bio-button" (click)="saveAvatar()">
+                  <i class="fa-solid fa-check"></i> Save
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         }
         <span class="online-dot" title="Online"></span>
       </div>
@@ -46,27 +91,27 @@
         <h1>{{ user().display_name }}</h1>
         <p>@{{ user().username }} · Full-stack developer</p>
         @if (!isOwnProfile && isLoggedIn) {
-        <button
-          type="button"
-          class="bio-button"
-          [class.save-bio-button]="!isFollowing"
-          [class.cancel-bio-button]="isFollowing"
-          [disabled]="isUpdatingFollow"
-          (click)="toggleFollow()"
-        >
-          @if (isFollowing) {
-          Unfollow
-          } @else {
-          Follow
+          <button
+            type="button"
+            class="bio-button"
+            [class.save-bio-button]="!isFollowing"
+            [class.cancel-bio-button]="isFollowing"
+            [disabled]="isUpdatingFollow"
+            (click)="toggleFollow()"
+          >
+            @if (isFollowing) {
+              Unfollow
+            } @else {
+              Follow
+            }
+          </button>
+          @if (followError) {
+            <span class="avatar-error">{{ followError }}</span>
           }
-        </button>
-        @if (followError) {
-        <span class="avatar-error">{{ followError }}</span>
-        }
         }
         <div class="identity-meta">
           @if (isOwnProfile) {
-          <span><i class="fa-regular fa-envelope"></i> {{ user().email }}</span>
+            <span><i class="fa-regular fa-envelope"></i> {{ user().email }}</span>
           }
           <button type="button" class="connection-count" (click)="toggleUserList('followers')">
             <i class="fa-solid fa-users"></i> {{ followers }} followers
@@ -74,65 +119,73 @@
           <button type="button" class="connection-count" (click)="toggleUserList('following')">
             <i class="fa-solid fa-user-plus"></i> {{ followingList.length }} following
           </button>
-          <span><i class="fa-solid fa-location-dot"></i> {{user().locatinon}}</span>
-          <span><i class="fa-regular fa-calendar"></i> Member since
-            {{ user().created_at | date: 'yyyy' }}</span>
+          <span><i class="fa-solid fa-location-dot"></i> {{ user().location || 'Unknown' }}</span>
+          <span
+            ><i class="fa-regular fa-calendar"></i> Member since
+            {{ user().created_at | date: 'yyyy' }}</span
+          >
         </div>
       </div>
     </div>
 
     @if (activeUserList) {
-    <section class="connections-list">
-      @if (activeUserList === 'followers') {
-      <h2>Followers</h2>
-      } @else {
-      <h2>Following</h2>
-      }
-      @if (connectionsError) {
-      <p>{{ connectionsError }}</p>
-      } @else if (activeUserList === 'followers') {
-      @if (followersList.length === 0) {
-      <p>No followers yet.</p>
-      } @else {
-      @for (person of followersList; track person.userId) {
-      <a class="connection-person" [routerLink]="['/account', person.username]">
-        <img [src]="person.avatar_url" [alt]="person.username + ' avatar'" />
-        <span>
-          <strong>{{ person.display_name }}</strong>
-          <small>@{{ person.username }}</small>
-        </span>
-      </a>
-      }
-      }
-      } @else {
-      @if (followingList.length === 0) {
-      <p>Not following anyone yet.</p>
-      } @else {
-      @for (person of followingList; track person.userId) {
-      <a class="connection-person" [routerLink]="['/account', person.username]">
-        <img [src]="person.avatar_url" [alt]="person.username + ' avatar'" />
-        <span>
-          <strong>{{ person.display_name }}</strong>
-          <small>@{{ person.username }}</small>
-        </span>
-      </a>
-      }
-      }
-      }
-    </section>
+      <section class="connections-list">
+        @if (activeUserList === 'followers') {
+          <h2>Followers</h2>
+        } @else {
+          <h2>Following</h2>
+        }
+        @if (connectionsError) {
+          <p>{{ connectionsError }}</p>
+        } @else if (activeUserList === 'followers') {
+          @if (followersList.length === 0) {
+            <p>No followers yet.</p>
+          } @else {
+            @for (person of followersList; track person.userId) {
+              <a class="connection-person" [routerLink]="['/account', person.username]">
+                <img [src]="person.avatar_url" [alt]="person.username + ' avatar'" />
+                <span>
+                  <strong>{{ person.display_name }}</strong>
+                  <small>@{{ person.username }}</small>
+                </span>
+              </a>
+            }
+          }
+        } @else {
+          @if (followingList.length === 0) {
+            <p>Not following anyone yet.</p>
+          } @else {
+            @for (person of followingList; track person.userId) {
+              <a class="connection-person" [routerLink]="['/account', person.username]">
+                <img [src]="person.avatar_url" [alt]="person.username + ' avatar'" />
+                <span>
+                  <strong>{{ person.display_name }}</strong>
+                  <small>@{{ person.username }}</small>
+                </span>
+              </a>
+            }
+          }
+        }
+      </section>
     }
 
     <div class="profile-stats" aria-label="Profile statistics">
       <div>
-        <strong>{{ postsFromUser.length }}</strong><span>Posts</span>
+        <strong>{{ postsFromUser.length }}</strong
+        ><span>Posts</span>
       </div>
       <div>
-        <strong>{{ comments }}</strong><span>Comments</span>
+        <strong>{{ comments }}</strong
+        ><span>Comments</span>
       </div>
       <div>
-        <strong>{{ likes }}</strong><span>Likes</span>
+        <strong>{{ likes }}</strong
+        ><span>Likes</span>
       </div>
-      <div><strong>{{views}}</strong><span>Views</span></div>
+      <div>
+        <strong>{{ views }}</strong
+        ><span>Views</span>
+      </div>
     </div>
   </section>
 
@@ -150,30 +203,40 @@
           </div>
 
           @if (isOwnProfile && !editingBio) {
-          <button type="button" class="edit-bio-button" aria-label="Edit biography" (click)="editBio()">
-            <i class="fa-solid fa-pencil"></i>
-          </button>
+            <button
+              type="button"
+              class="edit-bio-button"
+              aria-label="Edit biography"
+              (click)="editBio()"
+            >
+              <i class="fa-solid fa-pencil"></i>
+            </button>
           }
         </header>
 
         @if (!isOwnProfile || !editingBio) {
-        <p>{{ user().bio }}</p>
+          <p>{{ user().bio }}</p>
         } @else {
-        <div class="bio-editor">
-          <textarea class="bio-textarea" [(ngModel)]="editedBio" rows="5" maxlength="500"
-            placeholder="Write something about yourself..."></textarea>
+          <div class="bio-editor">
+            <textarea
+              class="bio-textarea"
+              [(ngModel)]="editedBio"
+              rows="5"
+              maxlength="500"
+              placeholder="Write something about yourself..."
+            ></textarea>
 
-          <div class="bio-actions">
-            <button type="button" class="bio-button cancel-bio-button" (click)="cancelBio()">
-              Cancel
-            </button>
+            <div class="bio-actions">
+              <button type="button" class="bio-button cancel-bio-button" (click)="cancelBio()">
+                Cancel
+              </button>
 
-            <button type="button" class="bio-button save-bio-button" (click)="saveBio()">
-              <i class="fa-solid fa-check"></i>
-              Save
-            </button>
+              <button type="button" class="bio-button save-bio-button" (click)="saveBio()">
+                <i class="fa-solid fa-check"></i>
+                Save
+              </button>
+            </div>
           </div>
-        </div>
         }
       </section>
 
@@ -184,38 +247,69 @@
             <span>ACCOUNT</span>
             <h2>Personal details</h2>
           </div>
-        </header>
-        <dl>
-          <div>
-            <dt>Username</dt>
-            <dd>{{ user().username }}</dd>
-          </div>
-          @if (isOwnProfile) {
-          <div>
-            <dt>Email</dt>
-            <dd>{{ user().email }}</dd>
-          </div>
+          @if (isOwnProfile && !editingProfile) {
+            <button
+              type="button"
+              class="edit-bio-button"
+              aria-label="Edit profile details"
+              (click)="editProfile()"
+            >
+              <i class="fa-solid fa-pencil"></i>
+            </button>
           }
-          <div>
-            <dt>Account ID</dt>
-            <dd>#{{ user().userId }}</dd>
-          </div>
-          <div>
-            <dt>Status</dt>
-
-            @if (user().status === 'active') {
-            <dd class="status-active">
-              <i class="fa-solid fa-circle-check"></i>
-              {{ user().status }}
-            </dd>
-            } @else {
-            <dd class="status-offline">
-              <i class="fa-solid fa-circle-xmark"></i>
-              {{ user().status }}
-            </dd>
+        </header>
+        @if (isOwnProfile && editingProfile) {
+          <div class="profile-editor">
+            <label>Display name<input [(ngModel)]="editedDisplayName" maxlength="100" /></label>
+            <label>Username<input [(ngModel)]="editedUsername" maxlength="100" /></label>
+            <label
+              >Country<input [(ngModel)]="editedLocation" maxlength="100" placeholder="Unknown"
+            /></label>
+            @if (profileError) {
+              <p class="avatar-error">{{ profileError }}</p>
             }
+            <div class="bio-actions">
+              <button type="button" class="bio-button cancel-bio-button" (click)="cancelProfile()">
+                Cancel
+              </button>
+              <button type="button" class="bio-button save-bio-button" (click)="saveProfile()">
+                Save
+              </button>
+            </div>
           </div>
-        </dl>
+        } @else {
+          <dl>
+            <div>
+              <dt>Username</dt>
+              <dd>{{ user().username }}</dd>
+            </div>
+            @if (isOwnProfile) {
+              <div>
+                <dt>Email</dt>
+                <dd>{{ user().email }}</dd>
+              </div>
+            }
+            <div>
+              <dt>Account ID</dt>
+              <dd>#{{ user().userId }}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+
+              @if (user().status === 'active') {
+                <dd class="status-active">
+                  <i class="fa-solid fa-circle-check"></i>
+                  {{ user().status }}
+                </dd>
+              } @else {
+                <dd class="status-offline">
+                  <i class="fa-solid fa-circle-xmark"></i>
+                  {{ user().status }}
+                </dd>
+              }
+            </div>
+          </dl>
+        }
       </section>
 
       <section class="account-card skills-card">
@@ -225,12 +319,65 @@
             <span>STACK</span>
             <h2>Technologies</h2>
           </div>
-        </header>
-        <div class="skill-list">
-          @for (technology of user().stack; track technology) {
-          <span>{{ technology }}</span>
+          @if (isOwnProfile && !editingStack) {
+            <button
+              type="button"
+              class="edit-bio-button"
+              aria-label="Edit technologies"
+              (click)="editStack()"
+            >
+              <i class="fa-solid fa-pencil"></i>
+            </button>
           }
-        </div>
+        </header>
+        @if (isOwnProfile && editingStack) {
+          <div class="stack-editor">
+            <label>
+              Add a technology
+              <span class="stack-add">
+                <input
+                  [(ngModel)]="technologyInput"
+                  (keydown.enter)="$event.preventDefault(); addTechnology()"
+                  placeholder="Type a technology and press Enter"
+                />
+                <button type="button" class="bio-button save-bio-button" (click)="addTechnology()">
+                  Add
+                </button>
+              </span>
+            </label>
+            <div class="skill-list">
+              @for (technology of editedStack; track technology) {
+                <span
+                  >{{ technology }}
+                  <button
+                    type="button"
+                    [attr.aria-label]="'Remove ' + technology"
+                    (click)="removeTechnology(technology)"
+                  >
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </span>
+              }
+            </div>
+            @if (stackError) {
+              <p class="avatar-error">{{ stackError }}</p>
+            }
+            <div class="bio-actions">
+              <button type="button" class="bio-button cancel-bio-button" (click)="cancelStack()">
+                Cancel
+              </button>
+              <button type="button" class="bio-button save-bio-button" (click)="saveStack()">
+                Save
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="skill-list">
+            @for (technology of user().stack; track technology) {
+              <span>{{ technology }}</span>
+            }
+          </div>
+        }
       </section>
     </aside>
 
@@ -241,12 +388,14 @@
           <h2>Publications</h2>
           <p>Ideas, progress and things shared with the community.</p>
         </div>
-        <span class="post-count"><i class="fa-regular fa-file-lines"></i> {{ postsFromUser.length }} posts</span>
+        <span class="post-count"
+          ><i class="fa-regular fa-file-lines"></i> {{ postsFromUser.length }} posts</span
+        >
       </header>
 
       <div class="publication-list">
         @for (post of postsFromUser; track post) {
-        <app-my-account-post [(user)]="user" [post]="post"></app-my-account-post>
+          <app-my-account-post [(user)]="user" [post]="post"></app-my-account-post>
         }
       </div>
     </section>
@@ -261,8 +410,8 @@
       </header>
 
       <div class="publication-list reposts-list">
-        @for (post of reposts; track post){
-        <app-post-template class="repost-card" [(post)]="post" />
+        @for (post of reposts; track post) {
+          <app-post-template class="repost-card" [(post)]="post" />
         }
       </div>
     </section>

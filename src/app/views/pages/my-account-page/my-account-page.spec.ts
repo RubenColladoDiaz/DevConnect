@@ -29,7 +29,7 @@ describe('MyAccountPage', () => {
       followers: [],
       email: '',
       password: '',
-      locatinon: '',
+      location: 'Unknown',
       status: '',
       avatar_url: '',
       created_at: '',
@@ -60,6 +60,7 @@ describe('MyAccountPage', () => {
                 comments: 0,
                 followers: 0,
                 reposts: [],
+                views: 7,
               }),
           },
         },
@@ -87,5 +88,30 @@ describe('MyAccountPage', () => {
 
     routeParams.next(convertToParamMap({ username: 'me' }));
     expect(component.user()).toBe(ownUser());
+  });
+
+  it('shows the profile visit count returned by the service', () => {
+    expect(component.views).toBe(7);
+  });
+
+  it('edits the profile fields and technology stack', () => {
+    component.editProfile();
+    expect(component.editedLocation).toBe('Unknown');
+    component.cancelProfile();
+
+    component.editStack();
+    component.technologyInput = 'TypeScript';
+    component.addTechnology();
+
+    expect(component.editedStack).toEqual(['TypeScript']);
+    component.removeTechnology('TypeScript');
+    expect(component.editedStack).toEqual([]);
+  });
+
+  it('opens cover image editing with the saved URL', () => {
+    ownUser.update((user) => ({ ...user, cover_url: 'https://example.com/cover.jpg' }));
+    component.editCover();
+
+    expect(component.editedCover).toBe('https://example.com/cover.jpg');
   });
 });

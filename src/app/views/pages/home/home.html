@@ -9,10 +9,7 @@
         aria-label="Open my account"
       >
         <div class="profile-avatar">
-          <img
-            src="{{user().avatar_url}}"
-            alt="User logo"
-          />
+          <img src="{{ user().avatar_url }}" alt="User logo" />
           <span class="profile-online" title="Online"></span>
         </div>
 
@@ -42,9 +39,71 @@
         </div>
       </a>
     }
+
+    <section class="trending-card" aria-label="Trending programming languages">
+      <div class="trending-heading">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <h2>Trending languages</h2>
+      </div>
+      <p class="trending-caption">Based on recent code blocks</p>
+      <ol class="trending-list">
+        @for (item of trendingLanguages; track item.language; let index = $index) {
+          <li>
+            <span class="trending-rank">{{ index + 1 }}</span>
+            <strong>{{ item.language }}</strong>
+            <span class="trending-count">{{ item.count }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+    @if (user().userId) {
+      <section class="trending-card following-presence-card" aria-label="Following online status">
+        <div class="trending-heading">
+          <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+          <h2>Following</h2>
+        </div>
+        <p class="trending-caption">Online and offline status</p>
+        <table class="presence-table">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (followedUser of followingPresence; track followedUser.userId) {
+              <tr>
+                <td>
+                  <a [routerLink]="['/account', followedUser.username]">
+                    <img
+                      [src]="followedUser.avatar_url"
+                      [alt]="followedUser.username + ' avatar'"
+                    />
+                    <strong>{{ followedUser.username }}</strong>
+                  </a>
+                </td>
+                <td>
+                  @if (followedUser.online) {
+                    <span class="presence-status online"> <i aria-hidden="true"></i> Online </span>
+                  } @else {
+                    <span class="presence-status offline">
+                      <i aria-hidden="true"></i> Offline
+                    </span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="presence-empty" colspan="2">You are not following anyone yet.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
   </section>
 
-  <section class="feed-column">
+  <section #feedTop class="feed-column">
     @if (creating() && user().username) {
       <app-new-post-template [(creating)]="creating" (postCreated)="addNewPost($event)" />
     }
@@ -57,5 +116,64 @@
     }
   </section>
 
-  <app-new-post-button [(creating)]="creating" />
+  <aside class="top-users-column">
+    <app-new-post-button [(creating)]="creating" (newPostRequested)="scrollToFeedTop()" />
+    <section class="trending-card" aria-label="Users with the most followers">
+      <div class="trending-heading">
+        <i class="fa-solid fa-users" aria-hidden="true"></i>
+        <h2>Top developers</h2>
+      </div>
+      <p class="trending-caption">Users with the most followers</p>
+      <ol class="trending-list top-users-list">
+        @for (user of topFollowers; track user.userId; let index = $index) {
+          <li>
+            <span class="trending-rank">{{ index + 1 }}</span>
+            <a [routerLink]="['/account', user.username]">
+              <img [src]="user.avatar_url" [alt]="user.username + ' avatar'" />
+              <strong>{{ user.username }}</strong>
+            </a>
+            <span class="trending-count">{{ user.followersCount }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+    <section class="trending-card" aria-label="Users with the most profile views">
+      <div class="trending-heading">
+        <i class="fa-solid fa-eye" aria-hidden="true"></i>
+        <h2>Trending users</h2>
+      </div>
+      <p class="trending-caption">Users with the most profile views</p>
+      <ol class="trending-list top-users-list">
+        @for (user of topProfileViews; track user.userId; let index = $index) {
+          <li>
+            <span class="trending-rank">{{ index + 1 }}</span>
+            <a [routerLink]="['/account', user.username]">
+              <img [src]="user.avatar_url" [alt]="user.username + ' avatar'" />
+              <strong>{{ user.username }}</strong>
+            </a>
+            <span class="trending-count">{{ user.profile_views }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+    <section class="trending-card" aria-label="Users who solved the most questions">
+      <div class="trending-heading">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+        <h2>Top question solvers</h2>
+      </div>
+      <p class="trending-caption">Questions with accepted answers</p>
+      <ol class="trending-list top-users-list">
+        @for (user of topQuestionSolvers; track user.userId; let index = $index) {
+          <li>
+            <span class="trending-rank">{{ index + 1 }}</span>
+            <a [routerLink]="['/account', user.username]">
+              <img [src]="user.avatar_url" [alt]="user.username + ' avatar'" />
+              <strong>{{ user.username }}</strong>
+            </a>
+            <span class="trending-count">{{ user.solvedQuestionCount }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+  </aside>
 </main>

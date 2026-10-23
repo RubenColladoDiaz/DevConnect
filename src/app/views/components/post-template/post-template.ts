@@ -1,8 +1,9 @@
-import { Component, model, ModelSignal, signal, WritableSignal } from '@angular/core';
+import { Component, model, ModelSignal, OnInit, signal, WritableSignal } from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { PostsService } from '../../../shared/services/posts-service';
 import { Router } from '@angular/router';
 import { Comment } from '../../../shared/types/Comment';
+import { AuthService } from '../../../shared/services/auth-service';
 
 @Component({
   selector: 'app-post-template',
@@ -10,15 +11,20 @@ import { Comment } from '../../../shared/types/Comment';
   templateUrl: './post-template.html',
   styleUrl: './post-template.css',
 })
-export class PostTemplate {
+export class PostTemplate implements OnInit {
   constructor(
     private postsService: PostsService,
     private router: Router,
+    private authService: AuthService,
   ) {}
 
   post: ModelSignal<Post | undefined> = model<Post>();
 
   creatingComment: WritableSignal<boolean> = signal<boolean>(false);
+
+  ngOnInit(): void {
+    this.registerView();
+  }
 
   isToday(date: Date | undefined): boolean {
     if (!date) return false;
@@ -82,6 +88,53 @@ export class PostTemplate {
       };
     });
     this.toggleCreating();
+  }
+
+  canManageAnswers(): boolean {
+    const currentUser = this.authService.user();
+    const currentPost = this.post();
+    if (!currentUser?.userId || !currentPost) return false;
+    if (currentPost.authorId !== undefined) {
+      return String(currentPost.authorId) === String(currentUser.userId);
+    }
+    return currentPost.username === currentUser.username;
+  }
+
+  isAcceptedAnswer(answerId?: string): boolean {
+    if (!answerId) return false;
+    return (this.post()?.acceptedAnswerIds || []).includes(answerId);
+  }
+
+  toggleAcceptedAnswer(answerId: string): void {
+    if (!this.canManageAnswers()) return;
+    const currentPost = this.post();
+    if (!currentPost?._id) return;
+
+    this.postsService
+      .toggleAcceptedAnswer(currentPost._id, answerId, !this.isAcceptedAnswer(answerId))
+      .subscribe({
+        next: (res) => {
+          this.post.update((post) => {
+            if (!post) return post;
+            return { ...post, acceptedAnswerIds: res.acceptedAnswerIds };
+          });
+        },
+        error: (err) => console.error('Error marking helpful answer:', err),
+      });
+  }
+
+  registerView(): void {
+    const currentPost = this.post();
+    if (!currentPost?._id) return;
+
+    this.postsService.registerPostView(currentPost._id).subscribe({
+      next: (res) => {
+        this.post.update((post) =>
+          post ? { ...post, views: Math.max(post.views || 0, res.views) } : post,
+        );
+      },
+      error: (err) => console.error('Error registering post view:', err),
+    });
   }
 
   checkLogin(): boolean {

@@ -91,6 +91,73 @@ textarea {
     background-color 150ms ease;
 }
 
+.comment-content-block {
+  margin-bottom: 9px;
+}
+
+.comment-block-heading,
+.comment-block-insert {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
+.comment-block-heading strong {
+  margin-right: auto;
+  color: #55596a;
+  font-size: 0.72rem;
+}
+
+.comment-block-heading select {
+  max-width: 110px;
+  padding: 5px 7px;
+  border: 1px solid #dfe2ea;
+  border-radius: 7px;
+  background: #fff;
+  color: #45495a;
+  font: inherit;
+  font-size: 0.68rem;
+}
+
+.remove-comment-block,
+.comment-block-insert button {
+  border: 0;
+  border-radius: 6px;
+  background: #f0eef5;
+  color: #65329d;
+  padding: 5px 8px;
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.remove-comment-block:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.comment-block-insert {
+  margin: 6px 0 0;
+}
+
+.comment-code-block {
+  margin: 8px 0;
+  overflow: hidden;
+  border: 1px solid #303241;
+  border-radius: 8px;
+}
+
+.comment-code-block header {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #222432;
+  color: #c7c9d4;
+  font-size: 0.64rem;
+  text-transform: capitalize;
+}
+
 textarea::placeholder {
   color: #9b9fad;
 }
@@ -99,6 +166,17 @@ textarea:focus {
   border-color: #65329d;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(101, 50, 157, 0.11);
+}
+
+:host-context(body.dark-theme) textarea,
+:host-context(body.dark-theme) textarea:focus {
+  border-color: #414559;
+  background: #202331;
+  color: #e3e5ee;
+}
+
+:host-context(body.dark-theme) textarea::placeholder {
+  color: #aeb3c2;
 }
 
 .composer-footer {

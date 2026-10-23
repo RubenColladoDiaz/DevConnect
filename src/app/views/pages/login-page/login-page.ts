@@ -58,6 +58,9 @@ export class LoginPage {
       next: (res: any) => {
         localStorage.setItem('token', res.token);
         this.authService.setUser(res.user);
+        this.userService.UpdatePresence().subscribe({
+          error: (error) => console.error('Error setting online status:', error),
+        });
         this.router.navigate(['/']);
       },
       error: (res: any) => {

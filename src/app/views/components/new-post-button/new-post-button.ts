@@ -1,4 +1,4 @@
-import { Component, model, ModelSignal } from '@angular/core';
+import { Component, model, ModelSignal, output } from '@angular/core';
 import { User } from '../../../shared/types/User';
 
 @Component({
@@ -9,9 +9,11 @@ import { User } from '../../../shared/types/User';
 })
 export class NewPostButton {
   creating: ModelSignal<boolean> = model<boolean>(false);
+  newPostRequested = output<void>();
   user: User = JSON.parse(localStorage.getItem('user') || '{}');
 
   toggleCreating() {
     this.creating.update((creating) => !creating);
+    this.newPostRequested.emit();
   }
 }

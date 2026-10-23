@@ -3,8 +3,10 @@
     <p>DevConnect © 2026 · Built for developers who love connection and code.</p>
     <nav class="footer-links">
       <a routerLink="/">Home</a>
-      <a routerLink="/login">Login</a>
-      <a routerLink="/register">Register</a>
+      @if (!isLoggedIn) {
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register">Register</a>
+      }
     </nav>
   </div>
 </footer>

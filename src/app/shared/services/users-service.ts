@@ -1,7 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserSearchResult } from '../types/User';
+import {
+  FollowingPresence,
+  TopFollowerUser,
+  TopQuestionSolver,
+  TopViewedUser,
+  UserSearchResult,
+} from '../types/User';
 
 @Injectable({
   providedIn: 'root',
@@ -12,11 +18,7 @@ export class UsersService {
   constructor(private http: HttpClient) {}
 
   Login(username: string, password: string) {
-    const body = {
-      username,
-      password,
-    };
-    return this.http.post(this.nodeURL + '/login', body);
+    return this.http.post(this.nodeURL + '/login', { username, password });
   }
 
   Register(
@@ -25,56 +27,59 @@ export class UsersService {
     password: string,
     display_name: string,
     stack: string[],
+    location: string,
   ) {
-    const body = {
+    return this.http.post(this.nodeURL + '/register', {
       username,
       email,
       password,
       display_name,
       stack,
-    };
-    return this.http.post(this.nodeURL + '/register', body);
+      location,
+    });
   }
 
-  UpdateBio(bio: string | undefined) {
-    const token = localStorage.getItem('token');
-
+  UpdateProfile(display_name: string, username: string, location: string) {
     return this.http.post(
-      this.nodeURL + '/updateBio',
-      { bio },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      this.nodeURL + '/updateProfile',
+      { display_name, username, location },
+      { headers: this.getAuthHeaders() },
     );
   }
 
-  UpdateAvatar(avatar_url: string) {
-    const token = localStorage.getItem('token');
+  UpdateStack(stack: string[]) {
+    return this.http.post(
+      this.nodeURL + '/updateStack',
+      { stack },
+      { headers: this.getAuthHeaders() },
+    );
+  }
 
+  UpdateCover(cover_url: string) {
+    return this.http.post(
+      this.nodeURL + '/updateCover',
+      { cover_url },
+      { headers: this.getAuthHeaders() },
+    );
+  }
+
+  UpdateBio(bio: string | undefined) {
+    return this.http.post(this.nodeURL + '/updateBio', { bio }, { headers: this.getAuthHeaders() });
+  }
+
+  UpdateAvatar(avatar_url: string) {
     return this.http.post(
       this.nodeURL + '/updateAvatar',
       { avatar_url },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      { headers: this.getAuthHeaders() },
     );
   }
 
   ToggleFollow(userId: number) {
-    const token = localStorage.getItem('token');
-
     return this.http.post(
       `${this.nodeURL}/follow/${userId}`,
       {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      { headers: this.getAuthHeaders() },
     );
   }
 
@@ -88,17 +93,34 @@ export class UsersService {
     });
   }
 
-  Logout() {
-    const token = localStorage.getItem('token');
+  GetTopFollowers(): Observable<TopFollowerUser[]> {
+    return this.http.get<TopFollowerUser[]>(`${this.nodeURL}/topFollowers`);
+  }
 
-    return this.http.post(
-      this.nodeURL + '/logout',
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+  GetTopProfileViews(): Observable<TopViewedUser[]> {
+    return this.http.get<TopViewedUser[]>(`${this.nodeURL}/topProfileViews`);
+  }
+
+  GetTopQuestionSolvers(): Observable<TopQuestionSolver[]> {
+    return this.http.get<TopQuestionSolver[]>(`${this.nodeURL}/topQuestionSolvers`);
+  }
+
+  GetFollowingPresence(): Observable<FollowingPresence[]> {
+    return this.http.get<FollowingPresence[]>(`${this.nodeURL}/followingPresence`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  UpdatePresence() {
+    return this.http.post(`${this.nodeURL}/heartbeat`, {}, { headers: this.getAuthHeaders() });
+  }
+
+  Logout() {
+    return this.http.post(this.nodeURL + '/logout', {}, { headers: this.getAuthHeaders() });
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({ Authorization: 'Bearer ' + token });
   }
 }

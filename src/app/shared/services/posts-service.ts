@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PostContentBlock } from '../types/Post';
+import { PostCodeLanguage, PostContentBlock, PostType } from '../types/Post';
 
 @Injectable({
   providedIn: 'root',
@@ -11,10 +11,19 @@ export class PostsService {
 
   constructor(private http: HttpClient) {}
 
+  getTrendingLanguages(): Observable<
+    { language: Exclude<PostCodeLanguage, 'Text'>; count: number }[]
+  > {
+    return this.http.get<{ language: Exclude<PostCodeLanguage, 'Text'>; count: number }[]>(
+      this.nodeURL + '/trendingLanguages',
+    );
+  }
+
   createPost(
     content: string,
     tags: string[],
     contentBlocks?: PostContentBlock[],
+    type: PostType = 'post',
   ): Observable<any> {
     const token = localStorage.getItem('token');
 
@@ -22,6 +31,7 @@ export class PostsService {
       content,
       tags,
       contentBlocks,
+      type,
     };
     return this.http.post(this.nodeURL + '/createPost', body, {
       headers: {
@@ -30,18 +40,41 @@ export class PostsService {
     });
   }
 
-  createComment(postId: string, content: string): Observable<any> {
+  createComment(
+    postId: string,
+    content: string,
+    contentBlocks?: PostContentBlock[],
+  ): Observable<any> {
     const token = localStorage.getItem('token');
 
     const body = {
       postId: postId,
       content: content,
+      contentBlocks,
     };
     return this.http.post(this.nodeURL + '/createComment', body, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+  }
+
+  toggleAcceptedAnswer(
+    postId: string,
+    answerId: string,
+    accepted: boolean,
+  ): Observable<{ acceptedAnswerIds: string[] }> {
+    const token = localStorage.getItem('token');
+
+    return this.http.post<{ acceptedAnswerIds: string[] }>(
+      this.nodeURL + '/toggleAcceptedAnswer',
+      { postId, answerId, accepted },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
   }
 
   getAllPosts(): Observable<any> {
@@ -104,5 +137,16 @@ export class PostsService {
         Authorization: `Bearer ${token}`,
       },
     });
+  }
+
+  registerPostView(id: string): Observable<{ views: number }> {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+
+    return this.http.post<{ views: number }>(
+      this.nodeURL + '/registerPostView',
+      { postId: id },
+      headers ? { headers } : {},
+    );
   }
 }

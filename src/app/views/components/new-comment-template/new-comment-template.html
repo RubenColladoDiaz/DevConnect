@@ -8,15 +8,70 @@
       <div>
         <span class="composer-title">
           <i class="fa-solid fa-reply" aria-hidden="true"></i>
-          Join the conversation
+          @if (isQuestion) {
+            Write an answer
+          } @else {
+            Join the conversation
+          }
         </span>
-        <span class="composer-subtitle">Share your thoughts with the community</span>
+        @if (isQuestion) {
+          <span class="composer-subtitle">Help the author solve this question</span>
+        } @else {
+          <span class="composer-subtitle">Share your thoughts with the community</span>
+        }
       </div>
       <i class="fa-regular fa-comment-dots heading-icon" aria-hidden="true"></i>
     </header>
 
-    <textarea [(ngModel)]="content" name="comment" maxlength="300" rows="3" placeholder="Write a thoughtful comment..."
-      aria-label="Comment content"></textarea>
+    @for (block of contentBlocks; track $index) {
+      <section class="comment-content-block">
+        <div class="comment-block-heading">
+          @if (block.type === 'text') {
+            <strong>Text</strong>
+          } @else {
+            <strong>Code</strong>
+            <select aria-label="Code language" [(ngModel)]="block.language">
+              @for (language of languages; track language) {
+                <option [value]="language">{{ language }}</option>
+              }
+            </select>
+            <select aria-label="Code theme" [(ngModel)]="block.theme">
+              @for (theme of themes; track theme) {
+                <option [value]="theme">{{ theme }}</option>
+              }
+            </select>
+          }
+          <button
+            type="button"
+            class="remove-comment-block"
+            aria-label="Remove block"
+            [disabled]="contentBlocks.length === 1"
+            (click)="removeBlock($index)"
+          >
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          </button>
+        </div>
+        @if (block.type === 'text') {
+          <textarea
+            [(ngModel)]="block.content"
+            name="comment-{{ $index }}"
+            rows="3"
+            [placeholder]="contentPlaceholder"
+            [attr.aria-label]="contentAriaLabel"
+          ></textarea>
+        } @else {
+          <app-code-editor
+            [(value)]="block.content"
+            [language]="block.language"
+            [theme]="block.theme"
+          ></app-code-editor>
+        }
+        <div class="comment-block-insert">
+          <button type="button" (click)="addTextBlock($index)">Add text below</button>
+          <button type="button" (click)="addCodeBlock($index)">Add code below</button>
+        </div>
+      </section>
+    }
 
     <footer class="composer-footer">
       <span class="composer-hint">
@@ -26,9 +81,18 @@
 
       <div class="composer-actions">
         <button class="cancel-button" type="button" (click)="toggleCreating()">Cancel</button>
-        <button class="comment-button" type="button" (click)="createComment()">
+        <button
+          class="comment-button"
+          type="button"
+          (click)="createComment()"
+          [disabled]="!hasContent"
+        >
           <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
-          Comment
+          @if (isQuestion) {
+            Answer
+          } @else {
+            Comment
+          }
         </button>
       </div>
     </footer>

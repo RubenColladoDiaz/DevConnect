@@ -20,6 +20,7 @@ export class RegisterPage {
 
   technologyInput: string = '';
   selectedTechnologies: string[] = [];
+  location = '';
 
   availableTechnologies: string[] = [
     'Angular',
@@ -98,15 +99,20 @@ export class RegisterPage {
 
     const { username, email, password, display_name, stack } = this.registerForm.value;
 
-    this.userService.Register(username, email, password, display_name, stack).subscribe({
-      next: (res: any) => {
-        localStorage.setItem('token', res.token);
-        this.authService.setUser(res.user);
-        this.router.navigate(['/']);
-      },
-      error: (res: any) => {
-        this.message = res.error.message ?? 'Unexpected error';
-      },
-    });
+    this.userService
+      .Register(username, email, password, display_name, stack, this.location.trim() || 'Unknown')
+      .subscribe({
+        next: (res: any) => {
+          localStorage.setItem('token', res.token);
+          this.authService.setUser(res.user);
+          this.userService.UpdatePresence().subscribe({
+            error: (error) => console.error('Error setting online status:', error),
+          });
+          this.router.navigate(['/']);
+        },
+        error: (res: any) => {
+          this.message = res.error.message ?? 'Unexpected error';
+        },
+      });
   }
 }

@@ -5,6 +5,7 @@ import { Post } from '../../../shared/types/Post';
 import { UsersService } from '../../../shared/services/users-service';
 import { AuthService } from '../../../shared/services/auth-service';
 import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 type UserListItem = Pick<User, 'userId' | 'username' | 'display_name' | 'avatar_url'>;
 
@@ -41,12 +42,25 @@ export class MyAccountPage implements OnInit {
   editingAvatar: boolean = false;
   editedAvatar: string = '';
   avatarError: string = '';
+  editingProfile = false;
+  editedDisplayName = '';
+  editedUsername = '';
+  editedLocation = '';
+  profileError = '';
+  editingStack = false;
+  editedStack: string[] = [];
+  technologyInput = '';
+  stackError = '';
+  editingCover = false;
+  editedCover = '';
+  coverError = '';
 
   constructor(
     private postsService: PostsService,
     private usersService: UsersService,
     private authService: AuthService,
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
     this.user = this.authService.user;
@@ -58,6 +72,9 @@ export class MyAccountPage implements OnInit {
       this.isOwnProfile = !username || username === this.authService.user().username;
       this.editingBio = false;
       this.editingAvatar = false;
+      this.editingProfile = false;
+      this.editingStack = false;
+      this.editingCover = false;
       this.isFollowing = false;
       this.followError = '';
       this.activeUserList = null;
@@ -75,6 +92,112 @@ export class MyAccountPage implements OnInit {
         this.getAllInfoFromUser();
       }
     });
+  }
+
+  editProfile(): void {
+    this.editedDisplayName = this.user().display_name || '';
+    this.editedUsername = this.user().username || '';
+    this.editedLocation = this.user().location || 'Unknown';
+    this.profileError = '';
+    this.editingProfile = true;
+  }
+
+  saveProfile(): void {
+    this.profileError = '';
+    this.usersService
+      .UpdateProfile(this.editedDisplayName, this.editedUsername, this.editedLocation)
+      .subscribe({
+        next: (res: any) => {
+          localStorage.setItem('token', res.token);
+          const updatedUser = { ...this.user(), ...res.user };
+          this.authService.setUser(updatedUser);
+          this.user = this.authService.user;
+          this.editingProfile = false;
+          this.cdr.detectChanges();
+          this.router.navigate(['/account', updatedUser.username]);
+        },
+        error: (err) => {
+          this.profileError = err.error?.message || 'Failed to update profile';
+        },
+      });
+  }
+
+  cancelProfile(): void {
+    this.editingProfile = false;
+    this.profileError = '';
+  }
+
+  editStack(): void {
+    this.editedStack = [...(this.user().stack || [])];
+    this.technologyInput = '';
+    this.stackError = '';
+    this.editingStack = true;
+  }
+
+  addTechnology(): void {
+    const technology = this.technologyInput.trim();
+    if (!technology) return;
+    if (this.editedStack.some((item) => item.toLowerCase() === technology.toLowerCase())) {
+      this.technologyInput = '';
+      return;
+    }
+    this.editedStack.push(technology);
+    this.technologyInput = '';
+  }
+
+  removeTechnology(technology: string): void {
+    this.editedStack = this.editedStack.filter((item) => item !== technology);
+  }
+
+  saveStack(): void {
+    this.stackError = '';
+    this.usersService.UpdateStack(this.editedStack).subscribe({
+      next: (res: any) => {
+        const updatedUser = { ...this.user(), stack: res.stack };
+        this.authService.setUser(updatedUser);
+        this.user = this.authService.user;
+        this.editingStack = false;
+      },
+      error: (err) => {
+        this.stackError = err.error?.message || 'Failed to update technologies';
+      },
+    });
+  }
+
+  cancelStack(): void {
+    this.editingStack = false;
+    this.stackError = '';
+  }
+
+  editCover(): void {
+    this.editedCover = this.user().cover_url || '';
+    this.coverError = '';
+    this.editingCover = true;
+  }
+
+  saveCover(): void {
+    const cover = this.editedCover.trim();
+    if (cover && !/^https?:\/\/.+/i.test(cover)) {
+      this.coverError = 'Please enter a valid image URL starting with http:// or https://';
+      return;
+    }
+
+    this.usersService.UpdateCover(cover).subscribe({
+      next: (res: any) => {
+        const updatedUser = { ...this.user(), cover_url: res.cover_url };
+        this.authService.setUser(updatedUser);
+        this.user = this.authService.user;
+        this.editingCover = false;
+      },
+      error: (err) => {
+        this.coverError = err.error?.message || 'Failed to update cover image';
+      },
+    });
+  }
+
+  cancelCover(): void {
+    this.editingCover = false;
+    this.coverError = '';
   }
 
   editBio(): void {
@@ -200,6 +323,7 @@ export class MyAccountPage implements OnInit {
           });
           this.isFollowing = res.isFollowing;
         }
+        this.views = res.user?.profile_views ?? res.views ?? 0;
         this.getUserConnections(this.user().userId);
         this.postsFromUser = res.posts.map((post: any) => ({
           ...post,

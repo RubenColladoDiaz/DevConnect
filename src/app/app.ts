@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, HostListener, signal } from '@angular/core';
 import { WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
 import { UsersService } from './shared/services/users-service';
@@ -22,8 +22,13 @@ export class App {
   searchResults: UserSearchResult[] = [];
   searchError = '';
   searchLoading = false;
+  darkMode = localStorage.getItem('devconnect-theme') === 'dark';
+  headerHidden = false;
+  private lastScrollY = 0;
+  private lastTouchY = 0;
   private openSearchResultOnEnter = false;
   private searchTerms = new Subject<string>();
+  private presenceInterval: ReturnType<typeof setInterval>;
 
   constructor(
     private usersService: UsersService,
@@ -33,6 +38,10 @@ export class App {
     destroyRef: DestroyRef,
   ) {
     this.user = this.authService.user;
+    this.applyTheme();
+    this.updatePresence();
+    this.presenceInterval = setInterval(() => this.updatePresence(), 25000);
+    destroyRef.onDestroy(() => clearInterval(this.presenceInterval));
 
     this.searchTerms
       .pipe(
@@ -79,6 +88,75 @@ export class App {
         }
         this.cdr.detectChanges();
       });
+  }
+
+  toggleTheme(): void {
+    this.darkMode = !this.darkMode;
+    localStorage.setItem('devconnect-theme', this.darkMode ? 'dark' : 'light');
+    this.applyTheme();
+  }
+
+  private applyTheme(): void {
+    document.body.classList.toggle('dark-theme', this.darkMode);
+  }
+
+  @HostListener('window:focus')
+  updatePresence(): void {
+    if (!this.user()?.userId || !localStorage.getItem('token')) return;
+
+    this.usersService.UpdatePresence().subscribe({
+      error: (error) => console.error('Error updating online status:', error),
+    });
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('body:scroll')
+  onWindowScroll(): void {
+    const currentScrollY = this.getScrollPosition();
+    const scrollDifference = currentScrollY - this.lastScrollY;
+
+    if (currentScrollY < 80) {
+      this.headerHidden = false;
+    } else if (scrollDifference !== 0) {
+      this.headerHidden = scrollDifference > 0;
+    }
+
+    this.lastScrollY = currentScrollY;
+  }
+
+  @HostListener('window:wheel', ['$event'])
+  onWheel(event: WheelEvent): void {
+    this.updateHeaderFromScrollDirection(event.deltaY);
+  }
+
+  @HostListener('window:touchstart', ['$event'])
+  onTouchStart(event: TouchEvent): void {
+    this.lastTouchY = event.touches[0]?.clientY || 0;
+  }
+
+  @HostListener('window:touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
+    const touchY = event.touches[0]?.clientY;
+    if (touchY === undefined || this.lastTouchY === 0) return;
+
+    this.updateHeaderFromScrollDirection(this.lastTouchY - touchY);
+    this.lastTouchY = touchY;
+  }
+
+  private updateHeaderFromScrollDirection(deltaY: number): void {
+    if (deltaY === 0) return;
+
+    if (this.getScrollPosition() < 80) {
+      this.headerHidden = false;
+      return;
+    }
+
+    this.headerHidden = deltaY > 0;
+    this.lastScrollY = this.getScrollPosition();
+  }
+
+  private getScrollPosition(): number {
+    return Math.max(document.body.scrollTop, document.documentElement.scrollTop, window.scrollY, 0);
   }
 
   get username(): string {

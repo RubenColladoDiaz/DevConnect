@@ -4,6 +4,7 @@ import {
   PostCodeLanguage,
   PostCodeTheme,
   PostContentBlock,
+  PostType,
 } from '../../../shared/types/Post';
 import { User } from '../../../shared/types/User';
 import { PostsService } from '../../../shared/services/posts-service';
@@ -21,6 +22,7 @@ export class NewPostTemplate {
   postCreated = output<Post>();
 
   contentBlocks: PostContentBlock[] = [{ type: 'text', content: '' }];
+  postType: PostType = 'post';
   languages: PostCodeLanguage[] = [
     'JavaScript',
     'TypeScript',
@@ -70,9 +72,10 @@ export class NewPostTemplate {
       .map((block) => block.content)
       .join('\n');
 
-    this.postsService.createPost(content, [], this.contentBlocks).subscribe({
+    this.postsService.createPost(content, [], this.contentBlocks, this.postType).subscribe({
       next: (res) => {
         this.postCreated.emit(res.post);
+        this.postType = 'post';
         this.toggleCreating();
       },
       error: (err) => console.error('Error:', err),

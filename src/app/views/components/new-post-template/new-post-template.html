@@ -7,7 +7,11 @@
       />
       <div>
         <p class="author-name">{{ user.username }}</p>
-        <span>Creating a new post</span>
+        @if (postType === 'question') {
+          <span>Creating a question</span>
+        } @else {
+          <span>Creating a new post</span>
+        }
       </div>
     </div>
     <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
@@ -15,6 +19,24 @@
 
   <div class="composer-body">
     <label>What do you want to share?</label>
+    <div class="post-type-options" aria-label="Publication type">
+      <button
+        type="button"
+        [class.active]="postType === 'post'"
+        [attr.aria-pressed]="postType === 'post'"
+        (click)="postType = 'post'"
+      >
+        <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> Post
+      </button>
+      <button
+        type="button"
+        [class.active]="postType === 'question'"
+        [attr.aria-pressed]="postType === 'question'"
+        (click)="postType = 'question'"
+      >
+        <i class="fa-regular fa-circle-question" aria-hidden="true"></i> Question
+      </button>
+    </div>
     @for (block of contentBlocks; track $index) {
       <section class="content-block">
         <div class="block-heading">

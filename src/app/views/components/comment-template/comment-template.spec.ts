@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 
 import { CommentTemplate } from './comment-template';
+import { CodeEditor } from '../code-editor/code-editor';
 
 describe('CommentTemplate', () => {
   let component: CommentTemplate;
@@ -9,7 +10,7 @@ describe('CommentTemplate', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CommentTemplate],
+      declarations: [CommentTemplate, CodeEditor],
       imports: [RouterModule.forRoot([])],
     }).compileComponents();
 

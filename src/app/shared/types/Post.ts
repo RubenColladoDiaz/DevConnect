@@ -25,9 +25,14 @@ export type PostContentBlock =
       theme: PostCodeTheme;
     };
 
+export type PostType = 'post' | 'question';
+
 export type Post = {
   _id: string;
   username: string;
+  authorId?: number;
+  type?: PostType;
+  acceptedAnswerIds?: string[];
   content: string;
   contentBlocks?: PostContentBlock[];
   reposts: number;
