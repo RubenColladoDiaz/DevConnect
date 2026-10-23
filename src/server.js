@@ -263,6 +263,76 @@ app.get('/getAllInfoFromUser', async function (req, res) {
   }
 });
 
+app.get('/getAllInfoFromUser/:username', async function (req, res) {
+  try {
+    const users = await new Promise((resolve, reject) => {
+      dbConn.query(
+        'SELECT userId, username, display_name, bio, stack, status, location, avatar_url, created_at, JSON_LENGTH(followers) AS followers FROM users WHERE username = ?',
+        [req.params.username],
+        function (error, results) {
+          if (error) return reject(error);
+          resolve(results);
+        },
+      );
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const account = users[0];
+    let viewerId = null;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    if (token) {
+      try {
+        viewerId = jwt.verify(token, JWT_SECRET).userId;
+      } catch (error) {
+        viewerId = null;
+      }
+    }
+
+    const posts = await dbConnMongo
+      .collection('posts')
+      .find({ username: account.username })
+      .toArray();
+    const reposts = await dbConnMongo
+      .collection('posts')
+      .find({ repostedByUserIds: account.userId })
+      .toArray();
+
+    let likes = 0;
+    let comments = 0;
+
+    for (const post of posts) {
+      likes += post.likes || 0;
+      comments += post.comments?.length || 0;
+    }
+
+    const postsWithViewerState = posts.map((post) => ({
+      ...post,
+      liked: (post.likedByUserIds || []).includes(viewerId),
+      reposted: (post.repostedByUserIds || []).includes(viewerId),
+    }));
+
+    return res.send({
+      user: {
+        ...account,
+        stack: typeof account.stack === 'string' ? JSON.parse(account.stack) : account.stack,
+        locatinon: account.location,
+      },
+      posts: postsWithViewerState,
+      likes,
+      comments,
+      reposts,
+      followers: account.followers,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 app.post('/updateLikes', async function (req, res) {
   try {
     const postId = new ObjectId(req.body.postId); // En MongoDB el id no es ni numero ni string

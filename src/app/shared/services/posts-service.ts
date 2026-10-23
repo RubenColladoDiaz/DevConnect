@@ -52,7 +52,17 @@ export class PostsService {
     });
   }
 
-  getAllInfoFromUser(): Observable<any> {
+  getAllInfoFromUser(username?: string): Observable<any> {
+    if (username) {
+      const token = localStorage.getItem('token');
+      const options = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
+      return this.http.get(
+        `${this.nodeURL}/getAllInfoFromUser/${encodeURIComponent(username)}`,
+        options,
+      );
+    }
+
     const token = localStorage.getItem('token');
 
     return this.http.get(this.nodeURL + '/getAllInfoFromUser', {

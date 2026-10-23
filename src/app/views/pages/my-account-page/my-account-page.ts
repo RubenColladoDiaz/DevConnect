@@ -4,6 +4,7 @@ import { PostsService } from '../../../shared/services/posts-service';
 import { Post } from '../../../shared/types/Post';
 import { UsersService } from '../../../shared/services/users-service';
 import { AuthService } from '../../../shared/services/auth-service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-my-account-page',
@@ -20,6 +21,7 @@ export class MyAccountPage implements OnInit {
   comments: number = 0;
   followers: number = 0;
   views: number = 0;
+  isOwnProfile: boolean = true;
 
   editingBio: boolean = false;
   editedBio: string = '';
@@ -31,13 +33,26 @@ export class MyAccountPage implements OnInit {
     private postsService: PostsService,
     private usersService: UsersService,
     private authService: AuthService,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
   ) {
     this.user = this.authService.user;
   }
 
   ngOnInit(): void {
-    this.getAllInfoFromUser();
+    this.route.paramMap.subscribe((params) => {
+      const username = params.get('username');
+      this.isOwnProfile = !username || username === this.authService.user().username;
+      this.editingBio = false;
+      this.editingAvatar = false;
+
+      if (username) {
+        this.getAllInfoFromUser(username);
+      } else {
+        this.user = this.authService.user;
+        this.getAllInfoFromUser();
+      }
+    });
   }
 
   editBio(): void {
@@ -104,9 +119,16 @@ export class MyAccountPage implements OnInit {
     return new Date(value);
   }
 
-  getAllInfoFromUser(): void {
-    this.postsService.getAllInfoFromUser().subscribe({
+  getAllInfoFromUser(username?: string): void {
+    this.postsService.getAllInfoFromUser(username).subscribe({
       next: (res: any) => {
+        if (username && !this.isOwnProfile) {
+          this.user = signal<User>({
+            ...res.user,
+            email: '',
+            password: '',
+          });
+        }
         this.postsFromUser = res.posts.map((post: any) => ({
           ...post,
           createdAt: this.parseCreatedAt(post.createdAt),

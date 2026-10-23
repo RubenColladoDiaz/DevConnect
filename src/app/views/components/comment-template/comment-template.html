@@ -11,7 +11,11 @@
 
   <div class="comment-bubble">
     <header class="comment-header">
-      <p>{{ $any(comment())?.username || 'Community member' }}</p>
+      <p>
+        <a [routerLink]="['/account', $any(comment())?.username]">
+          {{ $any(comment())?.username || 'Community member' }}
+        </a>
+      </p>
       <span class="comment-label">
         <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
         Comment
