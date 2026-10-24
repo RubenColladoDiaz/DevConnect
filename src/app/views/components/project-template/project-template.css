@@ -237,6 +237,7 @@
   background: transparent;
 }
 
+:host-context(body.dark-theme) .project-invite input,
 :host-context(body.dark-theme) .project-icon-button,
 :host-context(body.dark-theme) .project-button:not(.save) {
   border-color: #414559;

@@ -56,7 +56,13 @@
   padding: 0;
   border: 0;
   background: transparent;
+  color: inherit;
   cursor: pointer;
+}
+
+:host-context(body.dark-theme) .stack-tag {
+  background: #303348;
+  color: #d7d1fa;
 }
 
 .field-error {

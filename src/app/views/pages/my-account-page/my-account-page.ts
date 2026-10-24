@@ -23,6 +23,7 @@ export class MyAccountPage implements OnInit {
   postsFromUser: Post[] = [];
   reposts: WritableSignal<Post>[] = [];
   savedPosts: WritableSignal<Post>[] = [];
+  likedPosts: WritableSignal<Post>[] = [];
   projects: WritableSignal<Project>[] = [];
   collaborations: WritableSignal<Project>[] = [];
   projectInvitations: Project[] = [];
@@ -109,6 +110,7 @@ export class MyAccountPage implements OnInit {
       this.followersList = [];
       this.followingList = [];
       this.savedPosts = [];
+      this.likedPosts = [];
       this.projects = [];
       this.collaborations = [];
       this.projectInvitations = [];
@@ -119,6 +121,7 @@ export class MyAccountPage implements OnInit {
 
       if (this.isOwnProfile) {
         this.getSavedPosts();
+        this.getLikedPosts();
         this.getProjectInvitations();
       }
 
@@ -440,6 +443,23 @@ export class MyAccountPage implements OnInit {
     this.postsService.getSavedPosts().subscribe({
       next: (res: any) => {
         this.savedPosts = res.posts.map((post: any) =>
+          signal({
+            ...post,
+            createdAt: this.parseCreatedAt(post.createdAt),
+          }),
+        );
+        this.cdr.detectChanges();
+      },
+      error: (res: any) => {
+        console.log(res);
+      },
+    });
+  }
+
+  getLikedPosts(): void {
+    this.postsService.getLikedPosts().subscribe({
+      next: (res: any) => {
+        this.likedPosts = res.posts.map((post: any) =>
           signal({
             ...post,
             createdAt: this.parseCreatedAt(post.createdAt),

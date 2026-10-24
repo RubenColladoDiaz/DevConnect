@@ -188,6 +188,10 @@ body.dark-theme .auth-form-panel {
   color: #e3e5ee;
 }
 
+body.dark-theme .auth-brand h4 {
+  color: #e3e5ee;
+}
+
 body.dark-theme .skill-list span,
 body.dark-theme .post-tags span {
   background-color: #303348;

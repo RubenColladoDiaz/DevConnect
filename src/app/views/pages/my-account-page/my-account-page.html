@@ -515,6 +515,25 @@
           }
         </div>
       </section>
+
+      <section class="publications-section reposts-section">
+        <header class="section-heading">
+          <div>
+            <span class="section-kicker">PRIVATE</span>
+            <h2>Liked Posts</h2>
+            <p>Posts you have liked. Only you can see this section.</p>
+          </div>
+          <span class="post-count"
+            ><i class="fa-regular fa-heart"></i> {{ likedPosts.length }} liked</span
+          >
+        </header>
+
+        <div class="publication-list reposts-list">
+          @for (post of likedPosts; track post) {
+            <app-post-template class="repost-card" [(post)]="post" />
+          }
+        </div>
+      </section>
     }
   </div>
 

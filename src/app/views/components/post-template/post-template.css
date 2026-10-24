@@ -354,6 +354,11 @@
   background: #242736;
 }
 
+:host-context(body.dark-theme) .views-metric,
+:host-context(body.dark-theme) .views-metric:hover {
+  background: transparent;
+}
+
 :host-context(body.dark-theme) .question-banner strong {
   color: #df1888;
 }

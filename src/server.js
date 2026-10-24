@@ -592,6 +592,32 @@ app.get('/getSavedPosts', async function (req, res) {
   }
 });
 
+app.get('/getLikedPosts', async function (req, res) {
+  try {
+    const token = getDecodedToken(req);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    const likedPosts = await dbConnMongo
+      .collection('posts')
+      .find({ likedByUserIds: userId })
+      .toArray();
+    await normalizePostComments(likedPosts);
+    await addAuthorAvatars(likedPosts);
+
+    const likedPostsWithState = likedPosts.map((post) => ({
+      ...post,
+      liked: true,
+      reposted: (post.repostedByUserIds || []).includes(userId),
+      saved: (post.savedByUserIds || []).includes(userId),
+    }));
+
+    return res.send({ posts: likedPostsWithState });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+});
+
 app.get('/getAllInfoFromUser/:username', async function (req, res) {
   try {
     const users = await new Promise((resolve, reject) => {

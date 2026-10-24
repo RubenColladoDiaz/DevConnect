@@ -163,6 +163,16 @@ export class PostsService {
     });
   }
 
+  getLikedPosts(): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    return this.http.get(this.nodeURL + '/getLikedPosts', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
   registerPostView(id: string): Observable<{ views: number }> {
     const token = localStorage.getItem('token');
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;

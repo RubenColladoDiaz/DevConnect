@@ -196,6 +196,52 @@
   color: #aeb3c2;
 }
 
+:host-context(body.dark-theme) .composer-body label,
+:host-context(body.dark-theme) .block-heading > strong {
+  color: #e3e5ee;
+}
+
+:host-context(body.dark-theme) .content-block {
+  border-color: #343747;
+  background: #242736;
+}
+
+:host-context(body.dark-theme) .post-type-options button,
+:host-context(body.dark-theme) .block-heading select,
+:host-context(body.dark-theme) .block-insert button,
+:host-context(body.dark-theme) .cancel-button {
+  border-color: #414559;
+  background: #202331;
+  color: #e3e5ee;
+}
+
+:host-context(body.dark-theme) .post-type-options button.active {
+  border-color: #7c3aed;
+  background: #303348;
+  color: #d7d1fa;
+}
+
+:host-context(body.dark-theme) .block-insert button:hover,
+:host-context(body.dark-theme) .cancel-button:hover {
+  background: #303348;
+}
+
+:host-context(body.dark-theme) .remove-block {
+  color: #e08a9b;
+}
+
+:host-context(body.dark-theme) .composer-meta {
+  color: #b2b6c5;
+}
+
+:host-context(body.dark-theme) .composer-meta i {
+  color: #c5b6ff;
+}
+
+:host-context(body.dark-theme) .composer-actions {
+  border-color: #343747;
+}
+
 .composer-meta {
   margin-top: 9px;
   display: flex;
