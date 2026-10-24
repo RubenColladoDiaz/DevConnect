@@ -31,6 +31,7 @@ export type Post = {
   _id: string;
   username: string;
   avatar_url?: string;
+  job_title?: string;
   authorId?: number;
   type?: PostType;
   acceptedAnswerIds?: string[];

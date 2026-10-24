@@ -292,7 +292,7 @@ app.get('/getAllPosts', async function (req, res) {
     }
 
     await normalizePostComments(posts);
-    await addAuthorAvatars(posts);
+    await addAuthorInfo(posts);
 
     const postsWithLiked = posts.map((post) => ({
       ...post,
@@ -524,7 +524,7 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       .toArray();
     await normalizePostComments(posts);
     await normalizePostComments(reposts);
-    await addAuthorAvatars(reposts);
+    await addAuthorInfo(reposts);
 
     let likes = 0;
     let comments = 0;
@@ -577,7 +577,7 @@ app.get('/getSavedPosts', async function (req, res) {
       .find({ savedByUserIds: userId })
       .toArray();
     await normalizePostComments(savedPosts);
-    await addAuthorAvatars(savedPosts);
+    await addAuthorInfo(savedPosts);
 
     const savedPostsWithState = savedPosts.map((post) => ({
       ...post,
@@ -603,7 +603,7 @@ app.get('/getLikedPosts', async function (req, res) {
       .find({ likedByUserIds: userId })
       .toArray();
     await normalizePostComments(likedPosts);
-    await addAuthorAvatars(likedPosts);
+    await addAuthorInfo(likedPosts);
 
     const likedPostsWithState = likedPosts.map((post) => ({
       ...post,
@@ -693,7 +693,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       .toArray();
     await normalizePostComments(posts);
     await normalizePostComments(reposts);
-    await addAuthorAvatars(reposts);
+    await addAuthorInfo(reposts);
 
     let likes = 0;
     let comments = 0;
@@ -1824,13 +1824,13 @@ function getDecodedToken(req) {
   return token;
 }
 
-async function addAuthorAvatars(posts) {
+async function addAuthorInfo(posts) {
   if (posts.length === 0) return;
 
   const usernames = posts.map((post) => post.username);
   const users = await new Promise((resolve, reject) => {
     dbConn.query(
-      'SELECT username, avatar_url FROM users WHERE username IN (?)',
+      'SELECT username, avatar_url, job_title FROM users WHERE username IN (?)',
       [usernames],
       function (error, results) {
         if (error) return reject(error);
@@ -1843,6 +1843,7 @@ async function addAuthorAvatars(posts) {
     const author = users.find((user) => user.username === post.username);
     if (author) {
       post.avatar_url = author.avatar_url;
+      post.job_title = author.job_title;
     }
   }
 }

@@ -15,7 +15,11 @@
             post()?.username
           }}</a>
         </p>
-        <span>Community post</span>
+        @if (post()?.job_title) {
+          <span>{{ post()?.job_title }}</span>
+        } @else {
+          <span>Developer</span>
+        }
       </div>
     </div>
 

@@ -10,8 +10,12 @@
         />
       }
       <div>
-        <strong>{{ user()?.username }}</strong
-        ><span>Community post</span>
+        <strong>{{ user()?.username }}</strong>
+        @if (user()?.job_title) {
+          <span>{{ user()?.job_title }}</span>
+        } @else {
+          <span>Developer</span>
+        }
       </div>
     </div>
     <time

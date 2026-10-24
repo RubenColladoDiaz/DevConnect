@@ -188,6 +188,7 @@ export class Home implements OnInit, OnDestroy {
     const newPost = {
       ...post,
       avatar_url: this.user().avatar_url,
+      job_title: this.user().job_title,
       createdAt: this.parseCreatedAt(post.createdAt),
     };
     this.posts = [
