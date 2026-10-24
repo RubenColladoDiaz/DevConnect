@@ -1,32 +1,103 @@
+/* Placeholder post shown while there are no posts, styled like a loading skeleton */
 .post-target {
-  border: none;
-  border-radius: 12px;
-  max-width: 500px;
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  padding: 20px 18px 14px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  margin-bottom: 20px;
-}
-.post-target p {
-  padding: 17px;
+  border-radius: 24px;
+  opacity: 0.7;
+  animation: placeholder-in 600ms var(--ease) both;
 }
 
-.post-target .user-bar {
-  height: 50px;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
+.post-target::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, var(--surface) 50%, transparent 70%);
+  background-size: 250% 100%;
+  content: '';
+  opacity: 0.7;
+  animation: shimmer 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes placeholder-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 0.7;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+.user-bar {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 312px;
-  border-bottom: 1px solid #e9ecef;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.post-target .user-bar img {
-  height: 30px;
-  width: 30px;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-bar img {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.user-bar p {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.user-bar .post-date {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 400;
+}
+
+.post-text {
+  padding: 10px 0 0 56px;
+}
+
+.post-text p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+.post-actions {
+  padding: 14px 0 0 56px;
+  display: flex;
+  gap: 22px;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+}
+
+.post-actions p {
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .post-text,
+  .post-actions {
+    padding-left: 0;
+  }
 }

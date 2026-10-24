@@ -524,6 +524,7 @@ app.get('/getAllInfoFromUser', async function (req, res) {
       .toArray();
     await normalizePostComments(posts);
     await normalizePostComments(reposts);
+    await addAuthorInfo(posts);
     await addAuthorInfo(reposts);
 
     let likes = 0;
@@ -693,6 +694,7 @@ app.get('/getAllInfoFromUser/:username', async function (req, res) {
       .toArray();
     await normalizePostComments(posts);
     await normalizePostComments(reposts);
+    await addAuthorInfo(posts);
     await addAuthorInfo(reposts);
 
     let likes = 0;

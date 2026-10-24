@@ -1,50 +1,65 @@
 .app-footer {
-  padding: 22px 0 14px;
-  margin-top: 42px;
-  background: rgba(255, 255, 255, 0.76);
-  border-top: 1px solid rgba(86, 49, 149, 0.08);
-  backdrop-filter: blur(10px);
+  margin-top: 72px;
+  padding: 26px 0 30px;
+  border-top: 1px solid var(--line);
 }
 
 .footer-content {
-  width: min(1100px, calc(100% - 32px));
+  width: min(1240px, calc(100% - 32px));
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  color: #6f7382;
-  font-size: 0.9rem;
+  color: var(--ink-3);
+  font-size: 0.86rem;
+}
+
+.footer-content p {
+  margin: 0;
 }
 
 .footer-links {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 22px;
 }
 
 .footer-links a {
-  color: #4f3496;
-  text-decoration: none;
+  position: relative;
+  color: var(--ink-2);
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
-  transition: color 150ms ease, transform 150ms ease;
+  transition: color 200ms var(--ease);
+}
+
+.footer-links a::after {
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--brand-gradient);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 300ms var(--ease);
 }
 
 .footer-links a:hover {
-  color: #e91388;
-  transform: translateY(-1px);
+  color: var(--ink);
+}
+
+.footer-links a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 @media (max-width: 720px) {
   .footer-content {
     flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .footer-links {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    text-align: center;
   }
 }

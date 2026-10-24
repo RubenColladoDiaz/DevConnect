@@ -1,4 +1,8 @@
-<article class="publication-card" [class.question-publication]="post()?.type === 'question'">
+<article
+  class="publication-card"
+  [class.question-publication]="post()?.type === 'question'"
+  (click)="openPost($event)"
+>
   <header class="publication-header">
     <div class="publication-author">
       @if (user()?.avatar_url) {
@@ -66,4 +70,25 @@
     <span><i class="fa-regular fa-heart"></i> {{ post()?.likes }}</span>
     <span><i class="fa-regular fa-eye"></i> {{ post()?.views }}</span>
   </footer>
+
+  @if (opened() == true) {
+    <div class="post-modal" (click)="closePost(); $event.stopPropagation()">
+      <div
+        class="post-modal-panel"
+        role="dialog"
+        aria-modal="true"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          type="button"
+          class="post-modal-close"
+          aria-label="Close post"
+          (click)="closePost()"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <app-post-template [(post)]="post" [inModal]="true" (authorOpened)="closePost()" />
+      </div>
+    </div>
+  }
 </article>

@@ -1,122 +1,150 @@
 .post-composer {
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(51, 51, 145, 0.08);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(27, 31, 59, 0.1);
+  margin-bottom: 26px;
+  padding: 20px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  transform-origin: top center;
+  animation: composer-in 550ms var(--ease-spring) both;
+}
+
+@keyframes composer-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .composer-header {
-  min-height: 64px;
-  padding: 10px 16px;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #fff;
-  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
 }
 
 .author {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
 }
 
 .author img {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--accent);
 }
 
 .author-name {
   margin: 0;
+  color: var(--ink);
   font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.15;
+  font-weight: 800;
 }
 
 .author span {
   display: block;
-  margin-top: 3px;
-  font-size: 0.74rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--ink-3);
+  font-size: 0.78rem;
 }
 
 .composer-header > i {
-  font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--accent);
+  font-size: 1.1rem;
+  animation: pen-wiggle 1.8s ease-in-out infinite;
 }
 
-.composer-body {
-  padding: 18px 18px 12px;
+@keyframes pen-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-14deg);
+  }
 }
 
-.composer-body label {
+.composer-body > label {
   display: block;
-  margin-bottom: 9px;
-  color: #202235;
-  font-size: 0.92rem;
-  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
+/* Segmented control for Post / Question */
 .post-type-options {
-  margin-bottom: 14px;
-  display: flex;
-  gap: 8px;
+  margin-bottom: 18px;
+  padding: 4px;
+  display: inline-flex;
+  gap: 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
 }
 
 .post-type-options button {
-  padding: 7px 12px;
-  border: 1px solid #dfe2ea;
-  border-radius: 8px;
-  background: #fff;
-  color: #65697a;
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.84rem;
+  font-weight: 700;
   cursor: pointer;
+  transition:
+    background-color 250ms var(--ease),
+    color 250ms var(--ease),
+    box-shadow 250ms var(--ease),
+    transform 300ms var(--ease-spring);
+}
+
+.post-type-options button:hover {
+  color: var(--ink);
+}
+
+.post-type-options button:active {
+  transform: scale(0.94);
 }
 
 .post-type-options button.active {
-  border-color: #65329d;
-  background: #f4f1fa;
-  color: #563195;
-}
-
-.composer-body textarea {
-  display: block;
-  width: 100%;
-  min-height: 130px;
-  padding: 13px 14px;
-  resize: vertical;
-  border: 1px solid #dfe2ea;
-  border-radius: 9px;
-  outline: none;
-  background: #f8f9fc;
-  color: #252638;
-  font: inherit;
-  line-height: 1.5;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease,
-    background-color 150ms ease;
+  background: var(--surface);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow-sm);
 }
 
 .content-block {
-  margin-bottom: 14px;
-  padding: 12px;
-  border: 1px solid #e5e7ef;
-  border-radius: 10px;
-  background: #fbfbfd;
+  margin-bottom: 16px;
+  padding: 4px 0 4px 16px;
+  border-left: 2px solid var(--line-strong);
+  transition: border-color 250ms var(--ease);
+  animation: block-in 400ms var(--ease) both;
+}
+
+@keyframes block-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.content-block:focus-within {
+  border-color: var(--accent);
 }
 
 .block-heading {
-  margin-bottom: 9px;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -124,33 +152,62 @@
 
 .block-heading > strong {
   margin-right: auto;
-  color: #55596a;
-  font-size: 0.78rem;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .block-heading select {
   max-width: 130px;
-  padding: 6px 8px;
-  border: 1px solid #dfe2ea;
-  border-radius: 7px;
-  background: #fff;
-  color: #45495a;
-  font: inherit;
-  font-size: 0.75rem;
+  padding: 5px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.76rem;
 }
 
 .remove-block {
-  padding: 5px 7px;
+  width: 30px;
+  height: 30px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 50%;
   background: transparent;
-  color: #9a5262;
+  color: var(--ink-3);
   cursor: pointer;
+  transition:
+    color 200ms var(--ease),
+    background-color 200ms var(--ease);
+}
+
+.remove-block:hover:not(:disabled) {
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .remove-block:disabled {
   cursor: not-allowed;
-  opacity: 0.4;
+  opacity: 0.35;
+}
+
+.composer-body textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 4px 0;
+  display: block;
+  resize: vertical;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.composer-body textarea::placeholder {
+  color: var(--ink-3);
 }
 
 .block-insert {
@@ -161,172 +218,107 @@
 }
 
 .block-insert button {
-  padding: 5px 8px;
-  border: 1px solid #e1deed;
-  border-radius: 7px;
-  background: #fff;
-  color: #5b4a86;
-  font: inherit;
-  font-size: 0.72rem;
+  padding: 5px 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.76rem;
+  font-weight: 600;
   cursor: pointer;
+  transition:
+    color 200ms var(--ease),
+    border-color 200ms var(--ease),
+    transform 250ms var(--ease-spring);
 }
 
 .block-insert button:hover {
-  background: #f4f1fa;
-}
-
-.composer-body textarea::placeholder {
-  color: #9297a8;
-}
-
-.composer-body textarea:focus {
-  border-color: #65329d;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(101, 50, 157, 0.12);
-}
-
-:host-context(body.dark-theme) .composer-body textarea,
-:host-context(body.dark-theme) .composer-body textarea:focus {
-  border-color: #414559;
-  background: #202331;
-  color: #e3e5ee;
-}
-
-:host-context(body.dark-theme) .composer-body textarea::placeholder {
-  color: #aeb3c2;
-}
-
-:host-context(body.dark-theme) .composer-body label,
-:host-context(body.dark-theme) .block-heading > strong {
-  color: #e3e5ee;
-}
-
-:host-context(body.dark-theme) .content-block {
-  border-color: #343747;
-  background: #242736;
-}
-
-:host-context(body.dark-theme) .post-type-options button,
-:host-context(body.dark-theme) .block-heading select,
-:host-context(body.dark-theme) .block-insert button,
-:host-context(body.dark-theme) .cancel-button {
-  border-color: #414559;
-  background: #202331;
-  color: #e3e5ee;
-}
-
-:host-context(body.dark-theme) .post-type-options button.active {
-  border-color: #7c3aed;
-  background: #303348;
-  color: #d7d1fa;
-}
-
-:host-context(body.dark-theme) .block-insert button:hover,
-:host-context(body.dark-theme) .cancel-button:hover {
-  background: #303348;
-}
-
-:host-context(body.dark-theme) .remove-block {
-  color: #e08a9b;
-}
-
-:host-context(body.dark-theme) .composer-meta {
-  color: #b2b6c5;
-}
-
-:host-context(body.dark-theme) .composer-meta i {
-  color: #c5b6ff;
-}
-
-:host-context(body.dark-theme) .composer-actions {
-  border-color: #343747;
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  transform: translateY(-2px);
 }
 
 .composer-meta {
-  margin-top: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: #858a99;
-  font-size: 0.75rem;
+  color: var(--ink-3);
+  font-size: 0.76rem;
 }
 
 .composer-meta i {
   margin-right: 4px;
-  color: #65329d;
+  color: var(--accent);
 }
 
 .composer-actions {
-  padding: 12px 18px 16px;
+  margin-top: 18px;
+  padding-top: 16px;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  border-top: 1px solid #eef0f5;
+  gap: 8px;
+  border-top: 1px solid var(--line);
 }
 
 .composer-actions button {
-  min-width: 96px;
-  padding: 9px 17px;
-  border-radius: 9px;
+  min-width: 100px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 700;
+  cursor: pointer;
   transition:
-    transform 150ms ease,
-    box-shadow 150ms ease,
-    filter 150ms ease;
+    transform 300ms var(--ease-spring),
+    background-color 200ms var(--ease),
+    background-position 700ms var(--ease),
+    box-shadow 250ms var(--ease);
+}
+
+.composer-actions button:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .cancel-button {
-  border: 1px solid #d9dce5;
-  background: #fff;
-  color: #5d6170;
+  background: transparent;
+  color: var(--ink-2);
 }
 
 .cancel-button:hover {
-  border-color: #b8bdca;
-  background: #f5f6f9;
+  background: var(--surface-2);
 }
 
 .publish-button {
-  border: 0;
-  background: linear-gradient(90deg, #333391 0%, #a51a93 55%, #e91369 100%);
+  background: var(--brand-gradient);
+  background-size: 200% 200%;
   color: #fff;
-  box-shadow: 0 3px 9px rgba(101, 50, 157, 0.24);
+  box-shadow: var(--shadow-glow);
 }
 
 .publish-button i {
-  margin-right: 5px;
+  margin-right: 6px;
+  transition: transform 400ms var(--ease-spring);
 }
 
 .publish-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-  box-shadow: 0 5px 12px rgba(101, 50, 157, 0.3);
+  background-position: 100% 50%;
+  transform: translateY(-2px);
+}
+
+.publish-button:hover:not(:disabled) i {
+  transform: translate(3px, -3px) rotate(-10deg);
 }
 
 .publish-button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.45;
   box-shadow: none;
 }
 
-.composer-actions button:focus-visible {
-  outline: 3px solid rgba(0, 168, 222, 0.25);
-  outline-offset: 2px;
-}
-
 @media (max-width: 520px) {
-  .composer-body {
-    padding: 16px 14px 10px;
-  }
-
-  .composer-actions {
-    padding: 12px 14px 14px;
+  .post-composer {
+    padding: 16px;
+    border-radius: 22px;
   }
 
   .composer-actions button {
     flex: 1;
-    min-width: 0;
   }
 }

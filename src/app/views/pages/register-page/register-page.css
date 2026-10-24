@@ -1,72 +1,84 @@
 :host {
-  --auth-card-min-height: 590px;
-  --auth-panel-padding: 38px;
-  --auth-brand-spacing: 24px;
+  --auth-card-min-height: 620px;
+  --auth-panel-padding: 28px;
+  --auth-brand-spacing: 22px;
 
   display: block;
 }
 
 .stack-section {
-  margin-bottom: 1rem;
+  margin: 6px 0 14px;
 }
 
 .stack-label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .stack-input-container {
   position: relative;
 }
 
-.stack-input-container .form-control {
-  padding-left: 2.75rem;
-}
-
-.stack-input-container .field-icon {
-  position: absolute;
-  top: 50%;
-  left: 1rem;
-  z-index: 2;
-  transform: translateY(-50%);
-}
-
 .stack-tags {
+  margin-top: 12px;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  gap: 8px;
 }
 
 .stack-tag {
+  padding: 6px 8px 6px 14px;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.7rem;
+  gap: 6px;
   border-radius: 999px;
-  background: #eeeeee;
-  font-size: 0.875rem;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.84rem;
+  font-weight: 600;
+  animation: tag-in 400ms var(--ease-spring) both;
+}
+
+@keyframes tag-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .remove-technology {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
   padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
   color: inherit;
   cursor: pointer;
+  transition:
+    background-color 200ms var(--ease),
+    transform 300ms var(--ease-spring);
 }
 
-:host-context(body.dark-theme) .stack-tag {
-  background: #303348;
-  color: #d7d1fa;
+.remove-technology:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: rotate(90deg);
 }
 
 .field-error {
   display: block;
-  margin-top: 0.5rem;
-  color: #c62828;
+  margin-top: 8px;
+  color: var(--red);
+  font-size: 0.8rem;
+  font-weight: 600;
 }

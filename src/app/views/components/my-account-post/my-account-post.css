@@ -1,61 +1,185 @@
+/* "backwards" so the fixed popup inside is placed relative to the screen once the card entered */
+:host {
+  display: block;
+  animation: publication-in 600ms var(--ease) backwards;
+}
+
+:host(:nth-child(2)) {
+  animation-delay: 70ms;
+}
+:host(:nth-child(3)) {
+  animation-delay: 140ms;
+}
+:host(:nth-child(n + 4)) {
+  animation-delay: 210ms;
+}
+
+@keyframes publication-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .publication-card {
-  border: 1px solid rgba(51, 51, 145, 0.08);
-  background: #fff;
-  box-shadow: 0 8px 28px rgba(27, 31, 59, 0.08);
+  position: relative;
+  padding: 20px 18px 14px;
+  border-radius: 26px;
+  cursor: pointer;
+  transition:
+    background-color 300ms var(--ease),
+    box-shadow 300ms var(--ease);
 }
 
-.question-publication {
-  border-color: rgba(86, 49, 149, 0.28);
+.publication-card::after {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  left: 18px;
+  height: 1px;
+  background: var(--line);
+  content: '';
+  transition: opacity 300ms var(--ease);
 }
 
-.question-publication-label {
-  margin-bottom: 12px;
-  padding: 9px 11px;
+.publication-card:hover {
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.publication-card:hover::after {
+  opacity: 0;
+}
+
+.publication-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  border: 1px solid #e5def1;
-  border-radius: 8px;
-  background: #f8f5fc;
-  color: #563195;
+  gap: 12px;
+}
+
+.publication-author {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.publication-author img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 4px var(--accent-soft);
+  transition: transform 400ms var(--ease-spring);
+}
+
+.publication-card:hover .publication-author img {
+  transform: scale(1.06) rotate(-5deg);
+}
+
+.publication-author div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.publication-author strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.publication-author span {
+  color: var(--ink-3);
   font-size: 0.78rem;
 }
 
-.question-publication-label strong {
+.publication-header time {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.publication-body {
+  padding: 10px 0 0 56px;
+}
+
+.publication-body > p {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 0.96rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.question-publication-label {
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.76rem;
+}
+
+.question-publication-label strong,
+.question-publication-label span {
+  padding: 4px 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  border-radius: 999px;
+}
+
+.question-publication-label strong {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .question-publication-label span {
-  color: #168455;
-  font-size: 0.72rem;
+  background: var(--green-soft);
+  color: var(--green);
   font-weight: 700;
 }
 
-:host-context(body.dark-theme) .publication-card {
-  border-color: #343747;
-  background: #1d202c;
-  color: #e3e5ee;
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-:host-context(body.dark-theme) .publication-body > p {
-  color: #e3e5ee;
+.post-tags span {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.76rem;
+  font-weight: 600;
 }
 
-:host-context(body.dark-theme) .publication-footer {
-  border-color: #343747;
-  background: #191b26;
-  color: #b2b6c5;
+.publication-footer {
+  padding: 12px 0 0 56px;
+  display: flex;
+  gap: 22px;
+  color: var(--ink-3);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
 }
 
-:host-context(body.dark-theme) .question-publication-label {
-  border-color: #3a3d50;
-  background: #242736;
-  color: #e3e5ee;
+.publication-footer i {
+  margin-right: 5px;
 }
 
-:host-context(body.dark-theme) .question-publication-label strong {
-  color: #df1888;
+@media (max-width: 520px) {
+  .publication-body,
+  .publication-footer {
+    padding-left: 0;
+  }
 }

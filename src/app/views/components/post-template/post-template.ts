@@ -1,4 +1,14 @@
-import { Component, model, ModelSignal, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Input,
+  model,
+  ModelSignal,
+  OnInit,
+  output,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { Post } from '../../../shared/types/Post';
 import { PostsService } from '../../../shared/services/posts-service';
 import { Router } from '@angular/router';
@@ -18,14 +28,61 @@ export class PostTemplate implements OnInit {
     private authService: AuthService,
   ) {}
 
+  /**
+   * True when this post is the copy shown inside the popup.
+   */
+  @Input() inModal = false;
+  @Input() startCommenting = false;
+
   post: ModelSignal<Post | undefined> = model<Post>();
+  authorOpened = output<void>();
 
   creatingComment: WritableSignal<boolean> = signal<boolean>(false);
 
   linkCopied: WritableSignal<boolean> = signal<boolean>(false);
 
+  opened: WritableSignal<boolean> = signal<boolean>(false);
+  openWithComment: boolean = false;
+
   ngOnInit(): void {
+    if (this.inModal) {
+      this.creatingComment.set(this.startCommenting);
+      return;
+    }
     this.registerView();
+  }
+
+  openPost(event: Event): void {
+    if (this.inModal) return;
+
+    // Buttons, links and code keep working as before instead of opening the popup
+    const target = event.target as HTMLElement;
+    if (target.closest('button, a, input, textarea, select, app-code-editor')) return;
+
+    this.openWithComment = false;
+    this.opened.set(true);
+  }
+
+  openComments(): void {
+    if (this.inModal) {
+      this.toggleCreating();
+      return;
+    }
+
+    this.openWithComment = true;
+    this.opened.set(true);
+  }
+
+  @HostListener('document:keydown.escape')
+  closePost(): void {
+    this.opened.set(false);
+  }
+
+  openAuthorProfile(): void {
+    if (!this.inModal) return;
+
+    this.authorOpened.emit();
+    this.router.navigate(['/account', this.post()?.username]);
   }
 
   isToday(date: Date | undefined): boolean {

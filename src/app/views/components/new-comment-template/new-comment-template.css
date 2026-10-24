@@ -1,38 +1,64 @@
 :host {
   display: block;
-  border-top: 1px solid #eceef3;
-  background:
-    radial-gradient(circle at 90% 10%, rgba(233, 19, 136, 0.05), transparent 32%), #fbfbfd;
+  margin: 8px 0 6px;
+  animation: composer-open 450ms var(--ease) both;
+}
+
+@keyframes composer-open {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .comment-composer {
-  padding: 15px 16px 16px;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: 11px;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
 }
 
 .composer-avatar {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #fff;
-  border-radius: 11px;
-  background: linear-gradient(135deg, #00a8de, #563195 55%, #e91388);
+  width: 32px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-gradient);
   color: #fff;
   font-size: 0.7rem;
-  box-shadow: 0 0 0 1px rgba(86, 49, 149, 0.12);
+  animation: pen-wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes pen-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-12deg);
+  }
 }
 
 .composer-panel {
   min-width: 0;
-  padding: 12px;
-  border: 1px solid #e5e7ee;
-  border-radius: 4px 13px 13px 13px;
-  background: #fff;
-  box-shadow: 0 4px 14px rgba(27, 31, 59, 0.05);
+  padding: 14px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  background: var(--surface-2);
+  transition:
+    border-color 250ms var(--ease),
+    background-color 250ms var(--ease),
+    box-shadow 250ms var(--ease);
+}
+
+.composer-panel:focus-within {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .composer-heading {
@@ -49,134 +75,116 @@
 }
 
 .composer-title {
-  color: #343647;
-  font-size: 0.78rem;
+  color: var(--ink);
+  font-size: 0.86rem;
   font-weight: 800;
 }
 
 .composer-title i {
   margin-right: 4px;
-  color: #65329d;
-  font-size: 0.68rem;
+  color: var(--accent);
 }
 
 .composer-subtitle {
-  margin-top: 3px;
-  color: #9498a7;
-  font-size: 0.66rem;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 0.74rem;
 }
 
 .heading-icon {
-  flex: 0 0 auto;
-  color: rgba(101, 50, 157, 0.42);
-  font-size: 0.85rem;
+  color: var(--accent);
+  opacity: 0.6;
 }
 
 textarea {
   width: 100%;
-  min-height: 82px;
-  padding: 11px 12px;
+  min-height: 70px;
+  padding: 4px 0;
   resize: vertical;
-  border: 1px solid #dfe2ea;
-  border-radius: 9px;
+  border: 0;
   outline: none;
-  background: #f8f9fc;
-  color: #303243;
-  font: inherit;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease,
-    background-color 150ms ease;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+textarea::placeholder {
+  color: var(--ink-3);
 }
 
 .comment-content-block {
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 }
 
 .comment-block-heading,
 .comment-block-insert {
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin-bottom: 6px;
+  gap: 6px;
+}
+
+.comment-block-heading {
+  margin-bottom: 4px;
 }
 
 .comment-block-heading strong {
   margin-right: auto;
-  color: #55596a;
-  font-size: 0.72rem;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .comment-block-heading select {
-  max-width: 110px;
-  padding: 5px 7px;
-  border: 1px solid #dfe2ea;
-  border-radius: 7px;
-  background: #fff;
-  color: #45495a;
-  font: inherit;
-  font-size: 0.68rem;
+  max-width: 120px;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.72rem;
 }
 
 .remove-comment-block,
 .comment-block-insert button {
-  border: 0;
-  border-radius: 6px;
-  background: #f0eef5;
-  color: #65329d;
-  padding: 5px 8px;
-  font: inherit;
-  font-size: 0.68rem;
+  padding: 4px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 600;
   cursor: pointer;
+  transition:
+    color 200ms var(--ease),
+    border-color 200ms var(--ease),
+    transform 250ms var(--ease-spring);
+}
+
+.comment-block-insert button:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  transform: translateY(-1px);
+}
+
+.remove-comment-block {
+  border-style: solid;
+  border-color: transparent;
+}
+
+.remove-comment-block:hover:not(:disabled) {
+  color: var(--red);
 }
 
 .remove-comment-block:disabled {
   cursor: not-allowed;
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .comment-block-insert {
-  margin: 6px 0 0;
-}
-
-.comment-code-block {
-  margin: 8px 0;
-  overflow: hidden;
-  border: 1px solid #303241;
-  border-radius: 8px;
-}
-
-.comment-code-block header {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 10px;
-  background: #222432;
-  color: #c7c9d4;
-  font-size: 0.64rem;
-  text-transform: capitalize;
-}
-
-textarea::placeholder {
-  color: #9b9fad;
-}
-
-textarea:focus {
-  border-color: #65329d;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(101, 50, 157, 0.11);
-}
-
-:host-context(body.dark-theme) textarea,
-:host-context(body.dark-theme) textarea:focus {
-  border-color: #414559;
-  background: #202331;
-  color: #e3e5ee;
-}
-
-:host-context(body.dark-theme) textarea::placeholder {
-  color: #aeb3c2;
+  margin-top: 6px;
 }
 
 .composer-footer {
@@ -188,101 +196,87 @@ textarea:focus {
 }
 
 .composer-hint {
-  color: #9296a5;
-  font-size: 0.65rem;
+  color: var(--ink-3);
+  font-size: 0.72rem;
   white-space: nowrap;
 }
 
 .composer-hint i {
   margin-right: 4px;
-  color: #28a879;
+  color: var(--green);
 }
 
 .composer-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
 }
 
 .composer-actions button {
-  min-height: 32px;
-  padding: 7px 11px;
-  border-radius: 8px;
-  font: inherit;
-  font-size: 0.7rem;
-  font-weight: 800;
+  min-height: 36px;
+  padding: 7px 16px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
   transition:
-    transform 150ms ease,
-    border-color 150ms ease,
-    background-color 150ms ease,
-    box-shadow 150ms ease;
+    transform 300ms var(--ease-spring),
+    background-color 200ms var(--ease),
+    background-position 700ms var(--ease),
+    opacity 200ms var(--ease);
+}
+
+.composer-actions button:active:not(:disabled) {
+  transform: scale(0.94);
 }
 
 .cancel-button {
-  border: 1px solid #dcdfe7;
-  background: #fff;
-  color: #727685;
+  background: transparent;
+  color: var(--ink-2);
 }
 
 .cancel-button:hover {
-  border-color: #bfc3ce;
-  background: #f5f6f9;
+  background: var(--surface-3);
 }
 
 .comment-button {
-  border: 0;
-  background: linear-gradient(100deg, #333391 0%, #a51a93 55%, #e91369 100%);
+  background: var(--brand-gradient);
+  background-size: 200% 200%;
   color: #fff;
-  box-shadow: 0 3px 9px rgba(101, 50, 157, 0.22);
+  box-shadow: var(--shadow-glow);
 }
 
 .comment-button i {
   margin-right: 4px;
 }
 
-.comment-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 12px rgba(101, 50, 157, 0.28);
+.comment-button:hover:not(:disabled) {
+  background-position: 100% 50%;
+  transform: translateY(-2px);
 }
 
-.composer-actions button:focus-visible {
-  outline: 3px solid rgba(0, 168, 222, 0.22);
-  outline-offset: 2px;
+.comment-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
 }
 
 @media (max-width: 520px) {
   .comment-composer {
-    padding: 13px 12px 14px;
-    grid-template-columns: 31px minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .composer-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-  }
-
-  .composer-panel {
-    padding: 10px;
+    display: none;
   }
 
   .composer-footer {
-    align-items: stretch;
     flex-direction: column;
-    gap: 9px;
-  }
-
-  .composer-hint {
-    white-space: normal;
+    align-items: stretch;
   }
 
   .composer-actions {
     justify-content: flex-end;
-  }
-
-  .composer-actions button {
-    min-width: 82px;
   }
 }

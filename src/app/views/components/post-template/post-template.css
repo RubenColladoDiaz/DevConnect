@@ -1,100 +1,134 @@
+/* "backwards" so the transform is gone once the post has entered, otherwise the fixed popup
+   inside it would be placed relative to the post instead of the screen */
 :host {
   display: block;
   width: 100%;
+  animation: post-in 650ms var(--ease) backwards;
 }
 
-:host(.repost-card) .post-card,
-:host-context(.reposts-list) .post-card {
-  width: 100% !important;
-  max-width: none !important;
+/* Posts enter one after another */
+:host(:nth-child(2)) {
+  animation-delay: 70ms;
+}
+:host(:nth-child(3)) {
+  animation-delay: 140ms;
+}
+:host(:nth-child(4)) {
+  animation-delay: 210ms;
+}
+:host(:nth-child(5)) {
+  animation-delay: 280ms;
+}
+:host(:nth-child(n + 6)) {
+  animation-delay: 350ms;
+}
+
+@keyframes post-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .post-card {
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(51, 51, 145, 0.08);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 3px 14px rgba(27, 31, 59, 0.09);
+  position: relative;
+  padding: 20px 18px 10px;
+  border-radius: 26px;
   transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
+    background-color 300ms var(--ease),
+    box-shadow 300ms var(--ease);
 }
 
-:host-context(.reposts-list) .post-card {
-  max-width: none !important;
-  width: 100% !important;
+/* Thin separator instead of a box */
+.post-card::after {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  left: 18px;
+  height: 1px;
+  background: var(--line);
+  content: '';
+  transition: opacity 300ms var(--ease);
 }
 
 .post-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 22px rgba(27, 31, 59, 0.13);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
 }
 
-.post-card:has(.views-metric:hover) {
-  transform: none;
-  box-shadow: 0 3px 14px rgba(27, 31, 59, 0.09);
+.post-card:hover::after {
+  opacity: 0;
 }
 
 .post-header {
-  min-height: 64px;
-  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  background: linear-gradient(90deg, #00a8de 0%, #333391 35%, #e91388 70%, #eb2d2e 100%);
-  color: #fff;
+  gap: 12px;
 }
 
 .post-author {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
 }
 
 .post-author img {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 4px var(--accent-soft);
+  transition:
+    transform 400ms var(--ease-spring),
+    box-shadow 300ms var(--ease);
+}
+
+.post-card:hover .post-author img {
+  transform: scale(1.06) rotate(-5deg);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--accent);
 }
 
 .author-info {
   min-width: 0;
+  line-height: 1.25;
 }
 
 .author-info p {
-  max-width: 220px;
+  max-width: 260px;
   margin: 0;
   overflow: hidden;
-  color: #fff;
   font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .author-link {
-  color: inherit;
+  color: var(--ink);
   text-decoration: none;
+  transition: color 200ms var(--ease);
 }
 
 .author-link:hover {
-  text-decoration: underline;
+  color: var(--accent-ink);
 }
 
 .author-info span {
   display: block;
-  margin-top: 3px;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 0.72rem;
+  color: var(--ink-3);
+  font-size: 0.78rem;
 }
 
 .post-date {
@@ -102,60 +136,304 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  background: rgba(18, 21, 53, 0.2);
-  color: #fff;
-  font-size: 0.73rem;
-  font-weight: 600;
-  line-height: 1;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   white-space: nowrap;
-  backdrop-filter: blur(4px);
 }
 
 .post-body {
-  padding: 20px 18px 18px;
-}
-
-.question-post {
-  border-color: rgba(86, 49, 149, 0.28);
+  padding: 10px 0 0 56px;
 }
 
 .question-banner {
-  margin: -2px 0 15px;
-  padding: 9px 11px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+}
+
+.question-banner strong {
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.question-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.question-status.solved {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.post-content {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.post-tags {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.post-tags span {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: transform 250ms var(--ease-spring);
+}
+
+.post-tags span:hover {
+  transform: translateY(-2px);
+}
+
+/* Actions */
+.post-footer {
+  padding: 8px 0 4px 46px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid #e5def1;
-  border-radius: 8px;
-  background: #f8f5fc;
-  color: #563195;
-  font-size: 0.78rem;
 }
 
-.question-banner strong {
+.post-metrics,
+.post-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric {
+  position: relative;
+  height: 36px;
+  padding: 0 11px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.question-status {
-  color: #858093;
+.comments-button,
+.repost-button,
+.like-button {
+  cursor: pointer;
+  transition:
+    color 200ms var(--ease),
+    background-color 200ms var(--ease),
+    transform 300ms var(--ease-spring);
+}
+
+.comments-button:active,
+.repost-button:active,
+.like-button:active,
+.tool-button:active {
+  transform: scale(0.85);
+}
+
+.comments-button:hover {
+  background: var(--cyan-soft);
+  color: var(--cyan);
+}
+
+.repost-button:hover {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.like-button:hover {
+  background: var(--pink-soft);
+  color: var(--pink);
+}
+
+.comments-button:hover i {
+  animation: icon-nudge 500ms var(--ease-spring);
+}
+
+@keyframes icon-nudge {
+  50% {
+    transform: translateY(-3px) rotate(-10deg);
+  }
+}
+
+.like-button.is-liked {
+  color: var(--pink);
+}
+
+.like-button.is-liked i {
+  animation: heart-pop 550ms var(--ease-spring) both;
+}
+
+/* Small burst ring when the like turns on */
+.like-button.is-liked::after {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 2px solid var(--pink);
+  border-radius: 50%;
+  content: '';
+  opacity: 0;
+  animation: like-burst 600ms var(--ease) both;
+  pointer-events: none;
+}
+
+@keyframes heart-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  45% {
+    transform: scale(1.45);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes like-burst {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+.repost-button.is-reposted {
+  color: var(--green);
+}
+
+.repost-button.is-reposted i {
+  animation: repost-spin 650ms var(--ease-spring) both;
+}
+
+@keyframes repost-spin {
+  from {
+    transform: rotate(-180deg) scale(0.7);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.views-metric {
+  cursor: default;
+}
+
+.tool-button {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    color 200ms var(--ease),
+    background-color 200ms var(--ease),
+    transform 300ms var(--ease-spring);
+}
+
+.save-button:hover {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.share-button:hover {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.share-button:hover i {
+  animation: icon-nudge 500ms var(--ease-spring);
+}
+
+.save-button.is-saved {
+  color: var(--amber);
+}
+
+.save-button.is-saved i {
+  animation: bookmark-drop 500ms var(--ease-spring) both;
+}
+
+@keyframes bookmark-drop {
+  0% {
+    transform: translateY(-8px) scale(0.7);
+  }
+  60% {
+    transform: translateY(2px) scale(1.2);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.link-copied {
+  margin-left: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
   font-size: 0.72rem;
+  font-weight: 700;
+  animation: chip-in 400ms var(--ease-spring) both;
 }
 
-.question-status.solved {
-  color: #168455;
-  font-weight: 700;
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Comments thread */
+app-new-comment-template,
+.comment-row {
+  margin-left: 56px;
 }
 
 .comment-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .comment-row app-comment-template {
@@ -164,238 +442,55 @@
 }
 
 .mark-answer-button {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
-  margin-right: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #dfe2e8;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
   border-radius: 50%;
-  background: #fff;
-  color: #9297a5;
+  background: transparent;
+  color: var(--ink-3);
   cursor: pointer;
-  line-height: 1;
+  transition:
+    transform 300ms var(--ease-spring),
+    background-color 200ms var(--ease),
+    color 200ms var(--ease),
+    border-color 200ms var(--ease);
+}
+
+.mark-answer-button:hover {
+  border-color: var(--green);
+  color: var(--green);
+  transform: scale(1.1);
 }
 
 .mark-answer-button.accepted-answer {
-  border-color: #168455;
-  background: #eaf7f0;
-  color: #168455;
-}
-
-.post-content {
-  margin: 0;
-  overflow-wrap: anywhere;
-  color: #292b3b;
-  font-size: 0.96rem;
-  line-height: 1.65;
-  white-space: pre-wrap;
-}
-
-.post-tags {
-  margin-top: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.post-tags span {
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: rgba(51, 51, 145, 0.07);
-  color: #4e3b94;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.post-footer {
-  min-height: 55px;
-  padding: 11px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  border-top: 1px solid #eceef3;
-  background: #fbfbfd;
-}
-
-.post-metrics,
-.post-tools {
-  display: flex;
-  align-items: center;
-}
-
-.post-metrics {
-  gap: 7px;
-}
-
-.metric {
-  min-width: 37px;
-  height: 32px;
-  padding: 0 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: rgba(244, 246, 250, 0.95);
-  color: #747887;
-  font-size: 0.78rem;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.like-button,
-.comments-button,
-.repost-button {
-  border: 0;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
-  transition:
-    color 150ms ease,
-    background-color 150ms ease,
-    transform 150ms ease;
-}
-
-.metric:not(.views-metric):hover {
-  transform: translateY(-1px);
-  background: rgba(233, 19, 105, 0.08);
-}
-
-.views-metric,
-.views-metric:hover {
-  background: transparent;
-}
-
-.like-button:hover {
-  color: #d91462;
-}
-.comments-button:hover {
-  color: #20c000;
-}
-.repost-button:hover {
-  color: #2b8cff;
-}
-
-.like-button:focus-visible {
-  outline: 3px solid rgba(0, 168, 222, 0.22);
-  outline-offset: 1px;
-}
-
-.like-button.is-liked {
-  color: #e91369;
-  background: rgba(233, 19, 105, 0.09);
-}
-
-.repost-button.is-reposted {
-  color: #00ba7c;
-}
-
-.repost-button.is-reposted i {
-  color: #00ba7c;
-}
-
-.post-tools {
-  gap: 3px;
-}
-
-.tool-button {
-  width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: #858997;
-  cursor: pointer;
-  transition:
-    color 150ms ease,
-    background-color 150ms ease,
-    transform 150ms ease;
-}
-
-.tool-button:hover {
-  transform: translateY(-1px);
-  background: rgba(233, 19, 105, 0.08);
-}
-
-.save-button:hover {
-  color: #f5a623;
-}
-.share-button:hover {
-  color: #2b8cff;
-}
-
-.save-button.is-saved {
-  color: #f5a623;
-}
-
-.link-copied {
-  margin-left: 4px;
-  color: #858997;
-  font-size: 0.72rem;
-}
-
-:host-context(body.dark-theme) .question-banner,
-:host-context(body.dark-theme) .question-status,
-:host-context(body.dark-theme) .post-tags span,
-:host-context(body.dark-theme) .metric {
-  color: #e3e5ee;
-}
-
-:host-context(body.dark-theme) .question-banner {
-  border-color: #3a3d50;
-  background: #242736;
-}
-
-:host-context(body.dark-theme) .views-metric,
-:host-context(body.dark-theme) .views-metric:hover {
-  background: transparent;
-}
-
-:host-context(body.dark-theme) .question-banner strong {
-  color: #df1888;
-}
-
-:host-context(body.dark-theme) .question-status.solved,
-:host-context(body.dark-theme) .mark-answer-button.accepted-answer {
-  color: #168455;
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+  animation: heart-pop 500ms var(--ease-spring) both;
 }
 
 @media (max-width: 520px) {
-  .post-header {
-    align-items: flex-start;
-    gap: 10px;
+  .post-card {
+    padding: 16px 12px 8px;
+    border-radius: 20px;
   }
 
-  .post-date {
-    padding: 5px 7px;
-    font-size: 0.68rem;
-  }
-
-  .post-body {
-    padding: 17px 14px 15px;
+  .post-body,
+  app-new-comment-template,
+  .comment-row {
+    padding-left: 0;
+    margin-left: 0;
   }
 
   .post-footer {
-    padding: 10px 12px;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
+    padding-left: 0;
+    flex-wrap: wrap;
   }
 
-  .post-metrics {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .post-tools {
-    display: none;
+  .metric {
+    padding: 0 9px;
   }
 }

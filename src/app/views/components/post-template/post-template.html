@@ -1,5 +1,10 @@
-<article class="post-card" [class.question-post]="post()?.type === 'question'">
-  <header class="post-header">
+<article
+  class="post-card"
+  [class.question-post]="post()?.type === 'question'"
+  [class.clickable]="!inModal"
+  (click)="openPost($event)"
+>
+  <header class="post-header" [class.author-clickable]="inModal" (click)="openAuthorProfile()">
     <div class="post-author">
       @if (post()?.avatar_url) {
         <img src="{{ post()?.avatar_url }}" alt="User logo" />
@@ -78,7 +83,7 @@
 
   <footer class="post-footer">
     <div class="post-metrics">
-      <button class="metric comments-button" type="button" (click)="toggleCreating()">
+      <button class="metric comments-button" type="button" (click)="openComments()">
         <i class="fa-regular fa-comment" aria-hidden="true"></i>
         {{ post()?.comments?.length ?? 0 }}
       </button>
@@ -148,35 +153,65 @@
     </div>
   </footer>
 
-  @if (creatingComment() == true) {
-    <app-new-comment-template
-      [(creatingComment)]="creatingComment"
-      [postId]="post()?._id"
-      [isQuestion]="post()?.type === 'question'"
-      (updatedComments)="updateComments($event)"
-    ></app-new-comment-template>
-  }
-  @if ((post()?.comments?.length ?? 0) > 0) {
-    @for (comment of post()?.comments ?? []; track comment.answerId || $index) {
-      <div class="comment-row">
-        <app-comment-template
-          [comment]="comment"
-          [isAnswer]="post()?.type === 'question'"
-          [accepted]="isAcceptedAnswer(comment.answerId)"
-        ></app-comment-template>
-        @if (post()?.type === 'question' && canManageAnswers() && comment.answerId) {
-          <button
-            class="mark-answer-button"
-            type="button"
-            [class.accepted-answer]="isAcceptedAnswer(comment.answerId)"
-            [attr.aria-pressed]="isAcceptedAnswer(comment.answerId)"
-            aria-label="Toggle helpful answer"
-            (click)="toggleAcceptedAnswer(comment.answerId)"
-          >
-            <i class="fa-solid fa-check" aria-hidden="true"></i>
-          </button>
-        }
-      </div>
+  @if (inModal) {
+    @if (creatingComment() == true) {
+      <app-new-comment-template
+        [(creatingComment)]="creatingComment"
+        [postId]="post()?._id"
+        [isQuestion]="post()?.type === 'question'"
+        (updatedComments)="updateComments($event)"
+      ></app-new-comment-template>
     }
+    @if ((post()?.comments?.length ?? 0) > 0) {
+      @for (comment of post()?.comments ?? []; track comment.answerId || $index) {
+        <div class="comment-row">
+          <app-comment-template
+            [comment]="comment"
+            [isAnswer]="post()?.type === 'question'"
+            [accepted]="isAcceptedAnswer(comment.answerId)"
+          ></app-comment-template>
+          @if (post()?.type === 'question' && canManageAnswers() && comment.answerId) {
+            <button
+              class="mark-answer-button"
+              type="button"
+              [class.accepted-answer]="isAcceptedAnswer(comment.answerId)"
+              [attr.aria-pressed]="isAcceptedAnswer(comment.answerId)"
+              aria-label="Toggle helpful answer"
+              (click)="toggleAcceptedAnswer(comment.answerId)"
+            >
+              <i class="fa-solid fa-check" aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+      }
+    } @else {
+      <p class="no-comments">No comments yet. Be the first one!</p>
+    }
+  }
+
+  @if (opened() == true) {
+    <div class="post-modal" (click)="closePost(); $event.stopPropagation()">
+      <div
+        class="post-modal-panel"
+        role="dialog"
+        aria-modal="true"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          type="button"
+          class="post-modal-close"
+          aria-label="Close post"
+          (click)="closePost()"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <app-post-template
+          [(post)]="post"
+          [inModal]="true"
+          [startCommenting]="openWithComment"
+          (authorOpened)="closePost()"
+        />
+      </div>
+    </div>
   }
 </article>
